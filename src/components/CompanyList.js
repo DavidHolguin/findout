@@ -6,6 +6,8 @@ import TopBurgers from './TopBurguers';
 import Slider from './Slider';
 import BarbershopSection from './BarbershopSection';
 import BannerSection from './BannerSection';
+import MarketsLatinosSection from './MarketsLatinosSection';
+
 
 
 const CompanyList = () => {
@@ -42,6 +44,7 @@ const CompanyList = () => {
       <Slider />
       <TopBurgers />
       <BarbershopSection />
+      <MarketsLatinosSection />
       <BannerSection />
       <MenuBar />
     </div>
