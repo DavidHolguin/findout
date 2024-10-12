@@ -4,6 +4,9 @@ import MenuBar from './MenuBar';
 import { Link } from 'react-router-dom';
 import TopBurgers from './TopBurguers';
 import Slider from './Slider';
+import BarbershopSection from './BarbershopSection';
+import BannerSection from './BannerSection';
+
 
 const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
@@ -38,7 +41,8 @@ const CompanyList = () => {
     <div className="container mx-auto mt-4 px-3 font-['Poppins',sans-serif]">
       <Slider />
       <TopBurgers />
-   
+      <BarbershopSection />
+      <BannerSection />
       <MenuBar />
     </div>
   );
