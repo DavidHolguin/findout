@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import MenuBar from './MenuBar';
 
 const CompanyDetail = () => {
   const [company, setCompany] = useState(null);
@@ -60,7 +61,7 @@ const CompanyDetail = () => {
           </div>
 
           <div className="w-2/3 border-l border-gray-400 pl-4">
-            <p className="text-sm text-gray-600">{company.description}</p>
+            <p className="text-sm leading-4 text-gray-600">{company.description}</p>
             <a id="escribirBoton" href="#" className="mt-4 flex items-center bg-cyan-400 text-white font-bold text-sm px-3 py-2 rounded-full">
               <svg id="Icons" height="15" viewBox="0 0 60 60" width="15" className="mr-2">
                 <path d="m28.473 54.271 3.945-4.486-2.431-.964z" />
@@ -72,27 +73,23 @@ const CompanyDetail = () => {
       </section>
 
       <section className="w-11/12">
-        <h3 className="text-center text-gray-600 font-bold text-xl mb-6">Productos y Servicios</h3>
+        <h3 className="text-center text-gray-600 font-bold text-xl mb-6">Descubre el menú</h3>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-8">
           {products.map((product) => (
             <div key={product.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
-              <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
+              <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />
               <div className="p-4">
-                <h4 className="text-lg font-semibold">{product.name}</h4>
-                <p className="text-gray-600">{product.description}</p>
+                <h4 className="text-lg font-semibold leading-4 mb-2">{product.name}</h4>
+                <p className="text-gray-600 leading-4">{product.description}</p>
                 <p className="text-green-600 font-bold">{`$${product.price}`}</p>
-                <button
-                  onClick={() => addToCart(product)}
-                  className="mt-4 w-full bg-cyan-400 text-white font-bold py-2 rounded hover:bg-cyan-500 transition duration-200"
-                >
-                  Añadir al carrito
-                </button>
+               
               </div>
             </div>
           ))}
         </div>
       </section>
+      <MenuBar />
     </div>
   );
 };
