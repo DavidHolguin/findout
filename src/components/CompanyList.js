@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MenuBar from './MenuBar';
 import { Link } from 'react-router-dom';
+import TopBurgers from './TopBurguers';
+import Slider from './Slider';
 
 const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
@@ -33,8 +35,9 @@ const CompanyList = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8 px-2 font-['Poppins',sans-serif]">
-
+    <div className="container mx-auto mt-4 px-3 font-['Poppins',sans-serif]">
+      <Slider />
+      <TopBurgers />
       <input
         type="text"
         placeholder="Buscar empresas..."

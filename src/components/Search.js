@@ -1,36 +1,53 @@
-// src/components/Search.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Search = () => {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const response = await axios.get(`http://localhost:8000/api/search/?q=${query}`);
-    setResults(response.data);
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/companies/');
+        setCompanies(response.data);
+        setFilteredCompanies(response.data); // Mostrar todas las empresas al inicio
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
+  useEffect(() => {
+    const results = companies.filter(company =>
+      company.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredCompanies(results);
+  }, [query, companies]);
+
+  const handleSearch = (e) => {
+    setQuery(e.target.value);
   };
 
   return (
-    <div className="container mx-auto mt-8">
-      <h2 className="text-2xl font-bold mb-4">Búsqueda</h2>
-      <form onSubmit={handleSearch} className="mb-4">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar empresas, productos o categorías"
-          className="w-full p-2 border rounded"
-        />
-        <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Buscar</button>
-      </form>
-      <div>
-        {results.map((item) => (
-          <div key={item.id} className="mb-2 p-2 bg-white rounded shadow">
-            <h3 className="font-semibold">{item.name}</h3>
-            <p>{item.description}</p>
-          </div>
+    <div className="container px-4 mx-auto mt-8">
+    
+      <input
+        type="text"
+        value={query}
+        onChange={handleSearch}
+        placeholder="Buscar empresas..."
+        className="w-full p-2 border rounded"
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+        {filteredCompanies.map(company => (
+          <Link key={company.id} to={`/company/${company.id}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
+            <img src={company.profile_picture} alt={company.name} className="w-full h-40 object-cover rounded-md mb-2" />
+            <h3 className="text-xl font-semibold">{company.name}</h3>
+            <p className="text-gray-600">{company.description.slice(0, 100)}...</p>
+          </Link>
         ))}
       </div>
     </div>

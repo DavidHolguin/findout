@@ -14,11 +14,6 @@ const MenuBar = () => {
       </button>
       
       <button className="flex flex-col items-center text-gray-600 hover:text-cyan-400 transition">
-        <ShoppingCart size={24} />
-        <span className="text-xs mt-1">Cart</span>
-      </button>
-      
-      <button className="flex flex-col items-center text-gray-600 hover:text-cyan-400 transition">
         <User size={24} />
         <span className="text-xs mt-1">Profile</span>
       </button>
