@@ -3,22 +3,23 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import MenuBar from './MenuBar';
 
+
 const Search = () => {
+  const [activeTab, setActiveTab] = useState('companies');
   const [query, setQuery] = useState('');
   const [companies, setCompanies] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filteredResults, setFilteredResults] = useState({ companies: [], products: [], categories: [] });
+  const [filteredResults, setFilteredResults] = useState({ companies: [], products: [] });
   const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
       try {
-        const token = localStorage.getItem('authToken'); // Asumiendo que guardas el token en localStorage
-        const config = {
-          headers: { Authorization: `Bearer ${token}` }
-        };
+        const token = localStorage.getItem('authToken');
+        const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const [companiesResponse, productsResponse, categoriesResponse] = await Promise.all([
           axios.get('http://localhost:8000/api/companies/', config),
@@ -31,11 +32,9 @@ const Search = () => {
         setCategories(categoriesResponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
-        if (error.response && error.response.status === 403) {
-          setError('No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.');
-        } else {
-          setError('Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.');
-        }
+        setError(error.response?.status === 403
+          ? 'No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.'
+          : 'Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.');
       }
     };
     fetchData();
@@ -44,60 +43,128 @@ const Search = () => {
   useEffect(() => {
     const filterResults = () => {
       const lowercaseQuery = query.toLowerCase();
-      setFilteredResults({
-        companies: companies.filter(company => company.name.toLowerCase().includes(lowercaseQuery)),
-        products: products.filter(product => product.name.toLowerCase().includes(lowercaseQuery)),
-        categories: categories.filter(category => category.name.toLowerCase().includes(lowercaseQuery))
-      });
+      const filteredCompanies = companies.filter(company => 
+        company.name.toLowerCase().includes(lowercaseQuery) &&
+        (selectedCategory === 'all' || company.category === selectedCategory)
+      );
+      const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(lowercaseQuery)
+      );
+      setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
     };
     filterResults();
-  }, [query, companies, products, categories]);
+  }, [query, companies, products, selectedCategory]);
 
   const handleSearch = (e) => {
     setQuery(e.target.value);
   };
 
+  const renderCompanies = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {filteredResults.companies.map(company => (
+        <div key={company.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
+          {company.profile_picture && (
+            <img src={company.profile_picture} alt={company.name} className="w-full h-48 object-cover rounded-md mb-2" />
+          )}
+          <h3 className="text-xl font-semibold">{company.name}</h3>
+          {company.description && (
+            <p className="text-gray-600 leading-5">{company.description.slice(0, 100)}...</p>
+          )}
+          <Link to={`/company/${company.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
+            Ver detalles
+          </Link>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderProducts = () => (
+    <div>
+      {categories.map(category => (
+        <div key={category.id} className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
+          <div className="flex overflow-x-auto pb-4">
+            {products.filter(product => product.category === category.id).map(product => (
+              <div key={product.id} className="flex-none w-64 mr-4">
+                <div className="border rounded-lg p-4">
+                  {product.image && (
+                    <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-md mb-2" />
+                  )}
+                  <h3 className="text-lg font-semibold">{product.name}</h3>
+                  <p className="text-gray-600">{product.price}</p>
+                  <Link to={`/product/${product.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
+                    Ver detalles
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   if (error) {
     return (
       <div className="container px-4 pb-12 mx-auto">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">Error: </strong>
           <span className="block sm:inline">{error}</span>
         </div>
-        <MenuBar />
       </div>
     );
   }
 
   return (
     <div className="container px-4 pb-12 mx-auto">
-      <input
-        type="text"
-        value={query}
-        onChange={handleSearch}
-        placeholder="Buscar empresas, productos o categorías..."
-        className="w-full p-2 border rounded mb-4"
-      />
+      <div className="mb-6">
+        <input
+          type="text"
+          value={query}
+          onChange={handleSearch}
+          placeholder="Buscar empresas, productos o servicios..."
+          className="w-full p-2 border rounded"
+        />
+      </div>
       
-      {['companies', 'products', 'categories'].map((section) => (
-        <div key={section}>
-          <h2 className="text-2xl font-bold mt-6 mb-3 capitalize">{section}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {filteredResults[section].map(item => (
-              <Link key={item.id} to={`/${section.slice(0, -1)}/${item.id}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
-                {item.profile_picture && (
-                  <img src={item.profile_picture} alt={item.name} className="w-full h-48 object-cover rounded-md mb-2" />
-                )}
-                <h3 className="text-xl font-semibold">{item.name}</h3>
-                {item.description && (
-                  <p className="text-gray-600 leading-5">{item.description.slice(0, 100)}...</p>
-                )}
-              </Link>
+      <div className="mb-6">
+        <button
+          onClick={() => setActiveTab('companies')}
+          className={`mr-4 px-4 py-2 rounded ${activeTab === 'companies' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+        >
+          Empresas
+        </button>
+        <button
+          onClick={() => setActiveTab('products')}
+          className={`px-4 py-2 rounded ${activeTab === 'products' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+        >
+          Productos
+        </button>
+      </div>
+
+      {activeTab === 'companies' && (
+        <>
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-3 py-1 rounded ${selectedCategory === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            >
+              Todas
+            </button>
+            {categories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-3 py-1 rounded ${selectedCategory === category.id ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              >
+                {category.name}
+              </button>
             ))}
           </div>
-        </div>
-      ))}
-      
+          {renderCompanies()}
+        </>
+      )}
+
+      {activeTab === 'products' && renderProducts()}
       <MenuBar />
     </div>
   );
