@@ -126,18 +126,26 @@ const Search = () => {
         />
       </div>
       
-      <div className="mb-6">
+      <div className="mb-6 flex w-full rounded-full overflow-hidden">
         <button
           onClick={() => setActiveTab('companies')}
-          className={`mr-4 px-4 py-2 rounded ${activeTab === 'companies' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          className={`flex-1 py-2 text-center ${
+            activeTab === 'companies'
+              ? 'bg-[#09FDFD] text-white'
+              : 'bg-gray-200 text-gray-700'
+          }`}
         >
-          Empresas
+          Business
         </button>
         <button
           onClick={() => setActiveTab('products')}
-          className={`px-4 py-2 rounded ${activeTab === 'products' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          className={`flex-1 py-2 text-center ${
+            activeTab === 'products'
+              ? 'bg-[#09FDFD] text-white'
+              : 'bg-gray-200 text-gray-700'
+          }`}
         >
-          Productos
+          Products 
         </button>
       </div>
 
@@ -146,15 +154,15 @@ const Search = () => {
           <div className="mb-4 flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`px-3 py-1 rounded ${selectedCategory === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              className={`px-3 py-1 rounded ${selectedCategory === 'all' ? 'bg-[#09FDFD] text-white' : 'bg-gray-200'}`}
             >
-              Todas
+              All
             </button>
             {categories.map(category => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-3 py-1 rounded ${selectedCategory === category.id ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                className={`px-3 py-1 rounded ${selectedCategory === category.id ? 'bg-[#09FDFD] text-white' : 'bg-gray-200'}`}
               >
                 {category.name}
               </button>
