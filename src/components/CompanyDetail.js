@@ -10,10 +10,10 @@ const CompanyDetail = () => {
 
   useEffect(() => {
     const fetchCompanyAndProducts = async () => {
-      const companyResponse = await axios.get(`http://localhost:8000/api/companies/${id}/`);
+      const companyResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`);
       setCompany(companyResponse.data);
       
-      const productsResponse = await axios.get(`http://localhost:8000/api/products/?company=${id}`);
+      const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/?company=${id}`);
       setProducts(productsResponse.data);
     };
     fetchCompanyAndProducts();

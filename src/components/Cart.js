@@ -43,7 +43,7 @@ const Cart = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8000/api/orders/', orderData, {
+      const response = await axios.post('https://backendfindout-ea692e018a66.herokuapp.com/api/orders/', orderData, {
         headers: { Authorization: `Token ${localStorage.getItem('token')}` }
       });
       alert('Pedido realizado con éxito!');

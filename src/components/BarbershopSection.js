@@ -2,7 +2,7 @@ import React from 'react';
 
 const BarbershopSection = () => {
   return (
-    <section className="flex flex-col items-center my-4 font-[Poppins] rounded-2xl">
+    <section className="flex flex-col items-center my-4 font-[Poppins] rounded-2xl    ">
       <div className="flex items-center gap-2 w-[100%] mb-1">
         <h3 className="font-extrabold m-0">
           <span className="text-[#09fdfd]">BARBER </span>SHOP

@@ -12,7 +12,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/register/', { username, email, password });
+      await axios.post('https://backendfindout-ea692e018a66.herokuapp.com/api/register/', { username, email, password });
       navigate('/login');
     } catch (error) {
       console.error('Error durante el registro:', error);
