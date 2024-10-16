@@ -7,6 +7,7 @@ import CompanyDetail from './components/CompanyDetail';
 import Search from './components/Search';
 import Login from './components/Login';
 import Register from './components/Register';
+import MenuBar from './components/MenuBar';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/register" element={<Register />} />
           </Routes>
         </main>
+        <MenuBar />
       </div>
     </Router>
   );
