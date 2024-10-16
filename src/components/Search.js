@@ -1,49 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import MenuBar from './MenuBar';
 
-// Custom hook para manejar la carga de imágenes con URLs prefirmadas
-const usePresignedImage = (imageUrl, type, imageUrls, setImageUrls) => {
-  const [currentUrl, setCurrentUrl] = useState(imageUrl);
+// Componente para mostrar imágenes desde S3 directamente
+const ImageFromS3 = ({ imageUrl, alt }) => {
   const [error, setError] = useState(false);
-
-  useEffect(() => {
-    const loadImage = async () => {
-      if (!imageUrl || imageUrls[imageUrl]) {
-        setCurrentUrl(imageUrls[imageUrl] || imageUrl);
-        return;
-      }
-
-      try {
-        const objectKey = imageUrl.includes('amazonaws.com')
-          ? imageUrl.split('.com/').pop()
-          : imageUrl;
-          
-        const presignedUrl = await getPresignedUrl(objectKey, type);
-
-        if (presignedUrl) {
-          setImageUrls(prev => ({
-            ...prev,
-            [imageUrl]: presignedUrl,
-          }));
-          setCurrentUrl(presignedUrl);
-        }
-      } catch (err) {
-        console.error('Error loading presigned URL:', err);
-        setError(true);
-      }
-    };
-
-    loadImage();
-  }, [imageUrl, type, imageUrls, setImageUrls]);
-
-  return { currentUrl, error };
-};
-
-// Componente optimizado para manejo de imágenes
-const ImageWithPresignedUrl = ({ imageUrl, alt, type, imageUrls, setImageUrls }) => {
-  const { currentUrl, error } = usePresignedImage(imageUrl, type, imageUrls, setImageUrls);
 
   if (error) {
     return <img src="/path/to/placeholder-image.jpg" alt={alt} className="w-full h-48 object-cover rounded-md mb-2" />;
@@ -51,7 +12,7 @@ const ImageWithPresignedUrl = ({ imageUrl, alt, type, imageUrls, setImageUrls })
 
   return (
     <img
-      src={currentUrl}
+      src={imageUrl}
       alt={alt}
       className="w-full h-48 object-cover rounded-md mb-2"
       onError={() => setError(true)}
@@ -68,7 +29,6 @@ const Search = () => {
   const [filteredResults, setFilteredResults] = useState({ companies: [], products: [] });
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [imageUrls, setImageUrls] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,22 +46,12 @@ const Search = () => {
         setCompanies(companiesResponse.data);
         setProducts(productsResponse.data);
         setCategories(categoriesResponse.data);
-
-        // Precargar URLs prefirmadas
-        const companyImages = companiesResponse.data
-          .filter(company => company.profile_picture)
-          .map(company => loadPresignedUrl(company.profile_picture, 'companies'));
-
-        const productImages = productsResponse.data
-          .filter(product => product.image)
-          .map(product => loadPresignedUrl(product.image, 'products'));
-
-        await Promise.all([...companyImages, ...productImages]);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setError(error.response?.status === 403
-          ? 'No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.'
-          : 'Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.'
+        setError(
+          error.response?.status === 403
+            ? 'No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.'
+            : 'Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.'
         );
       }
     };
@@ -134,12 +84,9 @@ const Search = () => {
       {filteredResults.companies.map(company => (
         <div key={company.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
           {company.profile_picture && (
-            <ImageWithPresignedUrl
+            <ImageFromS3
               imageUrl={company.profile_picture}
               alt={company.name}
-              type="companies"
-              imageUrls={imageUrls}
-              setImageUrls={setImageUrls}
             />
           )}
           <h3 className="text-xl font-semibold">{company.name}</h3>
@@ -164,12 +111,9 @@ const Search = () => {
               <div key={product.id} className="flex-none w-64 mr-4">
                 <div className="border rounded-lg p-4">
                   {product.image && (
-                    <ImageWithPresignedUrl
+                    <ImageFromS3
                       imageUrl={product.image}
                       alt={product.name}
-                      type="products"
-                      imageUrls={imageUrls}
-                      setImageUrls={setImageUrls}
                     />
                   )}
                   <h3 className="text-lg font-semibold">{product.name}</h3>
