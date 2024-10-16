@@ -14,43 +14,113 @@ const Search = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [imageUrls, setImageUrls] = useState({});
 
-  const getPresignedUrl = async (objectKey, type) => {
-    try {
-      const token = localStorage.getItem('authToken');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(
-        `https://backendfindout-ea692e018a66.herokuapp.com/api/${type}/get-presigned-url/?key=${encodeURIComponent(objectKey)}`,
-        config
-      );
-      return response.data.url;
-    } catch (error) {
-      console.error('Error fetching presigned URL:', error);
-      return null;
-    }
-  };
+  // Search.js - funciones actualizadas
 
-  const loadPresignedUrl = async (imageUrl, type) => {
-    if (!imageUrl) return null;
-    if (imageUrls[imageUrl]) return imageUrls[imageUrl];
+const getPresignedUrl = async (objectKey, type) => {
+  try {
+    if (!objectKey) return null;
+    
+    // Limpiar la URL para obtener solo la parte relevante
+    const cleanKey = objectKey.includes('media/') 
+      ? objectKey.split('media/')[1] 
+      : objectKey;
 
-    try {
-      // Extraer la key de la URL completa
-      const urlParts = imageUrl.split('.com/');
-      const objectKey = urlParts[urlParts.length - 1];
-      
-      const presignedUrl = await getPresignedUrl(objectKey, type);
-      if (presignedUrl) {
-        setImageUrls(prev => ({
-          ...prev,
-          [imageUrl]: presignedUrl
-        }));
-        return presignedUrl;
+    const token = localStorage.getItem('authToken');
+    const config = { 
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      console.error('Error loading presigned URL:', error);
+    };
+
+    console.log('Requesting presigned URL for:', cleanKey); // Debug log
+
+    const response = await axios.get(
+      `https://backendfindout-ea692e018a66.herokuapp.com/api/${type}/get-presigned-url/?key=${encodeURIComponent(cleanKey)}`,
+      config
+    );
+
+    if (response.data && response.data.url) {
+      return response.data.url;
     }
-    return imageUrl; // Fallback a la URL original si algo falla
-  };
+    throw new Error('No URL in response');
+  } catch (error) {
+    console.error('Error fetching presigned URL:', error);
+    return null;
+  }
+};
+
+const loadPresignedUrl = async (imageUrl, type) => {
+  if (!imageUrl) return null;
+  if (imageUrls[imageUrl]) return imageUrls[imageUrl];
+
+  try {
+    // Extraer la key de la URL completa
+    let objectKey = imageUrl;
+    if (imageUrl.includes('amazonaws.com')) {
+      objectKey = imageUrl.split('.com/').pop();
+    }
+    
+    console.log('Loading presigned URL for:', objectKey); // Debug log
+
+    const presignedUrl = await getPresignedUrl(objectKey, type);
+    if (presignedUrl) {
+      setImageUrls(prev => ({
+        ...prev,
+        [imageUrl]: presignedUrl
+      }));
+      return presignedUrl;
+    }
+  } catch (error) {
+    console.error('Error loading presigned URL:', error);
+  }
+  return imageUrl; // Fallback a la URL original
+};
+
+// Actualizar el renderizado de imágenes
+const ImageWithPresignedUrl = ({ imageUrl, alt, type }) => {
+  const [currentUrl, setCurrentUrl] = useState(imageUrl);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      if (error) {
+        const presignedUrl = await loadPresignedUrl(imageUrl, type);
+        if (presignedUrl) {
+          setCurrentUrl(presignedUrl);
+          setError(false);
+        }
+      }
+    };
+    loadImage();
+  }, [error, imageUrl, type]);
+
+  return (
+    <img
+      src={currentUrl}
+      alt={alt}
+      className="w-full h-48 object-cover rounded-md mb-2"
+      onError={() => setError(true)}
+    />
+  );
+};
+
+// Usar el nuevo componente en renderCompanies y renderProducts
+{company.profile_picture && (
+  <ImageWithPresignedUrl
+    imageUrl={company.profile_picture}
+    alt={company.name}
+    type="companies"
+  />
+)}
+
+{product.image && (
+  <ImageWithPresignedUrl
+    imageUrl={product.image}
+    alt={product.name}
+    type="products"
+  />
+)}
 
   useEffect(() => {
     const fetchData = async () => {
