@@ -3,36 +3,47 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import MenuBar from './MenuBar';
 
-const Search = () => {
-  const [activeTab, setActiveTab] = useState('companies');
-  const [query, setQuery] = useState('');
-  const [companies, setCompanies] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [filteredResults, setFilteredResults] = useState({ companies: [], products: [] });
-  const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [imageUrls, setImageUrls] = useState({});
-
-  const ImageWithPresignedUrl = ({ imageUrl, alt, type }) => {
+// Custom hook para manejar la carga de imágenes con URLs prefirmadas
+const usePresignedImage = (imageUrl, type, imageUrls, setImageUrls) => {
   const [currentUrl, setCurrentUrl] = useState(imageUrl);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     const loadImage = async () => {
+      if (!imageUrl || imageUrls[imageUrl]) {
+        setCurrentUrl(imageUrls[imageUrl] || imageUrl);
+        return;
+      }
+
       try {
-        const presignedUrl = await loadPresignedUrl(imageUrl, type);
+        const objectKey = imageUrl.includes('amazonaws.com')
+          ? imageUrl.split('.com/').pop()
+          : imageUrl;
+          
+        const presignedUrl = await getPresignedUrl(objectKey, type);
+
         if (presignedUrl) {
+          setImageUrls(prev => ({
+            ...prev,
+            [imageUrl]: presignedUrl,
+          }));
           setCurrentUrl(presignedUrl);
-          setError(false);
         }
       } catch (err) {
-        console.error('Error loading image:', err);
+        console.error('Error loading presigned URL:', err);
         setError(true);
       }
     };
+
     loadImage();
-  }, [imageUrl, type]);
+  }, [imageUrl, type, imageUrls, setImageUrls]);
+
+  return { currentUrl, error };
+};
+
+// Componente optimizado para manejo de imágenes
+const ImageWithPresignedUrl = ({ imageUrl, alt, type, imageUrls, setImageUrls }) => {
+  const { currentUrl, error } = usePresignedImage(imageUrl, type, imageUrls, setImageUrls);
 
   if (error) {
     return <img src="/path/to/placeholder-image.jpg" alt={alt} className="w-full h-48 object-cover rounded-md mb-2" />;
@@ -48,32 +59,17 @@ const Search = () => {
   );
 };
 
-const loadPresignedUrl = async (imageUrl, type) => {
-  if (!imageUrl) return null;
-  if (imageUrls[imageUrl]) return imageUrls[imageUrl];
+const Search = () => {
+  const [activeTab, setActiveTab] = useState('companies');
+  const [query, setQuery] = useState('');
+  const [companies, setCompanies] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filteredResults, setFilteredResults] = useState({ companies: [], products: [] });
+  const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [imageUrls, setImageUrls] = useState({});
 
-  try {
-    let objectKey = imageUrl;
-    if (imageUrl.includes('amazonaws.com')) {
-      objectKey = imageUrl.split('.com/').pop();
-    }
-    
-    console.log('Loading presigned URL for:', objectKey);
-
-    const presignedUrl = await getPresignedUrl(objectKey, type);
-    if (presignedUrl) {
-      setImageUrls(prev => ({
-        ...prev,
-        [imageUrl]: presignedUrl
-      }));
-      return presignedUrl;
-    }
-  } catch (error) {
-    console.error('Error loading presigned URL:', error);
-    // Devolver una imagen de placeholder o la URL original
-    return '/path/to/placeholder-image.jpg';
-  }
-};
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
@@ -84,46 +80,48 @@ const loadPresignedUrl = async (imageUrl, type) => {
         const [companiesResponse, productsResponse, categoriesResponse] = await Promise.all([
           axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/companies/', config),
           axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/products/', config),
-          axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/categories/', config)
+          axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/categories/', config),
         ]);
 
         setCompanies(companiesResponse.data);
         setProducts(productsResponse.data);
         setCategories(categoriesResponse.data);
 
-        // Precargar URLs prefirmadas para todas las imágenes
+        // Precargar URLs prefirmadas
         const companyImages = companiesResponse.data
           .filter(company => company.profile_picture)
           .map(company => loadPresignedUrl(company.profile_picture, 'companies'));
-        
+
         const productImages = productsResponse.data
           .filter(product => product.image)
           .map(product => loadPresignedUrl(product.image, 'products'));
 
         await Promise.all([...companyImages, ...productImages]);
-
       } catch (error) {
         console.error('Error fetching data:', error);
         setError(error.response?.status === 403
           ? 'No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.'
-          : 'Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.');
+          : 'Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.'
+        );
       }
     };
+
     fetchData();
   }, []);
 
   useEffect(() => {
     const filterResults = () => {
       const lowercaseQuery = query.toLowerCase();
-      const filteredCompanies = companies.filter(company => 
+      const filteredCompanies = companies.filter(company =>
         company.name.toLowerCase().includes(lowercaseQuery) &&
         (selectedCategory === 'all' || company.category === selectedCategory)
       );
-      const filteredProducts = products.filter(product => 
+      const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(lowercaseQuery)
       );
       setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
     };
+
     filterResults();
   }, [query, companies, products, selectedCategory]);
 
@@ -136,15 +134,12 @@ const loadPresignedUrl = async (imageUrl, type) => {
       {filteredResults.companies.map(company => (
         <div key={company.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
           {company.profile_picture && (
-            <img 
-              src={imageUrls[company.profile_picture] || company.profile_picture} 
-              alt={company.name} 
-              className="w-full h-48 object-cover rounded-md mb-2"
-              onError={async () => {
-                if (!imageUrls[company.profile_picture]) {
-                  await loadPresignedUrl(company.profile_picture, 'companies');
-                }
-              }}
+            <ImageWithPresignedUrl
+              imageUrl={company.profile_picture}
+              alt={company.name}
+              type="companies"
+              imageUrls={imageUrls}
+              setImageUrls={setImageUrls}
             />
           )}
           <h3 className="text-xl font-semibold">{company.name}</h3>
@@ -169,15 +164,12 @@ const loadPresignedUrl = async (imageUrl, type) => {
               <div key={product.id} className="flex-none w-64 mr-4">
                 <div className="border rounded-lg p-4">
                   {product.image && (
-                    <img 
-                      src={imageUrls[product.image] || product.image} 
-                      alt={product.name} 
-                      className="w-full h-48 object-cover rounded-md mb-2"
-                      onError={async () => {
-                        if (!imageUrls[product.image]) {
-                          await loadPresignedUrl(product.image, 'products');
-                        }
-                      }}
+                    <ImageWithPresignedUrl
+                      imageUrl={product.image}
+                      alt={product.name}
+                      type="products"
+                      imageUrls={imageUrls}
+                      setImageUrls={setImageUrls}
                     />
                   )}
                   <h3 className="text-lg font-semibold">{product.name}</h3>
@@ -215,25 +207,17 @@ const loadPresignedUrl = async (imageUrl, type) => {
           className="w-full p-2 border rounded"
         />
       </div>
-      
+
       <div className="mb-6 flex w-full rounded-full overflow-hidden">
         <button
           onClick={() => setActiveTab('companies')}
-          className={`flex-1 py-2 text-center ${
-            activeTab === 'companies'
-              ? 'bg-[#09FDFD] text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
+          className={`flex-1 py-2 text-center ${activeTab === 'companies' ? 'bg-[#09FDFD] text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Business
         </button>
         <button
           onClick={() => setActiveTab('products')}
-          className={`flex-1 py-2 text-center ${
-            activeTab === 'products'
-              ? 'bg-[#09FDFD] text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
+          className={`flex-1 py-2 text-center ${activeTab === 'products' ? 'bg-[#09FDFD] text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Products 
         </button>
@@ -241,18 +225,15 @@ const loadPresignedUrl = async (imageUrl, type) => {
 
       {activeTab === 'companies' && (
         <>
-          <div className="mb-4 flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-3 py-1 rounded ${selectedCategory === 'all' ? 'bg-[#09FDFD] text-white' : 'bg-gray-200'}`}
-            >
-              All
+          <div className="mb-4 flex flex-wrap justify-start">
+            <button onClick={() => setSelectedCategory('all')} className={`py-1 px-4 mr-2 mb-2 ${selectedCategory === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'}`}>
+              Todas las categorías
             </button>
             {categories.map(category => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-3 py-1 rounded ${selectedCategory === category.id ? 'bg-[#09FDFD] text-white' : 'bg-gray-200'}`}
+                className={`py-1 px-4 mr-2 mb-2 ${selectedCategory === category.id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'}`}
               >
                 {category.name}
               </button>
@@ -263,7 +244,6 @@ const loadPresignedUrl = async (imageUrl, type) => {
       )}
 
       {activeTab === 'products' && renderProducts()}
-      <MenuBar />
     </div>
   );
 };
