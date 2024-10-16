@@ -14,86 +14,29 @@ const Search = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [imageUrls, setImageUrls] = useState({});
 
-  // Search.js - funciones actualizadas
-
-const getPresignedUrl = async (objectKey, type) => {
-  try {
-    if (!objectKey) return null;
-    
-    // Limpiar la URL para obtener solo la parte relevante
-    const cleanKey = objectKey.includes('media/') 
-      ? objectKey.split('media/')[1] 
-      : objectKey;
-
-    const token = localStorage.getItem('authToken');
-    const config = { 
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    };
-
-    console.log('Requesting presigned URL for:', cleanKey); // Debug log
-
-    const response = await axios.get(
-      `https://backendfindout-ea692e018a66.herokuapp.com/api/${type}/get-presigned-url/?key=${encodeURIComponent(cleanKey)}`,
-      config
-    );
-
-    if (response.data && response.data.url) {
-      return response.data.url;
-    }
-    throw new Error('No URL in response');
-  } catch (error) {
-    console.error('Error fetching presigned URL:', error);
-    return null;
-  }
-};
-
-const loadPresignedUrl = async (imageUrl, type) => {
-  if (!imageUrl) return null;
-  if (imageUrls[imageUrl]) return imageUrls[imageUrl];
-
-  try {
-    // Extraer la key de la URL completa
-    let objectKey = imageUrl;
-    if (imageUrl.includes('amazonaws.com')) {
-      objectKey = imageUrl.split('.com/').pop();
-    }
-    
-    console.log('Loading presigned URL for:', objectKey); // Debug log
-
-    const presignedUrl = await getPresignedUrl(objectKey, type);
-    if (presignedUrl) {
-      setImageUrls(prev => ({
-        ...prev,
-        [imageUrl]: presignedUrl
-      }));
-      return presignedUrl;
-    }
-  } catch (error) {
-    console.error('Error loading presigned URL:', error);
-  }
-  return imageUrl; // Fallback a la URL original
-};
-
-// Actualizar el renderizado de imágenes
-const ImageWithPresignedUrl = ({ imageUrl, alt, type }) => {
+  const ImageWithPresignedUrl = ({ imageUrl, alt, type }) => {
   const [currentUrl, setCurrentUrl] = useState(imageUrl);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     const loadImage = async () => {
-      if (error) {
+      try {
         const presignedUrl = await loadPresignedUrl(imageUrl, type);
         if (presignedUrl) {
           setCurrentUrl(presignedUrl);
           setError(false);
         }
+      } catch (err) {
+        console.error('Error loading image:', err);
+        setError(true);
       }
     };
     loadImage();
-  }, [error, imageUrl, type]);
+  }, [imageUrl, type]);
+
+  if (error) {
+    return <img src="/path/to/placeholder-image.jpg" alt={alt} className="w-full h-48 object-cover rounded-md mb-2" />;
+  }
 
   return (
     <img
@@ -105,23 +48,32 @@ const ImageWithPresignedUrl = ({ imageUrl, alt, type }) => {
   );
 };
 
-// Usar el nuevo componente en renderCompanies y renderProducts
-{company.profile_picture && (
-  <ImageWithPresignedUrl
-    imageUrl={company.profile_picture}
-    alt={company.name}
-    type="companies"
-  />
-)}
+const loadPresignedUrl = async (imageUrl, type) => {
+  if (!imageUrl) return null;
+  if (imageUrls[imageUrl]) return imageUrls[imageUrl];
 
-{product.image && (
-  <ImageWithPresignedUrl
-    imageUrl={product.image}
-    alt={product.name}
-    type="products"
-  />
-)}
+  try {
+    let objectKey = imageUrl;
+    if (imageUrl.includes('amazonaws.com')) {
+      objectKey = imageUrl.split('.com/').pop();
+    }
+    
+    console.log('Loading presigned URL for:', objectKey);
 
+    const presignedUrl = await getPresignedUrl(objectKey, type);
+    if (presignedUrl) {
+      setImageUrls(prev => ({
+        ...prev,
+        [imageUrl]: presignedUrl
+      }));
+      return presignedUrl;
+    }
+  } catch (error) {
+    console.error('Error loading presigned URL:', error);
+    // Devolver una imagen de placeholder o la URL original
+    return '/path/to/placeholder-image.jpg';
+  }
+};
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
