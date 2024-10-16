@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import MenuBar from './MenuBar';
 
-
 const Search = () => {
   const [activeTab, setActiveTab] = useState('companies');
   const [query, setQuery] = useState('');
@@ -13,6 +12,45 @@ const Search = () => {
   const [filteredResults, setFilteredResults] = useState({ companies: [], products: [] });
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [imageUrls, setImageUrls] = useState({});
+
+  const getPresignedUrl = async (objectKey, type) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get(
+        `https://backendfindout-ea692e018a66.herokuapp.com/api/${type}/get-presigned-url/?key=${encodeURIComponent(objectKey)}`,
+        config
+      );
+      return response.data.url;
+    } catch (error) {
+      console.error('Error fetching presigned URL:', error);
+      return null;
+    }
+  };
+
+  const loadPresignedUrl = async (imageUrl, type) => {
+    if (!imageUrl) return null;
+    if (imageUrls[imageUrl]) return imageUrls[imageUrl];
+
+    try {
+      // Extraer la key de la URL completa
+      const urlParts = imageUrl.split('.com/');
+      const objectKey = urlParts[urlParts.length - 1];
+      
+      const presignedUrl = await getPresignedUrl(objectKey, type);
+      if (presignedUrl) {
+        setImageUrls(prev => ({
+          ...prev,
+          [imageUrl]: presignedUrl
+        }));
+        return presignedUrl;
+      }
+    } catch (error) {
+      console.error('Error loading presigned URL:', error);
+    }
+    return imageUrl; // Fallback a la URL original si algo falla
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +68,18 @@ const Search = () => {
         setCompanies(companiesResponse.data);
         setProducts(productsResponse.data);
         setCategories(categoriesResponse.data);
+
+        // Precargar URLs prefirmadas para todas las imágenes
+        const companyImages = companiesResponse.data
+          .filter(company => company.profile_picture)
+          .map(company => loadPresignedUrl(company.profile_picture, 'companies'));
+        
+        const productImages = productsResponse.data
+          .filter(product => product.image)
+          .map(product => loadPresignedUrl(product.image, 'products'));
+
+        await Promise.all([...companyImages, ...productImages]);
+
       } catch (error) {
         console.error('Error fetching data:', error);
         setError(error.response?.status === 403
@@ -64,7 +114,16 @@ const Search = () => {
       {filteredResults.companies.map(company => (
         <div key={company.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
           {company.profile_picture && (
-            <img src={company.profile_picture} alt={company.name} className="w-full h-48 object-cover rounded-md mb-2" />
+            <img 
+              src={imageUrls[company.profile_picture] || company.profile_picture} 
+              alt={company.name} 
+              className="w-full h-48 object-cover rounded-md mb-2"
+              onError={async () => {
+                if (!imageUrls[company.profile_picture]) {
+                  await loadPresignedUrl(company.profile_picture, 'companies');
+                }
+              }}
+            />
           )}
           <h3 className="text-xl font-semibold">{company.name}</h3>
           {company.description && (
@@ -88,7 +147,16 @@ const Search = () => {
               <div key={product.id} className="flex-none w-64 mr-4">
                 <div className="border rounded-lg p-4">
                   {product.image && (
-                    <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-md mb-2" />
+                    <img 
+                      src={imageUrls[product.image] || product.image} 
+                      alt={product.name} 
+                      className="w-full h-48 object-cover rounded-md mb-2"
+                      onError={async () => {
+                        if (!imageUrls[product.image]) {
+                          await loadPresignedUrl(product.image, 'products');
+                        }
+                      }}
+                    />
                   )}
                   <h3 className="text-lg font-semibold">{product.name}</h3>
                   <p className="text-gray-600">{product.price}</p>
