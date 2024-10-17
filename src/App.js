@@ -8,6 +8,9 @@ import Search from './components/Search';
 import Login from './components/Login';
 import Register from './components/Register';
 import MenuBar from './components/MenuBar';
+import Profile from './components/Profile';
+import Settings from './components/Settings';
+
 
 function App() {
   return (
@@ -21,6 +24,8 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>
         <MenuBar />
