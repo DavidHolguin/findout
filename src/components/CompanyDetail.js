@@ -3,11 +3,43 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 
+const ImageWithFallback = ({ src, alt, className }) => {
+  const [error, setError] = useState(false);
+
+  if (error || !src) {
+    return <img src="/api/placeholder/400/320" alt={alt} className={className} />;
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setError(true)}
+    />
+  );
+};
+
+const CategoryButton = ({ category, isSelected, onClick }) => (
+  <button
+    onClick={() => onClick(category.id)}
+    className={`flex-shrink-0 px-4 py-2 mx-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+      isSelected
+        ? 'bg-cyan-400 text-white shadow-lg'
+        : 'bg-white text-gray-700 hover:bg-gray-100'
+    } backdrop-filter backdrop-blur-lg bg-opacity-30 shadow-md`}
+  >
+    {category.name}
+  </button>
+);
+
 const CompanyDetail = () => {
   const [company, setCompany] = useState(null);
   const [productsByCategory, setProductsByCategory] = useState({});
-  const [categories, setCategories] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const carouselRefs = useRef({});
+  const categoryCarouselRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -16,24 +48,14 @@ const CompanyDetail = () => {
   useEffect(() => {
     const fetchCompanyAndProducts = async () => {
       try {
-        // Obtener detalles de la empresa
         const companyResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`);
         setCompany(companyResponse.data);
         
-        // Obtener productos específicos de esta empresa
         const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`);
-        // Filtrar solo los productos que pertenecen a esta empresa
         const companyProducts = productsResponse.data.filter(product => product.company === parseInt(id));
         
-        // Obtener categorías
         const categoriesResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/`);
-        const categoriesMap = categoriesResponse.data.reduce((acc, category) => {
-          acc[category.id] = category.name;
-          return acc;
-        }, {});
-        setCategories(categoriesMap);
         
-        // Agrupar productos por categoría
         const grouped = companyProducts.reduce((acc, product) => {
           if (!acc[product.category]) {
             acc[product.category] = [];
@@ -43,6 +65,12 @@ const CompanyDetail = () => {
         }, {});
         
         setProductsByCategory(grouped);
+        
+        // Filter categories to only those with products
+        const categoriesWithProducts = categoriesResponse.data.filter(
+          category => grouped[category.id]
+        );
+        setCategories(categoriesWithProducts);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -51,61 +79,89 @@ const CompanyDetail = () => {
     fetchCompanyAndProducts();
   }, [id]);
 
-  const startDragging = (e, category) => {
+  const toggleCategory = (categoryId) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const filteredProductsByCategory = selectedCategories.length === 0
+    ? productsByCategory
+    : Object.fromEntries(
+        Object.entries(productsByCategory).filter(([categoryId]) => 
+          selectedCategories.includes(parseInt(categoryId))
+        )
+      );
+
+  const startDragging = (e, ref) => {
     setIsDragging(true);
-    setStartX(e.pageX - carouselRefs.current[category].offsetLeft);
-    setScrollLeft(carouselRefs.current[category].scrollLeft);
+    setStartX(e.pageX - ref.current.offsetLeft);
+    setScrollLeft(ref.current.scrollLeft);
   };
 
   const stopDragging = () => {
     setIsDragging(false);
   };
 
-  const onDrag = (e, category) => {
+  const onDrag = (e, ref) => {
     if (!isDragging) return;
     e.preventDefault();
-    const x = e.pageX - carouselRefs.current[category].offsetLeft;
+    const x = e.pageX - ref.current.offsetLeft;
     const walk = (x - startX) * 2;
-    carouselRefs.current[category].scrollLeft = scrollLeft - walk;
+    ref.current.scrollLeft = scrollLeft - walk;
   };
 
   const getCarouselProducts = (products) => {
     if (products.length <= 1) return products;
-    if (products.length === 2) return [...products, products[0]]; // Solo duplicamos uno si hay dos productos
-    return [...products, ...products, ...products]; // Triplicamos si hay más de 2 productos
-  };
-
-  const addToCart = (product) => {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingItem = cart.find(item => item.product.id === product.id);
-    
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      cart.push({ product, quantity: 1 });
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Producto añadido al carrito');
+    if (products.length === 2) return [...products, products[0]];
+    return [...products, ...products, ...products];
   };
 
   if (!company) return <div>Cargando...</div>;
 
   return (
     <div className="flex flex-col items-center font-poppins">
-      {/* Sección del perfil de la empresa */}
-      <section className="w-11/12 mb-8 flex flex-col items-center">
+      {/* Company profile section */}
+      <section className="w-full mb-8 flex flex-col items-center">
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 border-4 border-cyan-400 rounded-full flex items-center justify-center">
-            <img src={company.profile_picture} alt={company.name} className="w-full h-full rounded-full object-cover" />
+          <div className="w-24 h-24 border-4 border-cyan-400 rounded-full flex items-center justify-center overflow-hidden">
+            <ImageWithFallback 
+              src={company.profile_picture_url} 
+              alt={company.name} 
+              className="w-full h-full rounded-full object-cover"
+            />
           </div>
           <div className="mt-4 text-center">
             <h3 className="text-gray-600 text-2xl font-extrabold">{company.name}</h3>
-            <a href="#" className="text-sm text-gray-600">Fast Food Restaurante</a>
+            <div 
+              ref={categoryCarouselRef}
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-4 pb-4"
+              style={{ 
+                scrollBehavior: 'smooth',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+              onMouseDown={(e) => startDragging(e, categoryCarouselRef)}
+              onMouseUp={stopDragging}
+              onMouseLeave={stopDragging}
+              onMouseMove={(e) => onDrag(e, categoryCarouselRef)}
+            >
+              {categories.map(category => (
+                <CategoryButton
+                  key={category.id}
+                  category={category}
+                  isSelected={selectedCategories.includes(category.id)}
+                  onClick={toggleCategory}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="w-full mt-6 flex justify-between">
+        <div className="w-11/12 mt-6 flex justify-between">
           <div className="text-center">
             <h3 className="text-green-600 text-xl">OPEN NOW</h3>   
             <p className="text-sm">Hasta <span>11:50 pm</span></p>
@@ -123,13 +179,15 @@ const CompanyDetail = () => {
         </div>
       </section>
 
-      {/* Sección de productos por categoría */}
-      <section className="w-11/12">
+      {/* Products by category section */}
+      <section className="w-full">
         <h3 className="text-center text-gray-600 font-bold text-xl mb-6">Nuestro Menú</h3>
 
-        {Object.entries(productsByCategory).map(([categoryId, products]) => (
+        {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
           <div key={categoryId} className="mb-8">
-            <h4 className="text-lg font-bold mb-4 text-gray-700 px-4">{categories[categoryId] || 'Categoría'}</h4>
+            <h4 className="text-lg font-bold mb-4 text-gray-700 px-4">
+              {categories.find(cat => cat.id === parseInt(categoryId))?.name || 'Categoría'}
+            </h4>
             <div 
               className="overflow-x-hidden"
               style={{ WebkitOverflowScrolling: 'touch' }}
@@ -142,10 +200,10 @@ const CompanyDetail = () => {
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                 }}
-                onMouseDown={(e) => startDragging(e, categoryId)}
+                onMouseDown={(e) => startDragging(e, carouselRefs.current[categoryId])}
                 onMouseUp={stopDragging}
                 onMouseLeave={stopDragging}
-                onMouseMove={(e) => onDrag(e, categoryId)}
+                onMouseMove={(e) => onDrag(e, carouselRefs.current[categoryId])}
               >
                 {getCarouselProducts(products).map((product, index) => (
                   <div
@@ -154,7 +212,11 @@ const CompanyDetail = () => {
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                      <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />
+                      <ImageWithFallback 
+                        src={product.image_url} 
+                        alt={product.name} 
+                        className="w-full h-40 object-cover"
+                      />
                       <div className="p-4">
                         <h4 className="text-lg font-semibold leading-4 mb-2">{product.name}</h4>
                         <p className="text-gray-600 text-sm leading-4 line-clamp-2">{product.description}</p>
