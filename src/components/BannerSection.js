@@ -2,7 +2,10 @@ import React from 'react';
 
 const BannerSection = () => {
   return (
-    <section className="w-full h-[150px] mb-20 rounded-2xl flex justify-center items-center gap-2.5 bg-cover bg-center" style={{backgroundImage: "url('https://findout.store/wp-content/uploads/2024/05/registrateAhora.png')"}}>
+    <section 
+      className="w-full h-[150px] mb-20 rounded-2xl flex justify-center items-center gap-2.5 bg-cover bg-center" 
+      style={{backgroundImage: "url('/registrateAhora.png')"}}
+    >
       <div className="w-1/4 flex justify-center items-center">
         <button className="rounded-full bg-transparent text-white border-2 border-white text-xs px-2.5 py-1.5 font-bold">
           ES GRATIS

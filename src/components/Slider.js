@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 const Slider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const images = [
-    'https://findout.store/wp-content/uploads/2024/05/FindoutSlider1.webp', 
-    'https://findout.store/wp-content/uploads/2024/05/FindoutSlider3.webp',
-    'https://findout.store/wp-content/uploads/2024/05/FindoutSlider2.webp',
+    '/FindoutSlider1.webp', 
+    '/FindoutSlider2.webp',
+    '/FindoutSlider3.webp',
   ];
 
   const nextSlide = () => {
@@ -23,7 +23,7 @@ const Slider = () => {
         {images.map((image, index) => (
           <div
             key={index}
-            className="min-w-full h-48 rounded-2xl "
+            className="min-w-full h-48 rounded-2xl"
             style={{ backgroundImage: `url('${image}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
           />
         ))}
