@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-// Componente para mostrar imágenes desde S3 directamente
 const ImageFromS3 = ({ imageUrl, alt }) => {
   const [error, setError] = useState(false);
 
@@ -62,13 +61,22 @@ const Search = () => {
   useEffect(() => {
     const filterResults = () => {
       const lowercaseQuery = query.toLowerCase();
-      const filteredCompanies = companies.filter(company =>
-        company.name.toLowerCase().includes(lowercaseQuery) &&
-        (selectedCategory === 'all' || company.category === selectedCategory)
-      );
+      
+      const filteredCompanies = companies.filter(company => {
+        const companyMatches = company.name.toLowerCase().includes(lowercaseQuery);
+        const hasMatchingProducts = products.some(product => 
+          product.company === company.id && 
+          product.name.toLowerCase().includes(lowercaseQuery) &&
+          (selectedCategory === 'all' || product.category === selectedCategory)
+        );
+        return companyMatches || hasMatchingProducts;
+      });
+
       const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(lowercaseQuery)
+        product.name.toLowerCase().includes(lowercaseQuery) &&
+        (selectedCategory === 'all' || product.category === selectedCategory)
       );
+
       setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
     };
 
@@ -102,29 +110,20 @@ const Search = () => {
   );
 
   const renderProducts = () => (
-    <div>
-      {categories.map(category => (
-        <div key={category.id} className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
-          <div className="flex overflow-x-auto pb-4">
-            {products.filter(product => product.category === category.id).map(product => (
-              <div key={product.id} className="flex-none w-64 mr-4">
-                <div className="border rounded-lg p-4">
-                  {product.image && (
-                    <ImageFromS3
-                      imageUrl={product.image}
-                      alt={product.name}
-                    />
-                  )}
-                  <h3 className="text-lg font-semibold">{product.name}</h3>
-                  <p className="text-gray-600">{product.price}</p>
-                  <Link to={`/product/${product.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
-                    Ver detalles
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {filteredResults.products.map(product => (
+        <div key={product.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
+          {product.image && (
+            <ImageFromS3
+              imageUrl={product.image}
+              alt={product.name}
+            />
+          )}
+          <h3 className="text-lg font-semibold">{product.name}</h3>
+          <p className="text-gray-600">{product.price}</p>
+          <Link to={`/product/${product.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
+            Ver detalles
+          </Link>
         </div>
       ))}
     </div>
@@ -167,26 +166,22 @@ const Search = () => {
         </button>
       </div>
 
-      {activeTab === 'companies' && (
-        <>
-          <div className="mb-4 flex flex-wrap justify-start">
-            <button onClick={() => setSelectedCategory('all')} className={`py-1 px-4 mr-2 mb-2 ${selectedCategory === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'}`}>
-              Todas las categorías
-            </button>
-            {categories.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`py-1 px-4 mr-2 mb-2 ${selectedCategory === category.id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'}`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-          {renderCompanies()}
-        </>
-      )}
+      <div className="mb-4 flex flex-wrap justify-start">
+        <button onClick={() => setSelectedCategory('all')} className={`py-1 px-4 mr-2 mb-2 ${selectedCategory === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'}`}>
+          Todas las categorías
+        </button>
+        {categories.map(category => (
+          <button
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
+            className={`py-1 px-4 mr-2 mb-2 ${selectedCategory === category.id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'}`}
+          >
+            {category.name}
+          </button>
+        ))}
+      </div>
 
+      {activeTab === 'companies' && renderCompanies()}
       {activeTab === 'products' && renderProducts()}
     </div>
   );
