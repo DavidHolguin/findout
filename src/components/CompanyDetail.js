@@ -88,7 +88,7 @@ const CompanyDetail = () => {
       <section className="w-11/12 mb-8 flex flex-col items-center">
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 border-4 border-cyan-400 rounded-full flex items-center justify-center">
-            <img src={company.cover_photo} alt={company.name} className="w-full h-full rounded-full object-cover" />
+            <img src={company.profile_picture} alt={company.name} className="w-full h-full rounded-full object-cover" />
           </div>
           <div className="mt-4 text-center">
             <h3 className="text-gray-600 text-2xl font-extrabold">{company.name}</h3>

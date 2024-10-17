@@ -3,10 +3,10 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const CompanyLogo = ({ profilePicture, companyName }) => {
+const CompanyLogo = ({ logo, companyName }) => {
   const [error, setError] = useState(false);
 
-  if (error || !profilePicture) {
+  if (error || !logo) {
     return (
       <div className="absolute top-4 right-4 w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] z-10">
         <span className="text-xl font-bold text-gray-500">
@@ -18,7 +18,7 @@ const CompanyLogo = ({ profilePicture, companyName }) => {
 
   return (
     <img
-      src={profilePicture}
+      src={logo}
       alt={`${companyName} logo`}
       className="absolute top-4 right-4 w-16 h-16 rounded-full object-cover border-2 border-white shadow-lg z-10"
       onError={() => setError(true)}
@@ -269,33 +269,34 @@ const Search = () => {
 
   const renderCompanies = () => {
     const getMatchingProducts = (company) => {
-      return products.filter(product => 
-        product.company === company.id && 
+      return products.filter(product =>
+        product.company === company.id &&
         (selectedCategories.length === 0 || selectedCategories.includes(product.category))
       );
     };
-
+  
     const filteredCompaniesWithProducts = filteredResults.companies
       .map(company => ({
         ...company,
         matchingProducts: getMatchingProducts(company)
       }))
-      .filter(company => 
+      .filter(company =>
         selectedCategories.length === 0 || company.matchingProducts.length > 0
       );
-
+  
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredCompaniesWithProducts.map(company => (
           <div key={company.id} className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            {selectedCategories.length === 0 && company.profile_picture && (
+            {company.cover_photo && (
               <ImageFromS3
-                imageUrl={company.profile_picture}
-                alt={company.name}
+                imageUrl={company.cover_photo}  // Asegúrate de usar la imagen de portada
+                alt={`${company.name} cover photo`}
               />
             )}
+            
             <CompanyLogo 
-              profilePicture={company.profile_picture}
+              logo={company.profile_picture}  // Aquí usamos el logo, no la portada
               companyName={company.name}
             />
             
