@@ -29,7 +29,7 @@ const CompanyLogo = ({ logo, companyName }) => {
 const ImageFromS3 = ({ imageUrl, alt }) => {
   const [error, setError] = useState(false);
 
-  if (error) {
+  if (error || !imageUrl) {
     return <img src="/api/placeholder/400/320" alt={alt} className="w-full h-48 object-cover rounded-t-lg" />;
   }
 
@@ -162,7 +162,7 @@ const ProductCarousel = ({ products }) => {
           }`}
         >
           <ImageFromS3
-            imageUrl={product.image}
+            imageUrl={product.image_url} // Actualizado para usar la URL completa
             alt={product.name}
           />
           <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
@@ -288,15 +288,13 @@ const Search = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredCompaniesWithProducts.map(company => (
           <div key={company.id} className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            {company.cover_photo && (
-              <ImageFromS3
-                imageUrl={company.cover_photo}  // Asegúrate de usar la imagen de portada
-                alt={`${company.name} cover photo`}
-              />
-            )}
+            <ImageFromS3
+              imageUrl={company.cover_photo_url}
+              alt={`${company.name} cover photo`}
+            />
             
             <CompanyLogo 
-              logo={company.profile_picture}  // Aquí usamos el logo, no la portada
+              logo={company.profile_picture_url}
               companyName={company.name}
             />
             
@@ -324,12 +322,10 @@ const Search = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredResults.products.map(product => (
         <div key={product.id} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-          {product.image && (
-            <ImageFromS3
-              imageUrl={product.image}
-              alt={product.name}
-            />
-          )}
+          <ImageFromS3
+            imageUrl={product.image_url} // Actualizado para usar la URL completa
+            alt={product.name}
+          />
           <div className="p-4">
             <h3 className="text-lg font-semibold">{product.name}</h3>
             <p className="text-gray-600">{product.price}</p>
@@ -384,6 +380,7 @@ const Search = () => {
         selectedCategories={selectedCategories}
         onCategoryToggle={handleCategoryToggle}
       />
+
       {activeTab === 'companies' && renderCompanies()}
       {activeTab === 'products' && renderProducts()}
     </div>
