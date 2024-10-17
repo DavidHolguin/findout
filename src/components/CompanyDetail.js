@@ -6,6 +6,7 @@ import MenuBar from './MenuBar';
 const CompanyDetail = () => {
   const [company, setCompany] = useState(null);
   const [productsByCategory, setProductsByCategory] = useState({});
+  const [categories, setCategories] = useState({});
   const carouselRefs = useRef({});
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -23,6 +24,14 @@ const CompanyDetail = () => {
         const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`);
         // Filtrar solo los productos que pertenecen a esta empresa
         const companyProducts = productsResponse.data.filter(product => product.company === parseInt(id));
+        
+        // Obtener categorías
+        const categoriesResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/`);
+        const categoriesMap = categoriesResponse.data.reduce((acc, category) => {
+          acc[category.id] = category.name;
+          return acc;
+        }, {});
+        setCategories(categoriesMap);
         
         // Agrupar productos por categoría
         const grouped = companyProducts.reduce((acc, product) => {
@@ -118,25 +127,25 @@ const CompanyDetail = () => {
       <section className="w-11/12">
         <h3 className="text-center text-gray-600 font-bold text-xl mb-6">Nuestro Menú</h3>
 
-        {Object.entries(productsByCategory).map(([category, products]) => (
-          <div key={category} className="mb-8">
-            <h4 className="text-lg font-bold mb-4 text-gray-700 px-4">{category}</h4>
+        {Object.entries(productsByCategory).map(([categoryId, products]) => (
+          <div key={categoryId} className="mb-8">
+            <h4 className="text-lg font-bold mb-4 text-gray-700 px-4">{categories[categoryId] || 'Categoría'}</h4>
             <div 
               className="overflow-x-hidden"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               <div
-                ref={el => carouselRefs.current[category] = el}
+                ref={el => carouselRefs.current[categoryId] = el}
                 className="flex gap-4 px-4 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
                 style={{
                   scrollBehavior: 'smooth',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                 }}
-                onMouseDown={(e) => startDragging(e, category)}
+                onMouseDown={(e) => startDragging(e, categoryId)}
                 onMouseUp={stopDragging}
                 onMouseLeave={stopDragging}
-                onMouseMove={(e) => onDrag(e, category)}
+                onMouseMove={(e) => onDrag(e, categoryId)}
               >
                 {getCarouselProducts(products).map((product, index) => (
                   <div
@@ -150,12 +159,6 @@ const CompanyDetail = () => {
                         <h4 className="text-lg font-semibold leading-4 mb-2">{product.name}</h4>
                         <p className="text-gray-600 text-sm leading-4 line-clamp-2">{product.description}</p>
                         <p className="text-green-600 font-bold mt-2">${product.price}</p>
-                        <button 
-                          onClick={() => addToCart(product)}
-                          className="mt-2 w-full bg-cyan-400 text-white px-4 py-2 rounded-full text-sm hover:bg-cyan-500"
-                        >
-                          Agregar al carrito
-                        </button>
                       </div>
                     </div>
                   </div>

@@ -119,8 +119,8 @@ const CategorySlider = ({ categories, selectedCategories, onCategoryToggle }) =>
               : 'bg-white text-gray-800 hover:bg-gray-100'
             }
             border border-gray-200
-            backdrop-filter backdrop-blur-sm bg-opacity-30
-            hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#09FDFD] focus:ring-opacity-50
+            backdrop-filter backdrop-blur-sm 
+            hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#09FDFD] 
             transform hover:scale-105
             scroll-snap-align: start;
           `}
@@ -364,7 +364,7 @@ const Search = () => {
         />
       </div>
 
-      <div className="flex w-full rounded-full overflow-hidden mb-6">
+      <div className="flex w-full rounded-full overflow-hidden">
         <button
           onClick={() => setActiveTab('companies')}
           className={`flex-1 py-2 text-center ${activeTab === 'companies' ? 'bg-[#09FDFD] text-white' : 'bg-gray-200 text-gray-700'}`}
