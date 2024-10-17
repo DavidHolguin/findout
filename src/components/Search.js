@@ -1,19 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const CompanyLogo = ({ profilePicture, companyName }) => {
+  const [error, setError] = useState(false);
+
+  if (error || !profilePicture) {
+    return (
+      <div className="absolute top-4 right-4 w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] z-10">
+        <span className="text-xl font-bold text-gray-500">
+          {companyName.charAt(0)}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={profilePicture}
+      alt={`${companyName} logo`}
+      className="absolute top-4 right-4 w-16 h-16 rounded-full object-cover border-2 border-white shadow-lg z-10"
+      onError={() => setError(true)}
+    />
+  );
+};
 
 const ImageFromS3 = ({ imageUrl, alt }) => {
   const [error, setError] = useState(false);
 
   if (error) {
-    return <img src="/api/placeholder/400/320" alt={alt} className="w-full h-48 object-cover rounded-md mb-2" />;
+    return <img src="/api/placeholder/400/320" alt={alt} className="w-full h-48 object-cover rounded-t-lg" />;
   }
 
   return (
     <img
       src={imageUrl}
       alt={alt}
-      className="w-full h-48 object-cover rounded-md mb-2"
+      className="w-full h-48 object-cover rounded-t-lg"
       onError={() => setError(true)}
     />
   );
@@ -113,6 +137,56 @@ const CategorySlider = ({ categories, selectedCategories, onCategoryToggle }) =>
   );
 };
 
+const ProductCarousel = ({ products }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex + 1 === products.length ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex - 1 < 0 ? products.length - 1 : prevIndex - 1
+    );
+  };
+
+  return (
+    <div className="relative w-full h-48">
+      {products.map((product, index) => (
+        <div
+          key={product.id}
+          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-300 ${
+            index === currentIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <ImageFromS3
+            imageUrl={product.image}
+            alt={product.name}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
+            <p className="text-sm font-medium truncate">{product.name}</p>
+            <p className="text-xs">{product.price}</p>
+          </div>
+        </div>
+      ))}
+      <button
+        onClick={prevSlide}
+        className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+      >
+        <ChevronLeft size={20} />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+      >
+        <ChevronRight size={20} />
+      </button>
+    </div>
+  );
+};
+
 const Search = () => {
   const [activeTab, setActiveTab] = useState('companies');
   const [query, setQuery] = useState('');
@@ -155,15 +229,19 @@ const Search = () => {
   useEffect(() => {
     const filterResults = () => {
       const lowercaseQuery = query.toLowerCase();
-      
-      const filteredCompanies = companies.filter(company => {
-        const companyMatches = company.name.toLowerCase().includes(lowercaseQuery);
-        const hasMatchingProducts = products.some(product => 
-          product.company === company.id && 
-          product.name.toLowerCase().includes(lowercaseQuery) &&
+
+      let filteredCompanies = companies.filter(company => {
+        const matchingProducts = products.filter(product =>
+          product.company === company.id &&
+          (product.name.toLowerCase().includes(lowercaseQuery) ||
+           company.name.toLowerCase().includes(lowercaseQuery)) &&
           (selectedCategories.length === 0 || selectedCategories.includes(product.category))
         );
-        return companyMatches || hasMatchingProducts;
+
+        return matchingProducts.length > 0 || (
+          company.name.toLowerCase().includes(lowercaseQuery) &&
+          selectedCategories.length === 0
+        );
       });
 
       const filteredProducts = products.filter(product =>
@@ -189,43 +267,75 @@ const Search = () => {
     );
   };
 
-  const renderCompanies = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {filteredResults.companies.map(company => (
-        <div key={company.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
-          {company.profile_picture && (
-            <ImageFromS3
-              imageUrl={company.profile_picture}
-              alt={company.name}
+  const renderCompanies = () => {
+    const getMatchingProducts = (company) => {
+      return products.filter(product => 
+        product.company === company.id && 
+        (selectedCategories.length === 0 || selectedCategories.includes(product.category))
+      );
+    };
+
+    const filteredCompaniesWithProducts = filteredResults.companies
+      .map(company => ({
+        ...company,
+        matchingProducts: getMatchingProducts(company)
+      }))
+      .filter(company => 
+        selectedCategories.length === 0 || company.matchingProducts.length > 0
+      );
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filteredCompaniesWithProducts.map(company => (
+          <div key={company.id} className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            {selectedCategories.length === 0 && company.profile_picture && (
+              <ImageFromS3
+                imageUrl={company.profile_picture}
+                alt={company.name}
+              />
+            )}
+            <CompanyLogo 
+              profilePicture={company.profile_picture}
+              companyName={company.name}
             />
-          )}
-          <h3 className="text-xl font-semibold">{company.name}</h3>
-          {company.description && (
-            <p className="text-gray-600 leading-5">{company.description.slice(0, 100)}...</p>
-          )}
-          <Link to={`/company/${company.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
-            Ver detalles
-          </Link>
-        </div>
-      ))}
-    </div>
-  );
+            
+            <div className="p-4">
+              <h3 className="text-xl font-semibold mb-2">{company.name}</h3>
+              {company.description && (
+                <p className="text-gray-600 leading-5 mb-4">{company.description.slice(0, 100)}...</p>
+              )}
+              
+              {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
+                <ProductCarousel products={company.matchingProducts} />
+              )}
+              
+              <Link to={`/company/${company.id}`} className="mt-4 inline-block text-blue-600 hover:underline">
+                Ver detalles
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const renderProducts = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredResults.products.map(product => (
-        <div key={product.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow duration-300">
+        <div key={product.id} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
           {product.image && (
             <ImageFromS3
               imageUrl={product.image}
               alt={product.name}
             />
           )}
-          <h3 className="text-lg font-semibold">{product.name}</h3>
-          <p className="text-gray-600">{product.price}</p>
-          <Link to={`/product/${product.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
-            Ver detalles
-          </Link>
+          <div className="p-4">
+            <h3 className="text-lg font-semibold">{product.name}</h3>
+            <p className="text-gray-600">{product.price}</p>
+            <Link to={`/product/${product.id}`} className="mt-2 inline-block text-blue-600 hover:underline">
+              Ver detalles
+            </Link>
+          </div>
         </div>
       ))}
     </div>
@@ -253,7 +363,7 @@ const Search = () => {
         />
       </div>
 
-      <div className="flex w-full rounded-full overflow-hidden">
+      <div className="flex w-full rounded-full overflow-hidden mb-6">
         <button
           onClick={() => setActiveTab('companies')}
           className={`flex-1 py-2 text-center ${activeTab === 'companies' ? 'bg-[#09FDFD] text-white' : 'bg-gray-200 text-gray-700'}`}
@@ -273,7 +383,6 @@ const Search = () => {
         selectedCategories={selectedCategories}
         onCategoryToggle={handleCategoryToggle}
       />
-
       {activeTab === 'companies' && renderCompanies()}
       {activeTab === 'products' && renderProducts()}
     </div>
