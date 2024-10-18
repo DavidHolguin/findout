@@ -171,11 +171,11 @@ const CompanyDetail = () => {
           </div>
         </div>
 
-        <div className="w-11/12 flex justify-between">
+        <div className="w-11/12 flex items-center	 justify-between">
           <div className="text-center">
-            <h3 className="text-green-600 text-xl font-bold">OPEN NOW</h3>   
+            <h3 className="text-green-600 text-xl leading-4 font-bold">OPEN NOW</h3>   
             <p className="text-sm">Hasta <span>11:50 pm</span></p>
-            <a href="#" className="flex items-center justify-center mt-4 text-cyan-400">
+            <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400">
               <span>{company.address}</span>
             </a>
           </div>
