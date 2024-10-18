@@ -62,8 +62,8 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
 
   if (error || !logo) {
     return (
-      <div className={`w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] z-10 ${className}`}>
-        <span className="text-xl font-bold text-gray-500 font-system">
+      <div className={`w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
+        <span className="text-lg font-bold text-gray-500 font-system">
           {companyName ? companyName.charAt(0).toUpperCase() : '?'}
         </span>
       </div>
@@ -74,7 +74,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
     <img
       src={logo}
       alt={`Logo de ${companyName || 'la empresa'}`}
-      className={`w-16 h-16 rounded-full object-cover border-2 border-white shadow-lg z-10 ${className}`}
+      className={`w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg ${className}`}
       onError={() => setError(true)}
     />
   );
@@ -152,6 +152,7 @@ const Search = () => {
   const searchContainerRef = useRef(null);
   const { scrollDirection, isAtTop } = useScrollDirection();
   const shouldShowSearch = scrollDirection === "up" || isAtTop;
+  const [companyLogos, setCompanyLogos] = useState({});
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -228,6 +229,13 @@ const Search = () => {
         setCompanies(companiesResponse.data);
         setProducts(productsResponse.data);
         setCategories(categoriesResponse.data);
+
+        // Create a map of company IDs to their logo URLs
+        const logoMap = {};
+        companiesResponse.data.forEach(company => {
+          logoMap[company.id] = company.profile_picture_url;
+        });
+        setCompanyLogos(logoMap);
       } catch (error) {
         console.error('Error al cargar datos:', error);
         setError(
@@ -292,7 +300,7 @@ const Search = () => {
         (selectedCategories.length === 0 || selectedCategories.includes(product.category))
       );
     };
-  
+
     const filteredCompaniesWithProducts = filteredResults.companies
       .map(company => ({
         ...company,
@@ -302,86 +310,87 @@ const Search = () => {
         selectedCategories.length === 0 || company.matchingProducts.length > 0
       );
   
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredCompaniesWithProducts.map(company => (
-          <motion.div
-            key={company.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
-          >
-            <Link to={`/company/${company.id}`}>
-              <div className="relative">
-                {!selectedCategories.length && (
-                  <ImageFromS3
-                    imageUrl={company.cover_photo_url}
-                    alt={`${company.name} foto de portada`}
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {filteredCompaniesWithProducts.map(company => (
+            <motion.div
+              key={company.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
+            >
+              <Link to={`/company/${company.id}`}>
+                <div className="relative">
+                  {!selectedCategories.length && (
+                    <ImageFromS3
+                      imageUrl={company.cover_photo_url}
+                      alt={`${company.name} foto de portada`}
+                    />
+                  )}
+                  {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
+                    <ProductCarousel products={company.matchingProducts} companyId={company.id} />
+                  )}
+                  <CompanyLogo 
+                    logo={company.profile_picture_url}
+                    companyName={company.name}
+                    className="absolute top-2 right-2 w-[35px] h-[35px]"
                   />
-                )}
-                {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
-                  <ProductCarousel products={company.matchingProducts} companyId={company.id} />
-                )}
+                </div>
+                
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-2 font-system">{company.name}</h3>
+                  <Link 
+                    to={`/company-categories/${company.category.id}`}
+                    className="text-sm text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
+                  >
+                    {company.category.name}
+                  </Link>
+                  <p className="text-sm text-gray-600 mt-2 font-system line-clamp-2">{company.description}</p>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      );
+    };
+    
+
+    const renderProducts = () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filteredResults.products.map(product => (
+          <Link
+            key={product.id}
+            to={`/product/${product.id}`}
+            className="block"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white"
+            >
+              <div className="relative">
+                <ImageFromS3
+                  imageUrl={product.image_url}
+                  alt={product.name}
+                />
                 <CompanyLogo 
-                  logo={company.profile_picture_url}
-                  companyName={company.name}
-                  className="absolute top-4 right-4"
+                  logo={companyLogos[product.company]}
+                  companyName={product.company_name}
+                  className="absolute top-2 left-2 w-[35px] h-[35px]"
                 />
               </div>
-              
               <div className="p-4">
-                <h3 className="text-xl font-semibold mb-2 font-system">{company.name}</h3>
-                <Link 
-                  to={`/categories/${company.category_id}`}
-                  className="text-sm text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
-                >
-                  {company.category_name}
-                </Link>
-                <p className="text-sm text-gray-600 mt-2 font-system line-clamp-2">{company.description}</p>
+                <h3 className="text-lg font-semibold font-system">{product.name}</h3>
+                <p className="text-gray-600 font-system">{product.price}</p>
+                <p className="text-sm text-[#09FDFD] mt-1 font-system">{product.company_name}</p>
               </div>
-            </Link>
-          </motion.div>
+            </motion.div>
+          </Link>
         ))}
       </div>
     );
-  };
-
-  const renderProducts = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {filteredResults.products.map(product => (
-        <Link
-          key={product.id}
-          to={`/product/${product.id}`}
-          className="block"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white"
-          >
-            <div className="relative">
-              <ImageFromS3
-                imageUrl={product.image_url}
-                alt={product.name}
-              />
-              <CompanyLogo 
-                logo={product.company_logo}
-                companyName={product.company_name}
-                className="absolute top-4 right-4"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="text-lg font-semibold font-system">{product.name}</h3>
-              <p className="text-gray-600 font-system">{product.price}</p>
-              <p className="text-sm text-[#09FDFD] mt-1 font-system">{product.company_name}</p>
-            </div>
-          </motion.div>
-        </Link>
-      ))}
-    </div>
-  );
 
   if (error) {
     return (
