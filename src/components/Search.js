@@ -342,7 +342,7 @@ const Search = () => {
                   <h3 className="text-xl font-semibold leading-4 font-system">{company.name}</h3>
                   <Link 
                     to={`/company-categories/${company.category.id}`}
-                    className="text-base italic text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
+                    className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
                   >
                     {company.category.name}
                   </Link>

@@ -126,18 +126,28 @@ const CompanyDetail = () => {
       {/* Company profile section */}
       <section className="w-full mb-8 flex flex-col items-center">
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 border-4 border-cyan-400 rounded-full flex items-center justify-center overflow-hidden">
+          <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden relative">
+            <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
+              backgroundImage: 'linear-gradient(0deg, #00ffff 33%, #ff00ff 66%, #ffff00 100%)',
+              backgroundSize: '300% 300%',
+              animation: 'rotating 3s linear infinite, gradientRotate 3s ease infinite'
+            }}></div>
             <ImageWithFallback 
               src={company.profile_picture_url} 
               alt={company.name} 
-              className="w-full h-full rounded-full object-cover"
+              className="w-[88px] h-[88px] absolute rounded-full object-cover"
             />
           </div>
-          <div className="mt-4 text-center">
-            <h3 className="text-gray-600 text-2xl font-extrabold">{company.name}</h3>
+          <div className="mt-2 text-center">
+            <h3 className="text-gray-600 text-2xl leading-4 font-extrabold">{company.name}</h3>
+            <p className="text-cyan-400 text-base font-medium ">
+              {company.category && typeof company.category === 'object' 
+                ? company.category.name 
+                : (company.category || 'Categoría de la empresa')}
+            </p>
             <div 
               ref={categoryCarouselRef}
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-4 pb-4"
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-2 pb-4"
               style={{ 
                 scrollBehavior: 'smooth',
                 WebkitOverflowScrolling: 'touch',
@@ -161,9 +171,9 @@ const CompanyDetail = () => {
           </div>
         </div>
 
-        <div className="w-11/12 mt-6 flex justify-between">
+        <div className="w-11/12 flex justify-between">
           <div className="text-center">
-            <h3 className="text-green-600 text-xl">OPEN NOW</h3>   
+            <h3 className="text-green-600 text-xl font-bold">OPEN NOW</h3>   
             <p className="text-sm">Hasta <span>11:50 pm</span></p>
             <a href="#" className="flex items-center justify-center mt-4 text-cyan-400">
               <span>{company.address}</span>
@@ -181,10 +191,8 @@ const CompanyDetail = () => {
 
       {/* Products by category section */}
       <section className="w-full">
-        
-
         {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
-          <div key={categoryId} className="mb-8">
+          <div key={categoryId} className="mb-0">
             <h4 className="text-lg font-bold mb-4 text-gray-700 px-4">
               {categories.find(cat => cat.id === parseInt(categoryId))?.name || 'Categoría'}
             </h4>
@@ -239,6 +247,25 @@ const CompanyDetail = () => {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        @keyframes rotating {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes gradientRotate {
+          0% {
+            background-position: 0% 0%;
+          }
+          100% {
+            background-position: 100% 100%;
+          }
+        }
+        .animate-spin-slow {
+          animation: rotating 3s linear infinite;
         }
       `}</style>
     </div>
