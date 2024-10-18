@@ -339,14 +339,14 @@ const Search = () => {
                 </div>
                 
                 <div className="p-4">
-                  <h3 className="text-xl font-semibold mb-2 font-system">{company.name}</h3>
+                  <h3 className="text-xl font-semibold leading-4 font-system">{company.name}</h3>
                   <Link 
                     to={`/company-categories/${company.category.id}`}
-                    className="text-sm text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
+                    className="text-base italic text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
                   >
                     {company.category.name}
                   </Link>
-                  <p className="text-sm text-gray-600 mt-2 font-system line-clamp-2">{company.description}</p>
+                  <p className="text-sm leading-4 text-gray-600 mt-1 font-system line-clamp-2">{company.description}</p>
                 </div>
               </Link>
             </motion.div>
