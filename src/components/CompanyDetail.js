@@ -171,8 +171,8 @@ const CompanyDetail = () => {
           </div>
 
           <div className="w-2/3 border-l border-gray-400 pl-4">
-            <p className="text-sm leading-4 text-gray-600">{company.description}</p>
-            <a href="#" className="mt-4 flex items-center bg-cyan-400 text-white font-bold text-sm px-3 py-2 rounded-full">
+            <p className="text-sm leading-4 text-gray-600 mb-4">{company.description}</p>
+            <a href="#" className=" bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full">
               Escribir
             </a>
           </div>
@@ -181,7 +181,7 @@ const CompanyDetail = () => {
 
       {/* Products by category section */}
       <section className="w-full">
-        <h3 className="text-center text-gray-600 font-bold text-xl mb-6">Nuestro Menú</h3>
+        
 
         {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
           <div key={categoryId} className="mb-8">

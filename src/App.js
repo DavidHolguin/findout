@@ -17,7 +17,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-100">
         <Header />
-        <main className="container mx-auto py-8">
+        <main className="container mx-auto py-16">
           <Routes>
             <Route path="/" element={<CompanyList />} />
             <Route path="/company/:id" element={<CompanyDetail />} />
