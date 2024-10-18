@@ -62,8 +62,8 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
 
   if (error || !logo) {
     return (
-      <div className={`w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
-        <span className="text-lg font-bold text-gray-500 font-system">
+      <div className={`w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
+        <span className="text-lg font-bold text-gray-500">
           {companyName ? companyName.charAt(0).toUpperCase() : '?'}
         </span>
       </div>
@@ -74,7 +74,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
     <img
       src={logo}
       alt={`Logo de ${companyName || 'la empresa'}`}
-      className={`w-15 h-15 rounded-full object-cover border-2 border-white shadow-lg ${className}`}
+      className={`w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg ${className}`}
       onError={() => setError(true)}
     />
   );
@@ -113,8 +113,8 @@ const ProductCarousel = ({ products, companyId }) => {
             alt={product.name}
           />
           <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
-            <p className="text-sm font-medium font-system truncate">{product.name}</p>
-            <p className="text-xs font-system">{product.price}</p>
+            <p className="text-sm font-medium truncate">{product.name}</p>
+            <p className="text-xs">{product.price}</p>
           </div>
         </div>
       ))}
@@ -310,87 +310,83 @@ const Search = () => {
         selectedCategories.length === 0 || company.matchingProducts.length > 0
       );
   
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {filteredCompaniesWithProducts.map(company => (
-            <motion.div
-              key={company.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
-            >
-              <Link to={`/company/${company.id}`}>
-                <div className="relative">
-                  {!selectedCategories.length && (
-                    <ImageFromS3
-                      imageUrl={company.cover_photo_url}
-                      alt={`${company.name} foto de portada`}
-                    />
-                  )}
-                  {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
-                    <ProductCarousel products={company.matchingProducts} companyId={company.id} />
-                  )}
-                  <CompanyLogo 
-                    logo={company.profile_picture_url}
-                    companyName={company.name}
-                    className="absolute top-2 right-2 w-[55px] h-[55px]"
-                  />
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold leading-4 font-system">{company.name}</h3>
-                  <Link 
-                    to={`/company-categories/${company.category.id}`}
-                    className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
-                  >
-                    {company.category.name}
-                  </Link>
-                  <p className="text-sm leading-4 text-gray-600 mt-1 font-system line-clamp-2">{company.description}</p>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      );
-    };
-    
-
-    const renderProducts = () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredResults.products.map(product => (
-          <Link
-            key={product.id}
-            to={`/product/${product.id}`}
-            className="block"
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filteredCompaniesWithProducts.map(company => (
+          <motion.div
+            key={company.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white"
-            >
+            <Link to={`/company/${company.id}`}>
               <div className="relative">
-                <ImageFromS3
-                  imageUrl={product.image_url}
-                  alt={product.name}
-                />
+                {!selectedCategories.length && (
+                  <ImageFromS3
+                    imageUrl={company.cover_photo_url}
+                    alt={`${company.name} foto de portada`}
+                  />
+                )}
+                {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
+                  <ProductCarousel products={company.matchingProducts} companyId={company.id} />
+                )}
                 <CompanyLogo 
-                  logo={companyLogos[product.company]}
-                  companyName={product.company_name}
-                  className="absolute top-2 left-2 w-[55px] h-[55px]"
+                  logo={company.profile_picture_url}
+                  companyName={company.name}
+                  className="absolute top-2 right-2 w-[55px] h-[55px]"
                 />
               </div>
+              
               <div className="p-4">
-                <h3 className="text-lg font-semibold font-system">{product.name}</h3>
-                <p className="text-gray-600 font-system">{product.price}</p>
-                <p className="text-sm text-[#09FDFD] mt-1 font-system">{product.company_name}</p>
+                <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
+                <Link 
+                  to={`/company-categories/${company.category.id}`}
+                  className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
+                >
+                  {company.category.name}
+                </Link>
+                <p className="text-sm leading-4 text-gray-600 mt-1 line-clamp-2">{company.description}</p>
               </div>
-            </motion.div>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </div>
     );
+  };
+
+  const renderProducts = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {filteredResults.products.map(product => (
+        <Link key={product.id} to={`/product/${product.id}`} className="block">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 backdrop-blur-sm border border-white/20"
+          >
+            <div className="relative">
+              <ImageFromS3 imageUrl={product.image_url} alt={product.name} />
+              <div className="absolute top-0 left-0 right-0 p-2 flex justify-between items-start">
+                <CompanyLogo 
+                  logo={companyLogos[product.company]}
+                  companyName={product.company_name}
+                />
+                <div className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-bold">
+                  $ {product.price}
+                </div>
+              </div>
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold ">{product.name}</h3>
+              <p className="text-sm text-gray-600 leading-4 line-clamp-2">{product.description}</p>
+              <p className="text-sm text-[#09FDFD] mt-2">{product.company_name}</p>
+            </div>
+          </motion.div>
+        </Link>
+      ))}
+    </div>
+  );
 
   if (error) {
     return (
@@ -398,7 +394,7 @@ const Search = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-md font-system"
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-md"
           role="alert"
         >
           <span className="block sm:inline">{error}</span>
@@ -434,8 +430,7 @@ const Search = () => {
                       className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 
                                 bg-white/70 backdrop-blur-md shadow-lg
                                 focus:outline-none focus:ring-2 focus:ring-[#09FDFD]
-                                placeholder-gray-400 transition-all duration-300
-                                font-system"
+                                placeholder-gray-400 transition-all duration-300"
                     />
                     <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                   </div>
@@ -446,7 +441,7 @@ const Search = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setActiveTab('companies')}
-                    className={`p-3 rounded-full transition-all duration-300 font-system ${
+                    className={`p-3 rounded-full transition-all duration-300 ${
                       activeTab === 'companies'
                         ? 'bg-[#09FDFD] text-white shadow-lg'
                         : 'bg-white/70 text-gray-600 hover:bg-gray-100'
@@ -459,7 +454,7 @@ const Search = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setActiveTab('products')}
-                    className={`p-3 rounded-full transition-all duration-300 font-system ${
+                    className={`p-3 rounded-full transition-all duration-300 ${
                       activeTab === 'products'
                         ? 'bg-[#09FDFD] text-white shadow-lg'
                         : 'bg-white/70 text-gray-600 hover:bg-gray-100'
@@ -480,7 +475,7 @@ const Search = () => {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleCategoryToggle(category.id)}
                       className={`
-                        py-1 px-4 rounded-full whitespace-nowrap text-sm font-system
+                        py-1 px-4 rounded-full whitespace-nowrap text-sm
                         ${selectedCategories.includes(category.id)
                           ? 'bg-[#09FDFD] text-white shadow-md'
                           : 'bg-white/70 text-gray-600 hover:bg-gray-100'
@@ -526,7 +521,7 @@ const Search = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-12"
             >
-              <p className="text-gray-500 text-lg font-system">
+              <p className="text-gray-500 text-lg">
                 No se encontraron resultados para tu búsqueda.
                 {selectedCategories.length > 0 && " Prueba ajustando los filtros de categoría."}
               </p>
@@ -543,20 +538,6 @@ const Search = () => {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
-        }
-        
-        /* Definición de la fuente del sistema */
-        .font-system {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
-                       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 
-                       sans-serif;
-        }
-        
-        /* Aplicar la fuente del sistema globalmente */
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
-                       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 
-                       sans-serif;
         }
       `}</style>
     </>
