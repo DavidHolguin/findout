@@ -128,14 +128,15 @@ const CompanyDetail = () => {
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden relative">
             <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
-              backgroundImage: 'linear-gradient(0deg, #00ffff 33%, #ff00ff 66%, #ffff00 100%)',
-              backgroundSize: '300% 300%',
-              animation: 'rotating 3s linear infinite, gradientRotate 3s ease infinite'
+              backgroundImage: 'linear-gradient(0deg, #00ffff, #ff00ff, #ffff00, #00ffff)',
+              backgroundSize: '100% 400%',
+              animation: 'rotating 3s linear infinite, gradientRotate 12s linear infinite'
+           
             }}></div>
             <ImageWithFallback 
               src={company.profile_picture_url} 
               alt={company.name} 
-              className="w-[88px] h-[88px] absolute rounded-full object-cover"
+              className="w-[88px] h-[88px] absolute rounded-full object-cover border-4	border-inherit	border-solid	"
             />
           </div>
           <div className="mt-2 text-center">
