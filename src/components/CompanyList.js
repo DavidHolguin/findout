@@ -38,7 +38,7 @@ const CompanyList = () => {
   return (
     <div className="container mx-auto mt-10 px-3 font-system">
       <Slider />
-      <div className="my-8"> {/* Añadido margen vertical */}
+      <div className="my-4"> {/* Añadido margen vertical */}
         <TopBurgers />
       </div>
       <BannerSection />
