@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +15,6 @@ const SearchCategories = [
   "Busca servicios..."
 ];
 
-// Hook personalizado para detectar la dirección del scroll
 const useScrollDirection = () => {
   const [scrollDirection, setScrollDirection] = useState("up");
   const [isAtTop, setIsAtTop] = useState(true);
@@ -132,6 +131,8 @@ const ProductCarousel = ({ products }) => {
 };
 
 const Search = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('companies');
   const [query, setQuery] = useState('');
   const [companies, setCompanies] = useState([]);
@@ -147,6 +148,44 @@ const Search = () => {
   const searchContainerRef = useRef(null);
   const { scrollDirection, isAtTop } = useScrollDirection();
   const shouldShowSearch = scrollDirection === "up" || isAtTop;
+
+  // Efecto para manejar los parámetros de la URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchQuery = params.get('q');
+    const tab = params.get('tab');
+    const cats = params.get('categories');
+
+    if (searchQuery) {
+      setQuery(searchQuery);
+    }
+    if (tab && (tab === 'companies' || tab === 'products')) {
+      setActiveTab(tab);
+    }
+    if (cats) {
+      try {
+        const categoriesArray = JSON.parse(cats);
+        if (Array.isArray(categoriesArray)) {
+          setSelectedCategories(categoriesArray);
+        }
+      } catch (e) {
+        console.error('Error parsing categories from URL:', e);
+      }
+    }
+  }, [location.search]);
+
+  // Efecto para actualizar la URL cuando cambian los filtros
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (activeTab !== 'companies') params.set('tab', activeTab);
+    if (selectedCategories.length > 0) {
+      params.set('categories', JSON.stringify(selectedCategories));
+    }
+    
+    const newUrl = `${location.pathname}?${params.toString()}`;
+    navigate(newUrl, { replace: true });
+  }, [query, activeTab, selectedCategories, navigate]);
 
   useEffect(() => {
     const animatePlaceholder = async () => {
@@ -246,6 +285,11 @@ const Search = () => {
     if (isHovered) {
       setPlaceholderText(SearchCategories[currentCategoryIndex]);
     }
+  };
+
+  const handleQueryChange = (e) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
   };
 
   const renderCompanies = () => {

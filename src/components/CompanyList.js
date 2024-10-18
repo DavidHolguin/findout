@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import TopBurgers from './TopBurguers';
 import Slider from './Slider';
 import BannerSection from './BannerSection';
+import MiniSearch from './MiniSearch';
+
 
 const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
@@ -37,6 +39,9 @@ const CompanyList = () => {
 
   return (
     <div className="container mx-auto mt-10 px-3 font-system">
+      <div className="mt-8 mb-8"> {/* Añadido margen vertical */}
+      <MiniSearch />
+      </div>
       <Slider />
       <div className="my-4"> {/* Añadido margen vertical */}
         <TopBurgers />
