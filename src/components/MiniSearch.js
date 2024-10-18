@@ -83,7 +83,7 @@ const MiniSearch = () => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-2xl mb-2 mx-6 text-gray-400"
+        className="text-xl mb-2 mx-6 text-gray-400"
       >
         ¿Qué buscas hoy?
       </motion.p>
