@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const SearchCategories = [
   "Quizá un hot dog...",
-  "quizá una barbería...",
-  "Encuentra negocios locales increíbles...",
-  "Descubre productos en tendencia...",
+  "Quizá una barbería...",
+  "Encuentra negocios locales...",
+  "Descubre productos...",
   "Quizá una hamburguesa...",
-  "Encuentra artículos de moda...",
+  "Encuentra artículos...",
   "Explora restaurantes...",
   "Busca servicios..."
 ];
@@ -299,7 +299,7 @@ const Search = () => {
                 to={`/company/${company.id}`}
                 className="mt-4 inline-block text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
               >
-                Ver detalles
+                Go to 
               </Link>
             </div>
           </motion.div>
@@ -329,7 +329,7 @@ const Search = () => {
               to={`/product/${product.id}`}
               className="mt-2 inline-block text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
             >
-              Ver detalles
+              Ver producto
             </Link>
           </div>
         </motion.div>
@@ -362,7 +362,7 @@ const Search = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg shadow-lg border-b border-gray-200/50"
+            className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50"
             style={{ top: '60px' }}
           >
             <div className="container mx-auto px-4 py-4">
