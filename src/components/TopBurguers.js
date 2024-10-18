@@ -47,7 +47,7 @@ const TopBurgers = () => {
             className="w-full h-auto rounded-lg"
           />
           {item.company_name && (
-            <p className="font-extrabold italic mt-1 text-lg text-neutral-700	">{item.company_name}</p>
+            <p className="font-extrabold italic mt-1 text-base text-neutral-700	">{item.company_name}</p>
           )}
         </a>
       </div>
