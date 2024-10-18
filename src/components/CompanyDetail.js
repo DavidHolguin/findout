@@ -128,7 +128,7 @@ const CompanyDetail = () => {
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden relative">
             <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
-              backgroundImage: 'linear-gradient(0deg, #00ffff, #ff00ff, #ffff00, #00ffff)',
+              backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #99ffff, #ccffff, #09fdfd)',
               backgroundSize: '100% 400%',
               animation: 'rotating 3s linear infinite, gradientRotate 12s linear infinite'
            
