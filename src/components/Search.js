@@ -62,7 +62,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
 
   if (error || !logo) {
     return (
-      <div className={`w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
+      <div className={`w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
         <span className="text-lg font-bold text-gray-500 font-system">
           {companyName ? companyName.charAt(0).toUpperCase() : '?'}
         </span>
@@ -74,7 +74,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
     <img
       src={logo}
       alt={`Logo de ${companyName || 'la empresa'}`}
-      className={`w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg ${className}`}
+      className={`w-15 h-15 rounded-full object-cover border-2 border-white shadow-lg ${className}`}
       onError={() => setError(true)}
     />
   );
@@ -334,7 +334,7 @@ const Search = () => {
                   <CompanyLogo 
                     logo={company.profile_picture_url}
                     companyName={company.name}
-                    className="absolute top-2 right-2 w-[35px] h-[35px]"
+                    className="absolute top-2 right-2 w-[55px] h-[55px]"
                   />
                 </div>
                 
@@ -378,7 +378,7 @@ const Search = () => {
                 <CompanyLogo 
                   logo={companyLogos[product.company]}
                   companyName={product.company_name}
-                  className="absolute top-2 left-2 w-[35px] h-[35px]"
+                  className="absolute top-2 left-2 w-[55px] h-[55px]"
                 />
               </div>
               <div className="p-4">
