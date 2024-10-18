@@ -75,7 +75,7 @@ const MiniSearch = () => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-3xl text-[#09FDFD]"
+        className="text-3xl font-semibold text-[#09FDFD]"
       >
         ¡Hola, qué gusto verte!
       </motion.h2>
