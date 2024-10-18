@@ -47,7 +47,7 @@ const TopBurgers = () => {
             className="w-full h-auto rounded-lg"
           />
           {item.company_name && (
-            <p className="font-extrabold italic mt-1 text-base text-neutral-700	">{item.company_name}</p>
+            <p className="font-extrabold italic mt-1 text-lg text-neutral-700	">{item.company_name}</p>
           )}
         </a>
       </div>
@@ -59,7 +59,7 @@ const TopBurgers = () => {
       {sections.map((section) => (
         <section key={section.position} className="flex flex-col items-center my-2">
           <div className="flex items-center gap-2 w-[100%] mb-2">
-            <h3 className="font-extrabold m-0 text-xl text-neutral-700">
+            <h3 className="font-extrabold m-0 text-2xl text-neutral-700">
               {section.title.split(' ').map((word, index, array) => {
                 const shouldBeColored = 
                   (array.includes('BURGUERS') && index === 2) || 
@@ -72,7 +72,7 @@ const TopBurgers = () => {
                 );
               })}
             </h3>
-            <p className="m-0">{section.location}</p>
+            <p className="m-0 text-lg text-neutral-700">{section.location}</p>
             <svg
               id="Layer_1"
               height="10"
