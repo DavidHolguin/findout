@@ -36,9 +36,11 @@ const CompanyList = () => {
   };
 
   return (
-    <div className="container mx-auto mt-4 px-3 font-['Poppins',sans-serif]">
+    <div className="container mx-auto mt-10 px-3 font-system">
       <Slider />
-      <TopBurgers />
+      <div className="my-8"> {/* Añadido margen vertical */}
+        <TopBurgers />
+      </div>
       <BannerSection />
       <MenuBar />
     </div>

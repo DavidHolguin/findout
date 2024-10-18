@@ -57,16 +57,20 @@ const TopBurgers = () => {
   return (
     <div className="flex flex-col gap-1 font-system">
       {sections.map((section) => (
-        <section key={section.position} className="flex flex-col items-center my-4">
+        <section key={section.position} className="flex flex-col items-center my-2">
           <div className="flex items-center gap-2 w-[100%] mb-2">
             <h3 className="font-extrabold m-0">
-              {section.title.split(' ').map((word, index) => 
-                index === 2 ? (
-                  <span key={index} className="text-[#09fdfd]">{word}</span>
+              {section.title.split(' ').map((word, index, array) => {
+                const shouldBeColored = 
+                  (array.includes('BURGUERS') && index === 2) || 
+                  (array.includes('BARBER') && word === 'SHOP');
+                
+                return shouldBeColored ? (
+                  <span key={index} className="text-[#09fdfd]">{word} </span>
                 ) : (
                   word + ' '
-                )
-              )}
+                );
+              })}
             </h3>
             <p className="m-0">{section.location}</p>
             <svg
