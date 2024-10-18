@@ -26,29 +26,23 @@ const TopBurgers = () => {
   if (error) return <div className="font-system">Error loading data</div>;
 
   const renderItem = (item) => {
-    const itemUrl = item.item_type === 'BANNER' ? item.click_url : item.company_profile_url;
-    
     return (
       <div key={item.order} className="text-center relative font-system">
-        {item.item_type === 'COMPANY' && (
-          <span 
-            className="absolute top-0 left-0 mt-1 ml-1 w-[35px] h-[35px] rounded-full bg-cover bg-center bg-no-repeat shadow-[inset_0_1px_2px_0_rgba(60,64,67,0.3),inset_0_2px_6px_2px_rgba(60,64,67,0.15)]" 
-            style={{ backgroundImage: `url(${item.company_logo})` }}
-          />
-        )}
         <a 
-          href={itemUrl} 
-          target={item.item_type === 'BANNER' ? "_blank" : "_self"}
-          rel={item.item_type === 'BANNER' ? "noopener noreferrer" : undefined}
+          href={item.company_profile_url}
+          className="block relative"
         >
           <img
             src={item.featured_image}
-            alt={item.company_name || 'Banner'}
+            alt={item.company_name}
             className="w-full h-auto rounded-lg"
           />
-          {item.company_name && (
-            <p className="font-extrabold italic mt-1 text-base text-neutral-700	">{item.company_name}</p>
-          )}
+          <img 
+            src={item.company_logo}
+            alt={`${item.company_name} logo`}
+            className="absolute top-2 left-2 w-[35px] h-[35px] rounded-full object-cover shadow-[inset_0_1px_2px_0_rgba(60,64,67,0.3),inset_0_2px_6px_2px_rgba(60,64,67,0.15)]"
+          />
+          <p className="font-extrabold italic mt-1 text-base text-neutral-700">{item.company_name}</p>
         </a>
       </div>
     );
@@ -57,7 +51,7 @@ const TopBurgers = () => {
   return (
     <div className="flex flex-col gap-1 font-system">
       {sections.map((section) => (
-        <section key={section.position} className="flex flex-col items-center">
+        <section key={section.title} className="flex flex-col items-center">
           <div className="flex items-center gap-2 w-[100%] mb-2">
             <h3 className="font-extrabold m-0 text-2xl text-neutral-700">
               {section.title.split(' ').map((word, index, array) => {
