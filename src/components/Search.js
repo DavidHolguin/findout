@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const SearchCategories = [
+const FrasesDeBusqueda = [
   "Quizá un hot dog...",
   "Quizá una barbería...",
   "Encuentra negocios locales...",
@@ -40,14 +40,31 @@ const useScrollDirection = () => {
   return { scrollDirection, isAtTop };
 };
 
-const CompanyLogo = ({ logo, companyName }) => {
+const ImageFromS3 = ({ imageUrl, alt }) => {
+  const [error, setError] = useState(false);
+
+  if (error || !imageUrl) {
+    return <img src="/api/placeholder/400/320" alt={alt} className="w-full h-48 object-cover" />;
+  }
+
+  return (
+    <img
+      src={imageUrl}
+      alt={alt}
+      className="w-full h-48 object-cover"
+      onError={() => setError(true)}
+    />
+  );
+};
+
+const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
   const [error, setError] = useState(false);
 
   if (error || !logo) {
     return (
-      <div className="absolute top-4 right-4 w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] z-10">
+      <div className={`w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] z-10 ${className}`}>
         <span className="text-xl font-bold text-gray-500 font-system">
-          {companyName.charAt(0)}
+          {companyName ? companyName.charAt(0).toUpperCase() : '?'}
         </span>
       </div>
     );
@@ -56,40 +73,27 @@ const CompanyLogo = ({ logo, companyName }) => {
   return (
     <img
       src={logo}
-      alt={`${companyName} logo`}
-      className="absolute top-4 right-4 w-16 h-16 rounded-full object-cover border-2 border-white shadow-lg z-10"
+      alt={`Logo de ${companyName || 'la empresa'}`}
+      className={`w-16 h-16 rounded-full object-cover border-2 border-white shadow-lg z-10 ${className}`}
       onError={() => setError(true)}
     />
   );
 };
 
-const ImageFromS3 = ({ imageUrl, alt }) => {
-  const [error, setError] = useState(false);
-
-  if (error || !imageUrl) {
-    return <img src="/api/placeholder/400/320" alt={alt} className="w-full h-48 object-cover rounded-t-lg" />;
-  }
-
-  return (
-    <img
-      src={imageUrl}
-      alt={alt}
-      className="w-full h-48 object-cover rounded-t-lg"
-      onError={() => setError(true)}
-    />
-  );
-};
-
-const ProductCarousel = ({ products }) => {
+const ProductCarousel = ({ products, companyId }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const nextSlide = () => {
+  const nextSlide = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setCurrentIndex((prevIndex) =>
       prevIndex + 1 === products.length ? 0 : prevIndex + 1
     );
   };
 
-  const prevSlide = () => {
+  const prevSlide = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setCurrentIndex((prevIndex) =>
       prevIndex - 1 < 0 ? products.length - 1 : prevIndex - 1
     );
@@ -149,19 +153,14 @@ const Search = () => {
   const { scrollDirection, isAtTop } = useScrollDirection();
   const shouldShowSearch = scrollDirection === "up" || isAtTop;
 
-  // Efecto para manejar los parámetros de la URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const searchQuery = params.get('q');
     const tab = params.get('tab');
     const cats = params.get('categories');
 
-    if (searchQuery) {
-      setQuery(searchQuery);
-    }
-    if (tab && (tab === 'companies' || tab === 'products')) {
-      setActiveTab(tab);
-    }
+    if (searchQuery) setQuery(searchQuery);
+    if (tab && (tab === 'companies' || tab === 'products')) setActiveTab(tab);
     if (cats) {
       try {
         const categoriesArray = JSON.parse(cats);
@@ -169,12 +168,11 @@ const Search = () => {
           setSelectedCategories(categoriesArray);
         }
       } catch (e) {
-        console.error('Error parsing categories from URL:', e);
+        console.error('Error al procesar categorías de la URL:', e);
       }
     }
   }, [location.search]);
 
-  // Efecto para actualizar la URL cuando cambian los filtros
   useEffect(() => {
     const params = new URLSearchParams();
     if (query) params.set('q', query);
@@ -191,7 +189,7 @@ const Search = () => {
     const animatePlaceholder = async () => {
       if (isInputHovered) return;
 
-      const currentCategory = SearchCategories[currentCategoryIndex];
+      const currentCategory = FrasesDeBusqueda[currentCategoryIndex];
       
       if (isTyping) {
         for (let i = 0; i <= currentCategory.length; i++) {
@@ -207,7 +205,7 @@ const Search = () => {
           await new Promise(resolve => setTimeout(resolve, 30));
         }
         setIsTyping(true);
-        setCurrentCategoryIndex((prevIndex) => (prevIndex + 1) % SearchCategories.length);
+        setCurrentCategoryIndex((prevIndex) => (prevIndex + 1) % FrasesDeBusqueda.length);
       }
     };
 
@@ -283,13 +281,8 @@ const Search = () => {
   const handleInputHover = (isHovered) => {
     setIsInputHovered(isHovered);
     if (isHovered) {
-      setPlaceholderText(SearchCategories[currentCategoryIndex]);
+      setPlaceholderText(FrasesDeBusqueda[currentCategoryIndex]);
     }
-  };
-
-  const handleQueryChange = (e) => {
-    const newQuery = e.target.value;
-    setQuery(newQuery);
   };
 
   const renderCompanies = () => {
@@ -317,35 +310,37 @@ const Search = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white"
+            className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
           >
-            <ImageFromS3
-              imageUrl={company.cover_photo_url}
-              alt={`${company.name} cover photo`}
-            />
-            
-            <CompanyLogo 
-              logo={company.profile_picture_url}
-              companyName={company.name}
-            />
-            
-            <div className="p-4">
-              <h3 className="text-xl font-semibold mb-2 font-system">{company.name}</h3>
-              {company.description && (
-                <p className="text-gray-600 leading-5 mb-4 font-system">{company.description.slice(0, 100)}...</p>
-              )}
+            <Link to={`/company/${company.id}`}>
+              <div className="relative">
+                {!selectedCategories.length && (
+                  <ImageFromS3
+                    imageUrl={company.cover_photo_url}
+                    alt={`${company.name} foto de portada`}
+                  />
+                )}
+                {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
+                  <ProductCarousel products={company.matchingProducts} companyId={company.id} />
+                )}
+                <CompanyLogo 
+                  logo={company.profile_picture_url}
+                  companyName={company.name}
+                  className="absolute top-4 right-4"
+                />
+              </div>
               
-              {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
-                <ProductCarousel products={company.matchingProducts} />
-              )}
-              
-              <Link 
-                to={`/company/${company.id}`}
-                className="mt-4 inline-block text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
-              >
-                Go to 
-              </Link>
-            </div>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2 font-system">{company.name}</h3>
+                <Link 
+                  to={`/categories/${company.category_id}`}
+                  className="text-sm text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
+                >
+                  {company.category_name}
+                </Link>
+                <p className="text-sm text-gray-600 mt-2 font-system line-clamp-2">{company.description}</p>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -355,28 +350,35 @@ const Search = () => {
   const renderProducts = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredResults.products.map(product => (
-        <motion.div
+        <Link
           key={product.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white"
+          to={`/product/${product.id}`}
+          className="block"
         >
-          <ImageFromS3
-            imageUrl={product.image_url}
-            alt={product.name}
-          />
-          <div className="p-4">
-            <h3 className="text-lg font-semibold font-system">{product.name}</h3>
-            <p className="text-gray-600 font-system">{product.price}</p>
-            <Link 
-              to={`/product/${product.id}`}
-              className="mt-2 inline-block text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300 font-system"
-            >
-              Ver producto
-            </Link>
-          </div>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white"
+          >
+            <div className="relative">
+              <ImageFromS3
+                imageUrl={product.image_url}
+                alt={product.name}
+              />
+              <CompanyLogo 
+                logo={product.company_logo}
+                companyName={product.company_name}
+                className="absolute top-4 right-4"
+              />
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold font-system">{product.name}</h3>
+              <p className="text-gray-600 font-system">{product.price}</p>
+              <p className="text-sm text-[#09FDFD] mt-1 font-system">{product.company_name}</p>
+            </div>
+          </motion.div>
+        </Link>
       ))}
     </div>
   );
@@ -407,7 +409,7 @@ const Search = () => {
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50"
-            style={{ top: '60px' }}
+            style={{ top: '56px' }}
           >
             <div className="container mx-auto px-4 py-4">
               <div className="flex items-center gap-4">
@@ -494,7 +496,7 @@ const Search = () => {
       <div 
         className="container mx-auto px-4" 
         style={{ 
-          marginTop: shouldShowSearch ? '200px' : '80px',
+          marginTop: shouldShowSearch ? '140px' : '80px',
           transition: 'margin-top 0.3s ease-in-out'
         }}
       >
