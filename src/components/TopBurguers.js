@@ -42,7 +42,7 @@ const TopBurgers = () => {
             alt={`${item.company_name} logo`}
             className="absolute top-2 left-2 border-2 border-inherit w-[35px] h-[35px] rounded-full object-cover shadow-[inset_0_1px_2px_0_rgba(60,64,67,0.3),inset_0_2px_6px_2px_rgba(60,64,67,0.15)]"
           />
-          <p className="font-extrabold italic mt-1 text-base text-neutral-700">{item.company_name}</p>
+          <p className="font-extrabold italic mt-1 text-sm text-neutral-700">{item.company_name}</p>
         </a>
       </div>
     );
