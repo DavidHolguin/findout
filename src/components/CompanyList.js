@@ -39,7 +39,7 @@ const CompanyList = () => {
 
   return (
     <div className="container mx-auto mt-10 px-3 font-system">
-      <div className="mt-8 mb-8"> {/* Añadido margen vertical */}
+      <div className="mt-8 mb-2"> {/* Añadido margen vertical */}
       <MiniSearch />
       </div>
       <Slider />

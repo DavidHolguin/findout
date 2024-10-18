@@ -69,13 +69,13 @@ const MiniSearch = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-2xl mx-auto text-left"
+      className="w-full max-w-2xl mx-auto text-left "
     >
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-3xl font-semibold text-[#09FDFD]"
+        className="text-3xl mx-6 text-[#09FDFD]"
       >
         ¡Hola, qué gusto verte!
       </motion.h2>
@@ -83,7 +83,7 @@ const MiniSearch = () => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-2xl mb-4 text-gray-400"
+        className="text-2xl mb-4 mx-6 text-gray-400"
       >
         ¿Qué buscas hoy?
       </motion.p>
