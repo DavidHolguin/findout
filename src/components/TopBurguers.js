@@ -10,7 +10,6 @@ const TopBurgers = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/top-burgers/');
-        // Asumiendo que el endpoint ahora devuelve un array de secciones
         setSections(response.data);
         setLoading(false);
       } catch (error) {
@@ -23,28 +22,32 @@ const TopBurgers = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading data</div>;
+  if (loading) return <div className="font-system">Loading...</div>;
+  if (error) return <div className="font-system">Error loading data</div>;
 
   const renderItem = (item) => {
     const itemUrl = item.item_type === 'BANNER' ? item.click_url : item.company_profile_url;
     
     return (
-      <div key={item.order} className="text-center relative">
+      <div key={item.order} className="text-center relative font-system">
         {item.item_type === 'COMPANY' && (
           <span 
             className="absolute top-0 left-0 mt-1 ml-1 w-[35px] h-[35px] rounded-full bg-cover bg-center bg-no-repeat shadow-[inset_0_1px_2px_0_rgba(60,64,67,0.3),inset_0_2px_6px_2px_rgba(60,64,67,0.15)]" 
             style={{ backgroundImage: `url(${item.company_logo})` }}
           />
         )}
-        <a href={itemUrl} target={item.item_type === 'BANNER' ? "_blank" : "_self"}>
+        <a 
+          href={itemUrl} 
+          target={item.item_type === 'BANNER' ? "_blank" : "_self"}
+          rel={item.item_type === 'BANNER' ? "noopener noreferrer" : undefined}
+        >
           <img
             src={item.featured_image}
             alt={item.company_name || 'Banner'}
             className="w-full h-auto rounded-lg"
           />
           {item.company_name && (
-            <p className="font-semibold mt-1 text-xs">{item.company_name}</p>
+            <p className="font-bold italic mt-1 text-xs">{item.company_name}</p>
           )}
         </a>
       </div>
@@ -52,9 +55,9 @@ const TopBurgers = () => {
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 font-system">
       {sections.map((section) => (
-        <section key={section.position} className="flex flex-col items-center my-4 font-[Poppins]">
+        <section key={section.position} className="flex flex-col items-center my-4">
           <div className="flex items-center gap-2 w-[100%] mb-2">
             <h3 className="font-extrabold m-0">
               {section.title.split(' ').map((word, index) => 
