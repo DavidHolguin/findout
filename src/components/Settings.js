@@ -1,69 +1,333 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, MapPin, Home, Download } from 'lucide-react';
 
 const Settings = () => {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState({
+    darkMode: false,
+    notifications: false,
+    location: false,
+    addresses: [],
+  });
+  const [newAddress, setNewAddress] = useState({
+    state: '',
+    city: '',
+    street: '',
+    references: '',
+    postalCode: '',
+  });
+  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
     } else {
-      // Aquí deberías hacer una llamada a tu API para obtener las configuraciones del usuario
-      // Por ahora, simularemos datos de configuración
-      setSettings({
-        notificationsEnabled: true,
-        darkModeEnabled: false,
-        language: 'es',
-        // Otras configuraciones...
-      });
+      loadSettings();
     }
   }, [navigate]);
 
-  const handleToggle = (setting) => {
-    setSettings(prev => ({
-      ...prev,
-      [setting]: !prev[setting]
+  const loadSettings = () => {
+    const storedSettings = JSON.parse(localStorage.getItem('userSettings')) || {};
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      ...storedSettings,
+      darkMode: localStorage.getItem('darkMode') === 'true',
     }));
-    // Aquí deberías hacer una llamada a tu API para actualizar la configuración
+    applyDarkMode(storedSettings.darkMode);
   };
 
-  if (!settings) {
-    return <div>Cargando...</div>;
-  }
+  const saveSettings = (newSettings) => {
+    const updatedSettings = { ...settings, ...newSettings };
+    localStorage.setItem('userSettings', JSON.stringify(updatedSettings));
+    setSettings(updatedSettings);
+  };
+
+  const applyDarkMode = (isDark) => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const handleToggle = (setting) => {
+    const newValue = !settings[setting];
+    if (setting === 'darkMode') {
+      localStorage.setItem('darkMode', newValue);
+      applyDarkMode(newValue);
+    }
+    saveSettings({ [setting]: newValue });
+
+    if (setting === 'notifications' && newValue) {
+      requestNotificationPermission();
+    }
+
+    if (setting === 'location' && newValue) {
+      requestLocationPermission();
+    }
+  };
+
+  const requestNotificationPermission = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        saveSettings({ notifications: false });
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      saveSettings({ notifications: false });
+    }
+  };
+
+  const requestLocationPermission = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Aquí solo guardamos que la ubicación está activada, no las coordenadas
+          saveSettings({ location: true });
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          alert('No se pudo obtener tu ubicación. Por favor, verifica la configuración de tu navegador.');
+          saveSettings({ location: false });
+        }
+      );
+    } else {
+      alert('La geolocalización no es compatible con tu navegador');
+      saveSettings({ location: false });
+    }
+  };
+
+  const handleAddressChange = (e) => {
+    setNewAddress({ ...newAddress, [e.target.name]: e.target.value });
+  };
+
+  const handleAddAddress = () => {
+    if (Object.values(newAddress).some(value => value.trim() !== '')) {
+      saveSettings({ addresses: [...settings.addresses, newAddress] });
+      setNewAddress({ state: '', city: '', street: '', references: '', postalCode: '' });
+    }
+  };
+
+  const handleRemoveAddress = (index) => {
+    const updatedAddresses = settings.addresses.filter((_, i) => i !== index);
+    saveSettings({ addresses: updatedAddresses });
+  };
+
+  const handleDownloadApp = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      setShowIOSInstructions(true);
+    } else {
+      // Para Android u otros dispositivos, proporciona un enlace directo o al Play Store
+      window.location.href = 'https://play.google.com/store/apps/details?id=your.app.id';
+    }
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Configuraciones</h1>
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <div className="flex items-center mb-4">
-          <SettingsIcon size={32} className="text-gray-500 mr-4" />
-          <h2 className="text-xl font-semibold">Ajustes de usuario</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-6 transition-colors duration-200">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-xl rounded-lg p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+              <SettingsIcon size={24} className="text-white" />
+            </div>
+            <h2 className="text-2xl font-bold dark:text-white">Configuración</h2>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <span className="dark:text-white">Modo Oscuro</span>
+              </div>
+              <label className="theme">
+                <span className="theme__toggle-wrap">
+                  <input
+                    id="theme"
+                    className="theme__toggle"
+                    type="checkbox"
+                    role="switch"
+                    name="theme"
+                    checked={settings.darkMode}
+                    onChange={() => handleToggle('darkMode')}
+                  />
+                  <span className="theme__fill"></span>
+                  <span className="theme__icon">
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <Bell className={settings.notifications ? "text-green-500" : "text-gray-400"} />
+                <span className="dark:text-white">Notificaciones</span>
+              </div>
+              <label className="theme">
+                <span className="theme__toggle-wrap">
+                  <input
+                    className="theme__toggle"
+                    type="checkbox"
+                    role="switch"
+                    checked={settings.notifications}
+                    onChange={() => handleToggle('notifications')}
+                  />
+                  <span className="theme__fill"></span>
+                  <span className="theme__icon">
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <MapPin className={settings.location ? "text-green-500" : "text-gray-400"} />
+                <span className="dark:text-white">Ubicación</span>
+              </div>
+              <label className="theme">
+                <span className="theme__toggle-wrap">
+                  <input
+                    className="theme__toggle"
+                    type="checkbox"
+                    role="switch"
+                    checked={settings.location}
+                    onChange={() => handleToggle('location')}
+                  />
+                  <span className="theme__fill"></span>
+                  <span className="theme__icon">
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                    <span className="theme__icon-part"></span>
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            <div className="space-y-4 pb-4 border-b dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <Home className="text-green-500" />
+                <span className="dark:text-white">Direcciones de Entrega</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  name="state"
+                  value={newAddress.state}
+                  onChange={handleAddressChange}
+                  placeholder="Estado"
+                  className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+                />
+                <input
+                  type="text"
+                  name="city"
+                  value={newAddress.city}
+                  onChange={handleAddressChange}
+                  placeholder="Ciudad"
+                  className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+                />
+                <input
+                  type="text"
+                  name="street"
+                  value={newAddress.street}
+                  onChange={handleAddressChange}
+                  placeholder="Dirección"
+                  className="p-2 border rounded dark:bg-gray-700 dark:text-white col-span-2"
+                />
+                <input
+                  type="text"
+                  name="references"
+                  value={newAddress.references}
+                  onChange={handleAddressChange}
+                  placeholder="Referencias adicionales"
+                  className="p-2 border rounded dark:bg-gray-700 dark:text-white col-span-2"
+                />
+                <input
+                  type="text"
+                  name="postalCode"
+                  value={newAddress.postalCode}
+                  onChange={handleAddressChange}
+                  placeholder="Código Postal"
+                  className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+                />
+                <button
+                  onClick={handleAddAddress}
+                  className="p-2 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+                >
+                  Agregar
+                </button>
+              </div>
+              <div className="space-y-2">
+                {settings.addresses.map((address, index) => (
+                  <div key={index} className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                    <span className="dark:text-white">
+                      {address.street}, {address.city}, {address.state} {address.postalCode}
+                    </span>
+                    <button
+                      onClick={() => handleRemoveAddress(index)}
+                      className="px-2 py-1 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <button
+                onClick={handleDownloadApp}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+              >
+                <Download size={20} />
+                Descargar App
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span>Notificaciones</span>
+
+        {showIOSInstructions && (
+          <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-xl rounded-lg p-6">
+            <h3 className="text-xl font-semibold dark:text-white mb-4">Instalar en iOS</h3>
+            <ol className="list-decimal list-inside space-y-2 dark:text-white">
+              <li>Abre esta página en Safari</li>
+              <li>Toca el botón Compartir</li>
+              <li>Desplázate hacia abajo y toca "Añadir a la pantalla de inicio"</li>
+              <li>Toca "Añadir" en la esquina superior derecha</li>
+            </ol>
             <button
-              onClick={() => handleToggle('notificationsEnabled')}
-              className={`px-3 py-1 rounded ${settings.notificationsEnabled ? 'bg-green-500 text-white' : 'bg-gray-300'}`}
+              onClick={() => setShowIOSInstructions(false)}
+              className="mt-4 px-4 py-2 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
             >
-              {settings.notificationsEnabled ? 'Activadas' : 'Desactivadas'}
+              Cerrar
             </button>
           </div>
-          <div className="flex items-center justify-between">
-            <span>Modo oscuro</span>
-            <button
-              onClick={() => handleToggle('darkModeEnabled')}
-              className={`px-3 py-1 rounded ${settings.darkModeEnabled ? 'bg-green-500 text-white' : 'bg-gray-300'}`}
-            >
-              {settings.darkModeEnabled ? 'Activado' : 'Desactivado'}
-            </button>
-          </div>
-          {/* Puedes agregar más configuraciones aquí */}
-        </div>
+        )}
       </div>
     </div>
   );
