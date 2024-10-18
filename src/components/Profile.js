@@ -112,7 +112,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-3">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header Card */}
         <div className="backdrop-blur-lg bg-white/80 border border-white/20 shadow-xl rounded-lg p-6">
@@ -143,7 +143,7 @@ const Profile = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Nombre de usuario</label>
                     <input
-                      type="text"
+                      type="text" 
                       value={editForm.username}
                       onChange={(e) => setEditForm({...editForm, username: e.target.value})}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -184,7 +184,7 @@ const Profile = () => {
                   </div>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                    className="w-full py-2 px-4 bg-[#09fdfd] text-white rounded-lg hover:bg-blue-600 transition"
                   >
                     Editar Información
                   </button>
@@ -206,7 +206,7 @@ const Profile = () => {
                 <Key className="text-gray-500" size={20} />
                 <span>Cambiar contraseña</span>
               </div>
-              <button className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+              <button className="w-full py-2 px-4 bg-[#09fdfd] text-white rounded-lg hover:bg-blue-600 transition">
                 Actualizar Seguridad
               </button>
             </div>
@@ -214,9 +214,9 @@ const Profile = () => {
         </div>
 
         {/* Acciones de Cuenta */}
-        <div className="backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg rounded-lg">
-          <div className="p-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-red-500">Acciones de Cuenta</h3>
+        <div className="backdrop-blur-lg border border-white/20 shadow-lg rounded-lg">
+          <div>
+            
           </div>
           <div className="p-4 space-y-4">
             <button
