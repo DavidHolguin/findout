@@ -115,7 +115,7 @@ const CompanyDetail = () => {
 
   const getCarouselProducts = (products) => {
     if (products.length <= 1) return products;
-    if (products.length === 2) return [...products, products[0]];
+    if (products.length === 2) return products;
     return [...products, ...products, ...products];
   };
 
