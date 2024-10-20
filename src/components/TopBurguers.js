@@ -47,7 +47,7 @@ const TopBurgers = () => {
             />
           )}
           {item.item_type === 'COMPANY' && (
-            <p className="font-extrabold italic mt-1 text-sm text-neutral-700 leading-4">{item.company_name}</p>
+            <p className="font-extrabold mt-1 text-sm text-neutral-700 leading-4">{item.company_name}</p>
           )}
         </a>
       </div>

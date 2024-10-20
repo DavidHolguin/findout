@@ -1,8 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Import all necessary icons from lucide-react
+import {
+  Scissors,
+  Utensils,
+  ShoppingBag,
+  Coffee,
+  Shirt,
+  Wrench,
+  Book,
+  Music,
+  Laptop,
+  Palette,
+  Heart,
+  Dumbbell
+} from 'lucide-react';
 
 const FrasesDeBusqueda = [
   "Quizá un hot dog...",
@@ -14,6 +30,21 @@ const FrasesDeBusqueda = [
   "Explora restaurantes...",
   "Busca servicios..."
 ];
+
+const categoryIcons = {
+  "Barber Shop": Scissors,
+  "Fast Food Restaurant": Utensils,
+  "Retail Store": ShoppingBag,
+  "Cafe": Coffee,
+  "Clothing Store": Shirt,
+  "Auto Repair": Wrench,
+  "Bookstore": Book,
+  "Music Store": Music,
+  "Electronics Store": Laptop,
+  "Art Gallery": Palette,
+  "Health & Wellness": Heart,
+  "Fitness Center": Dumbbell
+};
 
 const useScrollDirection = () => {
   const [scrollDirection, setScrollDirection] = useState("up");
@@ -148,7 +179,7 @@ const Search = () => {
   const [placeholderText, setPlaceholderText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
-  const [isInputHovered, setIsInputHovered] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const searchContainerRef = useRef(null);
   const { scrollDirection, isAtTop } = useScrollDirection();
   const shouldShowSearch = scrollDirection === "up" || isAtTop;
@@ -188,20 +219,20 @@ const Search = () => {
 
   useEffect(() => {
     const animatePlaceholder = async () => {
-      if (isInputHovered) return;
+      if (isInputFocused) return;
 
       const currentCategory = FrasesDeBusqueda[currentCategoryIndex];
       
       if (isTyping) {
         for (let i = 0; i <= currentCategory.length; i++) {
-          if (isInputHovered) break;
+          if (isInputFocused) break;
           setPlaceholderText(currentCategory.slice(0, i));
           await new Promise(resolve => setTimeout(resolve, 50));
         }
         setIsTyping(false);
       } else {
         for (let i = currentCategory.length; i >= 0; i--) {
-          if (isInputHovered) break;
+          if (isInputFocused) break;
           setPlaceholderText(currentCategory.slice(0, i));
           await new Promise(resolve => setTimeout(resolve, 30));
         }
@@ -211,7 +242,7 @@ const Search = () => {
     };
 
     animatePlaceholder();
-  }, [isTyping, currentCategoryIndex, isInputHovered]);
+  }, [isTyping, currentCategoryIndex, isInputFocused]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -228,7 +259,7 @@ const Search = () => {
 
         setCompanies(companiesResponse.data);
         setProducts(productsResponse.data);
-        setCategories(categoriesResponse.data);
+        setCategories(categoriesResponse.data.filter(cat => cat.category_type === "EMPRESA"));
 
         // Create a map of company IDs to their logo URLs
         const logoMap = {};
@@ -252,29 +283,32 @@ const Search = () => {
   useEffect(() => {
     const filterResults = () => {
       const lowercaseQuery = query.toLowerCase();
-
+  
       let filteredCompanies = companies.filter(company => {
         const matchingProducts = products.filter(product =>
           product.company === company.id &&
           (product.name.toLowerCase().includes(lowercaseQuery) ||
-           company.name.toLowerCase().includes(lowercaseQuery)) &&
+           company.name.toLowerCase().includes(lowercaseQuery) ||
+           (company.category?.name && company.category.name.toLowerCase().includes(lowercaseQuery))) &&
           (selectedCategories.length === 0 || selectedCategories.includes(product.category))
         );
-
+  
         return matchingProducts.length > 0 || (
-          company.name.toLowerCase().includes(lowercaseQuery) &&
+          (company.name.toLowerCase().includes(lowercaseQuery) ||
+           (company.category?.name && company.category.name.toLowerCase().includes(lowercaseQuery))) &&
           selectedCategories.length === 0
         );
       });
-
+  
       const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(lowercaseQuery) &&
+        (product.name.toLowerCase().includes(lowercaseQuery) ||
+         (product.category?.name && product.category.name.toLowerCase().includes(lowercaseQuery))) &&
         (selectedCategories.length === 0 || selectedCategories.includes(product.category))
       );
-
+  
       setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
     };
-
+  
     filterResults();
   }, [query, companies, products, selectedCategories]);
 
@@ -286,11 +320,13 @@ const Search = () => {
     );
   };
 
-  const handleInputHover = (isHovered) => {
-    setIsInputHovered(isHovered);
-    if (isHovered) {
-      setPlaceholderText(FrasesDeBusqueda[currentCategoryIndex]);
-    }
+  const handleInputFocus = () => {
+    setIsInputFocused(true);
+    setPlaceholderText(FrasesDeBusqueda[currentCategoryIndex]);
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
   };
 
   const renderCompanies = () => {
@@ -339,7 +375,7 @@ const Search = () => {
               </div>
               
               <div className="p-4">
-                <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
+              <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
                 <Link 
                   to={`/company-categories/${company.category.id}`}
                   className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
@@ -388,6 +424,33 @@ const Search = () => {
     </div>
   );
 
+  const renderCategoryIcons = () => (
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mt-4">
+      {categories.map(category => {
+        const IconComponent = categoryIcons[category.name] || Building2;
+        return (
+          <motion.button
+            key={category.id}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleCategoryToggle(category.id)}
+            className={`
+              flex flex-col items-center justify-center p-4 rounded-lg
+              ${selectedCategories.includes(category.id)
+                ? 'bg-[#09FDFD] text-white shadow-md'
+                : 'bg-white/70 text-gray-600 hover:bg-gray-100'
+              }
+              border border-gray-200 backdrop-blur-sm transition-all duration-300
+            `}
+          >
+            <IconComponent size={24} className="mb-2" />
+            <span className="text-xs text-center">{category.name}</span>
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -419,84 +482,114 @@ const Search = () => {
             <div className="container mx-auto px-4 py-4">
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
-                  <div className="relative">
+                  <motion.div
+                    animate={{
+                      width: isInputFocused ? '100%' : '100%',
+                      height: isInputFocused ? 'auto' : '48px',
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="relative"
+                  >
                     <input
                       type="text"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
                       placeholder={placeholderText}
-                      onMouseEnter={() => handleInputHover(true)}
-                      onMouseLeave={() => handleInputHover(false)}
                       className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 
                                 bg-white/70 backdrop-blur-md shadow-lg
                                 focus:outline-none focus:ring-2 focus:ring-[#09FDFD]
                                 placeholder-gray-400 transition-all duration-300"
                     />
                     <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  </div>
+                    {query && (
+                      <button
+                        onClick={() => setQuery('')}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X size={20} />
+                      </button>
+                    )}
+                  </motion.div>
+
+                  <AnimatePresence>
+                    {isInputFocused && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute left-0 right-0 top-full mt-2 bg-white/90 backdrop-blur-md rounded-lg shadow-xl border border-gray-200/50 overflow-hidden z-50"
+                      >
+                        {renderCategoryIcons()}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="flex gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setActiveTab('companies')}
-                    className={`p-3 rounded-full transition-all duration-300 ${
-                      activeTab === 'companies'
-                        ? 'bg-[#09FDFD] text-white shadow-lg'
-                        : 'bg-white/70 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Building2 size={20} />
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setActiveTab('products')}
-                    className={`p-3 rounded-full transition-all duration-300 ${
-                      activeTab === 'products'
-                        ? 'bg-[#09FDFD] text-white shadow-lg'
-                        : 'bg-white/70 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Package size={20} />
-                  </motion.button>
-                </div>
-              </div>
-
-              {/* Categorías */}
-              <div className="mt-3">
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-                  {categories.map(category => (
+                {!isInputFocused && (
+                  <div className="flex gap-2">
                     <motion.button
-                      key={category.id}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleCategoryToggle(category.id)}
-                      className={`
-                        py-1 px-4 rounded-full whitespace-nowrap text-sm
-                        ${selectedCategories.includes(category.id)
-                          ? 'bg-[#09FDFD] text-white shadow-md'
+                      onClick={() => setActiveTab('companies')}
+                      className={`p-3 rounded-full transition-all duration-300 ${
+                        activeTab === 'companies'
+                          ? 'bg-[#09FDFD] text-white shadow-lg'
                           : 'bg-white/70 text-gray-600 hover:bg-gray-100'
-                        }
-                        border border-gray-200 backdrop-blur-sm transition-all duration-300
-                      `}
+                      }`}
                     >
-                      {category.name}
+                      <Building2 size={20} />
                     </motion.button>
-                  ))}
-                </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setActiveTab('products')}
+                      className={`p-3 rounded-full transition-all duration-300 ${
+                        activeTab === 'products'
+                          ? 'bg-[#09FDFD] text-white shadow-lg'
+                          : 'bg-white/70 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Package size={20} />
+                    </motion.button>
+                  </div>
+                )}
               </div>
+
+              {!isInputFocused && (
+                <div className="mt-3">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                    {categories.map(category => (
+                      <motion.button
+                        key={category.id}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleCategoryToggle(category.id)}
+                        className={`
+                          py-1 px-4 rounded-full whitespace-nowrap text-sm
+                          ${selectedCategories.includes(category.id)
+                            ? 'bg-[#09FDFD] text-white shadow-md'
+                            : 'bg-white/70 text-gray-600 hover:bg-gray-100'
+                          }
+                          border border-gray-200 backdrop-blur-sm transition-all duration-300
+                        `}
+                      >
+                        {category.name}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Efecto de degradado para el overflow */}
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Contenedor Principal */}
       <div 
         className="container mx-auto px-4" 
         style={{ 
@@ -504,7 +597,6 @@ const Search = () => {
           transition: 'margin-top 0.3s ease-in-out'
         }}
       >
-        {/* Cuadrícula de Resultados */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -513,7 +605,6 @@ const Search = () => {
           {activeTab === 'companies' && renderCompanies()}
           {activeTab === 'products' && renderProducts()}
 
-          {/* Mensaje de No Resultados */}
           {((activeTab === 'companies' && filteredResults.companies.length === 0) ||
             (activeTab === 'products' && filteredResults.products.length === 0)) && (
             <motion.div
@@ -530,7 +621,6 @@ const Search = () => {
         </motion.div>
       </div>
 
-      {/* Estilos personalizados para ocultar la barra de desplazamiento */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
