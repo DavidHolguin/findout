@@ -48,7 +48,7 @@ const TopBurgers = () => {
           )}
           {item.item_type === 'COMPANY' && (
             <p className="font-extrabold mt-1 text-sm text-neutral-700 leading-4 flex items-center justify-center">
-              <span className="inline-block w-2 h-2 bg-[#09fdfd] rounded-full mr-1"></span>
+              <span className="inline-block w-1.5 h-1.5 bg-[#09fdfd] rounded-full mr-1"></span>
               {item.company_name}
             </p>
           )}
@@ -62,7 +62,7 @@ const TopBurgers = () => {
       {sections.map((section) => (
         <section key={section.title} className="flex flex-col items-center">
           <div className="flex items-center gap-2 w-[100%] mb-2">
-            <h3 className="font-extrabold m-0 text-2xl text-neutral-700">
+            <h3 className="font-extrabold m-0 text-xl text-neutral-700">
               {section.title.split(' ').map((word, index, array) => {
                 const shouldBeColored = 
                   (array.includes('BURGUERS') && index === 2) || 
