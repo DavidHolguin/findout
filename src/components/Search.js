@@ -283,32 +283,32 @@ const Search = () => {
   useEffect(() => {
     const filterResults = () => {
       const lowercaseQuery = query.toLowerCase();
-  
+
       let filteredCompanies = companies.filter(company => {
         const matchingProducts = products.filter(product =>
           product.company === company.id &&
           (product.name.toLowerCase().includes(lowercaseQuery) ||
            company.name.toLowerCase().includes(lowercaseQuery) ||
-           (company.category?.name && company.category.name.toLowerCase().includes(lowercaseQuery))) &&
+           company.category.name.toLowerCase().includes(lowercaseQuery)) &&
           (selectedCategories.length === 0 || selectedCategories.includes(product.category))
         );
-  
+
         return matchingProducts.length > 0 || (
           (company.name.toLowerCase().includes(lowercaseQuery) ||
-           (company.category?.name && company.category.name.toLowerCase().includes(lowercaseQuery))) &&
+           company.category.name.toLowerCase().includes(lowercaseQuery)) &&
           selectedCategories.length === 0
         );
       });
-  
+
       const filteredProducts = products.filter(product =>
         (product.name.toLowerCase().includes(lowercaseQuery) ||
-         (product.category?.name && product.category.name.toLowerCase().includes(lowercaseQuery))) &&
+         product.category.name.toLowerCase().includes(lowercaseQuery)) &&
         (selectedCategories.length === 0 || selectedCategories.includes(product.category))
       );
-  
+
       setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
     };
-  
+
     filterResults();
   }, [query, companies, products, selectedCategories]);
 
@@ -375,7 +375,7 @@ const Search = () => {
               </div>
               
               <div className="p-4">
-              <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
+                <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
                 <Link 
                   to={`/company-categories/${company.category.id}`}
                   className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
