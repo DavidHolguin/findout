@@ -36,7 +36,7 @@ const MiniSearch = () => {
         }
         setIsTyping(false);
       } else {
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Espera más tiempo antes de borrar
+        await new Promise(resolve => setTimeout(resolve, 2000));
         for (let i = currentCategory.length; i >= 0; i--) {
           if (isInputHovered) break;
           setPlaceholderText(currentCategory.slice(0, i));
@@ -69,7 +69,7 @@ const MiniSearch = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-2xl mx-auto text-left "
+      className="w-full max-w-2xl mx-auto text-left"
     >
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
@@ -95,7 +95,7 @@ const MiniSearch = () => {
           placeholder={placeholderText}
           onMouseEnter={() => handleInputHover(true)}
           onMouseLeave={() => handleInputHover(false)}
-          className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 
+          className="w-full pl-12 pr-4 py-3 rounded-full border border-[#09FDFD] 
                     bg-white/70 backdrop-blur-md 
                     focus:outline-none focus:ring-2 focus:ring-[#09FDFD]
                     placeholder-gray-400 transition-all duration-300
