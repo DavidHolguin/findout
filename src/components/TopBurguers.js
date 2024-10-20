@@ -29,20 +29,26 @@ const TopBurgers = () => {
     return (
       <div key={item.order} className="text-center relative font-system">
         <a 
-          href={item.company_profile_url}
+          href={item.item_type === 'BANNER' ? item.custom_url : item.company_profile_url}
           className="block relative"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <img
             src={item.featured_image}
-            alt={item.company_name}
+            alt={item.item_type === 'BANNER' ? 'Banner' : item.company_name}
             className="w-full h-auto rounded-lg"
           />
-          <img 
-            src={item.company_logo}
-            alt={`${item.company_name} logo`}
-            className="absolute top-2 left-2 border-2 border-inherit w-[35px] h-[35px] rounded-full object-cover shadow-[inset_0_1px_2px_0_rgba(60,64,67,0.3),inset_0_2px_6px_2px_rgba(60,64,67,0.15)]"
-          />
-          <p className="font-extrabold italic mt-1 text-sm text-neutral-700">{item.company_name}</p>
+          {item.item_type === 'COMPANY' && (
+            <img 
+              src={item.company_logo}
+              alt={`${item.company_name} logo`}
+              className="absolute top-2 left-2 border-2 border-inherit w-[35px] h-[35px] rounded-full object-cover shadow-[inset_0_1px_2px_0_rgba(60,64,67,0.3),inset_0_2px_6px_2px_rgba(60,64,67,0.15)]"
+            />
+          )}
+          {item.item_type === 'COMPANY' && (
+            <p className="font-extrabold italic mt-1 text-sm text-neutral-700">{item.company_name}</p>
+          )}
         </a>
       </div>
     );
