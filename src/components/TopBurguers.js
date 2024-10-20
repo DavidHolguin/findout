@@ -47,7 +47,10 @@ const TopBurgers = () => {
             />
           )}
           {item.item_type === 'COMPANY' && (
-            <p className="font-extrabold mt-1 text-sm text-neutral-700 leading-4">{item.company_name}</p>
+            <p className="font-extrabold mt-1 text-sm text-neutral-700 leading-4">
+              <span className="inline-block w-3 h-3 bg-[#09fdfd] rounded-full mr-1"></span>
+              {item.company_name}
+            </p>
           )}
         </a>
       </div>
@@ -63,7 +66,8 @@ const TopBurgers = () => {
               {section.title.split(' ').map((word, index, array) => {
                 const shouldBeColored = 
                   (array.includes('BURGUERS') && index === 2) || 
-                  (array.includes('BARBER') && word === 'SHOP');
+                  (array.includes('BARBER') && word === 'SHOP') ||
+                  (word === 'LATINOS');
                 
                 return shouldBeColored ? (
                   <span key={index} className="text-[#09fdfd]">{word} </span>
