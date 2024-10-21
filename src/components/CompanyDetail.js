@@ -48,14 +48,53 @@ const CompanyDetail = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [nextTime, setNextTime] = useState('');
+
   const categoryCarouselRef = useRef(null);
   const carouselRefs = useMemo(() => ({}), []);
+
+  const checkBusinessHours = useCallback((businessHours) => {
+    const now = new Date();
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDay = days[now.getDay()];
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    const todayHours = businessHours[currentDay];
+    if (!todayHours) return { isOpen: false, nextTime: 'N/A' };
+
+    const [openHour, openMinute] = todayHours.open.split(':').map(Number);
+    const [closeHour, closeMinute] = todayHours.close.split(':').map(Number);
+    const openTime = openHour * 60 + openMinute;
+    const closeTime = closeHour * 60 + closeMinute;
+
+    if (currentTime >= openTime && currentTime < closeTime) {
+      return { isOpen: true, nextTime: todayHours.close };
+    } else {
+      // Find next opening time
+      let nextDay = currentDay;
+      let daysChecked = 0;
+      while (daysChecked < 7) {
+        const nextDayIndex = (days.indexOf(nextDay) + 1) % 7;
+        nextDay = days[nextDayIndex];
+        if (businessHours[nextDay]) {
+          return { isOpen: false, nextTime: businessHours[nextDay].open };
+        }
+        daysChecked++;
+      }
+      return { isOpen: false, nextTime: 'N/A' };
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCompanyAndProducts = async () => {
       try {
         const companyResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`);
         setCompany(companyResponse.data);
+        
+        const { isOpen, nextTime } = checkBusinessHours(companyResponse.data.business_hours);
+        setIsOpen(isOpen);
+        setNextTime(nextTime);
         
         const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`);
         const companyProducts = productsResponse.data.filter(product => product.company === parseInt(id));
@@ -82,7 +121,7 @@ const CompanyDetail = () => {
     };
     
     fetchCompanyAndProducts();
-  }, [id]);
+  }, [id, checkBusinessHours]);
 
   const toggleCategory = useCallback((categoryId) => {
     setSelectedCategories(prev => 
@@ -210,8 +249,12 @@ const CompanyDetail = () => {
 
         <div className="w-11/12 flex items-center justify-between">
           <div className="text-center">
-            <h3 className="text-green-600 dark:text-green-400 text-xl leading-4 font-bold">OPEN NOW</h3>   
-            <p className="text-sm dark:text-gray-300">Hasta <span>11:50 pm</span></p>
+            <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {isOpen ? 'OPEN NOW' : 'CLOSED'}
+            </h3>   
+            <p className="text-sm dark:text-gray-300">
+              {isOpen ? `Until ${nextTime}` : `Opens at ${nextTime}`}
+            </p>
             <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400 dark:text-cyan-300">
               <span>{company.address}</span>
             </a>
