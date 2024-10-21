@@ -53,6 +53,12 @@ const Header = () => {
     };
   }, [lastScrollY]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 w-full bg-[#09FDFD] dark:bg-gray-800 shadow-md dark:shadow-gray-900/50 z-50 font-['Poppins',sans-serif] transition-all duration-500 ease-in-out ${
@@ -70,7 +76,14 @@ const Header = () => {
           </Link>
         </div>
         <div className="absolute right-6 flex items-center gap-2">
-          {!user && (
+          {user ? (
+            <button 
+              onClick={handleLogout}
+              className="text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-sm"
+            >
+              Cerrar sesión
+            </button>
+          ) : (
             <Link 
               to="/login" 
               className="flex items-center gap-2 text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
