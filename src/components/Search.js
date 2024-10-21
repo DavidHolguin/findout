@@ -487,7 +487,7 @@ const Search = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 cursor-pointer"
+            className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm border border-[#09FDFD] dark:border-[#09FDFD] cursor-pointer"
             onClick={() => handleProductClick(product)}
           >
             <div className="relative">
