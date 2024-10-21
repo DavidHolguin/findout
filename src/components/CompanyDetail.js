@@ -138,7 +138,7 @@ const CompanyDetail = () => {
             />
             {/* Icono de la bandera del país */}
             {company.country?.flag_icon_url && (
-              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white rounded-full p-1 shadow-md overflow-hidden">
+              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white rounded-full border-2 shadow-md overflow-hidden">
                 <img 
                   src={company.country.flag_icon_url} 
                   alt={`Bandera de ${company.country.name}`}
