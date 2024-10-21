@@ -46,7 +46,6 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
 const CompanyCategory = () => {
   const { categoryId } = useParams();
   const [companies, setCompanies] = useState([]);
-  const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -58,13 +57,12 @@ const CompanyCategory = () => {
         const token = localStorage.getItem('authToken');
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        const [companiesResponse, categoryResponse] = await Promise.all([
-          axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/?category=${categoryId}`, config),
-          axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/${categoryId}/`, config)
-        ]);
+        const companiesResponse = await axios.get(
+          `https://backendfindout-ea692e018a66.herokuapp.com/api/companies/?category=${categoryId}`,
+          config
+        );
 
         setCompanies(companiesResponse.data);
-        setCategory(categoryResponse.data);
       } catch (error) {
         console.error('Error al cargar datos:', error);
         setError(
@@ -99,10 +97,13 @@ const CompanyCategory = () => {
     );
   }
 
+  // Get category name from the first company in the list
+  const categoryName = companies[0]?.category?.name || 'Categoría';
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">
-        Empresas en la categoría: {category?.name}
+      <h1 className="text-xl font-bold mb-6 text-[#09fdfd] dark:text-[#09fdfd]">
+       {categoryName}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {companies.map(company => (
