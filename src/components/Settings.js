@@ -133,13 +133,13 @@ const Settings = () => {
             <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
               <SettingsIcon size={24} className="text-white" />
             </div>
-            <h2 className="text-2xl font-bold dark:text-white">Configuración</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Configuración</h2>
           </div>
 
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
               <div className="flex items-center gap-2">
-                <span className="dark:text-white">Modo Oscuro</span>
+                <span className="text-gray-900 dark:text-white">Modo Oscuro</span>
               </div>
               <label className="theme">
                 <span className="theme__toggle-wrap">
@@ -170,8 +170,8 @@ const Settings = () => {
 
             <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
               <div className="flex items-center gap-2">
-                <Bell className={settings.notifications ? "text-green-500" : "text-gray-400"} />
-                <span className="dark:text-white">Notificaciones</span>
+                <Bell className={settings.notifications ? "text-primary" : "text-gray-400 dark:text-gray-500"} />
+                <span className="text-gray-900 dark:text-white">Notificaciones</span>
               </div>
               <label className="theme">
                 <span className="theme__toggle-wrap">
@@ -200,8 +200,8 @@ const Settings = () => {
 
             <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
               <div className="flex items-center gap-2">
-                <MapPin className={settings.location ? "text-green-500" : "text-gray-400"} />
-                <span className="dark:text-white">Ubicación</span>
+                <MapPin className={settings.location ? "text-primary" : "text-gray-400 dark:text-gray-500"} />
+                <span className="text-gray-900 dark:text-white">Ubicación</span>
               </div>
               <label className="theme">
                 <span className="theme__toggle-wrap">
@@ -230,8 +230,8 @@ const Settings = () => {
 
             <div className="space-y-4 pb-4 border-b dark:border-gray-700">
               <div className="flex items-center gap-2">
-                <Home className="text-green-500" />
-                <span className="dark:text-white">Direcciones de Entrega</span>
+                <Home className="text-primary" />
+                <span className="text-gray-900 dark:text-white">Direcciones de Entrega</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <input
@@ -240,7 +240,7 @@ const Settings = () => {
                   value={newAddress.state}
                   onChange={handleAddressChange}
                   placeholder="Estado"
-                  className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+                  className="p-2 border rounded bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 />
                 <input
                   type="text"
@@ -248,7 +248,7 @@ const Settings = () => {
                   value={newAddress.city}
                   onChange={handleAddressChange}
                   placeholder="Ciudad"
-                  className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+                  className="p-2 border rounded bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 />
                 <input
                   type="text"
@@ -256,7 +256,7 @@ const Settings = () => {
                   value={newAddress.street}
                   onChange={handleAddressChange}
                   placeholder="Dirección"
-                  className="p-2 border rounded dark:bg-gray-700 dark:text-white col-span-2"
+                  className="p-2 border rounded bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 col-span-2"
                 />
                 <input
                   type="text"
@@ -264,7 +264,7 @@ const Settings = () => {
                   value={newAddress.references}
                   onChange={handleAddressChange}
                   placeholder="Referencias adicionales"
-                  className="p-2 border rounded dark:bg-gray-700 dark:text-white col-span-2"
+                  className="p-2 border rounded bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 col-span-2"
                 />
                 <input
                   type="text"
@@ -272,11 +272,11 @@ const Settings = () => {
                   value={newAddress.postalCode}
                   onChange={handleAddressChange}
                   placeholder="Código Postal"
-                  className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+                  className="p-2 border rounded bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 />
                 <button
                   onClick={handleAddAddress}
-                  className="p-2 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+                  className="p-2 bg-primary hover:bg-primary-dark text-white rounded transition"
                 >
                   Agregar
                 </button>
@@ -284,12 +284,12 @@ const Settings = () => {
               <div className="space-y-2">
                 {settings.addresses.map((address, index) => (
                   <div key={index} className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded">
-                    <span className="dark:text-white">
+                    <span className="text-gray-900 dark:text-white">
                       {address.street}, {address.city}, {address.state} {address.postalCode}
                     </span>
                     <button
                       onClick={() => handleRemoveAddress(index)}
-                      className="px-2 py-1 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+                      className="px-2 py-1 bg-primary hover:bg-primary-dark text-white rounded transition"
                     >
                       Eliminar
                     </button>
@@ -301,7 +301,7 @@ const Settings = () => {
             <div className="pt-4">
               <button
                 onClick={handleDownloadApp}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded transition"
               >
                 <Download size={20} />
                 Descargar App
@@ -312,8 +312,8 @@ const Settings = () => {
 
         {showIOSInstructions && (
           <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-xl rounded-lg p-6">
-            <h3 className="text-xl font-semibold dark:text-white mb-4">Instalar en iOS</h3>
-            <ol className="list-decimal list-inside space-y-2 dark:text-white">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Instalar en iOS</h3>
+            <ol className="list-decimal list-inside space-y-2 text-gray-900 dark:text-white">
               <li>Abre esta página en Safari</li>
               <li>Toca el botón Compartir</li>
               <li>Desplázate hacia abajo y toca "Añadir a la pantalla de inicio"</li>
@@ -321,7 +321,7 @@ const Settings = () => {
             </ol>
             <button
               onClick={() => setShowIOSInstructions(false)}
-              className="mt-4 px-4 py-2 bg-[#09fdfd] text-white rounded hover:bg-[#08e0e0] transition"
+              className="mt-4 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded transition"
             >
               Cerrar
             </button>

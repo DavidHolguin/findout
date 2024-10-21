@@ -62,8 +62,8 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
 
   if (error || !logo) {
     return (
-      <div className={`w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
-        <span className="text-lg font-bold text-gray-500">
+      <div className={`w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center border-2 border-[#09FDFD] ${className}`}>
+        <span className="text-lg font-bold text-gray-500 dark:text-gray-400">
           {companyName ? companyName.charAt(0).toUpperCase() : '?'}
         </span>
       </div>
@@ -74,7 +74,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
     <img
       src={logo}
       alt={`Logo de ${companyName || 'la empresa'}`}
-      className={`w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg ${className}`}
+      className={`w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-800 shadow-lg ${className}`}
       onError={() => setError(true)}
     />
   );
@@ -353,7 +353,7 @@ const Search = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
+              className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700"
             >
               <Link to={`/company/${company.id}`}>
                 <div className="relative">
@@ -373,14 +373,14 @@ const Search = () => {
                 </div>
                 
                 <div className="p-4">
-                  <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
+                  <h3 className="text-xl font-semibold leading-4 dark:text-white">{company.name}</h3>
                   <Link 
                     to={`/company-categories/${company.category?.id}`}
                     className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
                   >
                     {company.category?.name}
                   </Link>
-                  <p className="text-sm leading-4 text-gray-600 mt-1 line-clamp-2">{company.description}</p>
+                  <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{company.description}</p>
                   {shouldShowProducts && (
                     <p className="text-sm text-[#09FDFD] mt-2">
                       {matchingProducts.length} producto{matchingProducts.length !== 1 ? 's' : ''} encontrado{matchingProducts.length !== 1 ? 's' : ''}
@@ -407,7 +407,7 @@ const Search = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 backdrop-blur-sm border border-white/20"
+              className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm border border-white/20 dark:border-gray-700/20"
             >
               <div className="relative">
                 <ImageFromS3 imageUrl={product.image_url} alt={product.name} />
@@ -422,11 +422,11 @@ const Search = () => {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold">{product.name}</h3>
-                <p className="text-sm text-gray-600 leading-4 line-clamp-2">{product.description}</p>
+                <h3 className="text-lg font-semibold dark:text-white">{product.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-4 line-clamp-2">{product.description}</p>
                 <div className="mt-2 flex justify-between items-center">
                   <p className="text-sm text-[#09FDFD]">{productCompany?.name}</p>
-                  <span className="text-xs text-gray-500">{productCategory?.name}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{productCategory?.name}</span>
                 </div>
               </div>
             </motion.div>
@@ -442,7 +442,7 @@ const Search = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-md"
+          className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg shadow-md"
           role="alert"
         >
           <span className="block sm:inline">{error}</span>
@@ -461,7 +461,7 @@ const Search = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50"
+            className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 dark:border-gray-700/50"
             style={{ top: '56px' }}
           >
             <div className="container mx-auto px-4 pt-4 pb-3">
@@ -475,12 +475,13 @@ const Search = () => {
                       placeholder={placeholderText}
                       onMouseEnter={() => handleInputHover(true)}
                       onMouseLeave={() => handleInputHover(false)}
-                      className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 
-                                bg-white/70 backdrop-blur-md shadow-lg
+                      className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700
+                                bg-white/70 dark:bg-gray-800/70 backdrop-blur-md shadow-lg
                                 focus:outline-none focus:ring-2 focus:ring-[#09FDFD]
-                                placeholder-gray-400 transition-all duration-300"
+                                placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white
+                                transition-all duration-300"
                     />
-                    <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                   </div>
                 </div>
 
@@ -492,7 +493,7 @@ const Search = () => {
                     className={`p-3 rounded-full transition-all duration-300 ${
                       activeTab === 'companies'
                         ? 'bg-[#09FDFD] text-white shadow-lg'
-                        : 'bg-white/70 text-gray-600 hover:bg-gray-100'
+                        : 'bg-white/70 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Building2 size={20} />
@@ -505,7 +506,7 @@ const Search = () => {
                     className={`p-3 rounded-full transition-all duration-300 ${
                       activeTab === 'products'
                         ? 'bg-[#09FDFD] text-white shadow-lg'
-                        : 'bg-white/70 text-gray-600 hover:bg-gray-100'
+                        : 'bg-white/70 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Package size={20} />
@@ -525,9 +526,9 @@ const Search = () => {
                         py-1 px-4 rounded-full whitespace-nowrap text-sm
                         ${selectedCategories.includes(category.id)
                           ? 'bg-[#09FDFD] text-white shadow-md'
-                          : 'bg-white/70 text-gray-600 hover:bg-gray-100'
+                          : 'bg-white/70 dark:bg-gray-800/70 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                         }
-                        border border-gray-200 backdrop-blur-sm transition-all duration-300
+                        border border-gray-200 dark:border-gray-700 backdrop-blur-sm transition-all duration-300
                       `}
                     >
                       {category.name}
@@ -537,7 +538,7 @@ const Search = () => {
               </div>
             </div>
 
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/80 dark:from-gray-900/80 to-transparent pointer-events-none" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -564,7 +565,7 @@ const Search = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-12"
             >
-              <p className="text-gray-500 text-lg">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
                 No se encontraron resultados para tu búsqueda.
                 {selectedCategories.length > 0 && " Prueba ajustando los filtros de categoría."}
               </p>

@@ -95,7 +95,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -103,8 +103,8 @@ const Profile = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+      <div className="flex items-center justify-center min-h-screen dark:bg-gray-900">
+        <div className="bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-200 p-4 rounded-lg">
           {error}
         </div>
       </div>
@@ -112,17 +112,17 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-3">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-3 transition-colors duration-200">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header Card */}
-        <div className="backdrop-blur-lg bg-white/80 border border-white/20 shadow-xl rounded-lg p-6">
+        <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-xl rounded-lg p-6">
           <div className="flex items-center gap-4">
             <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
               <User size={40} className="text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">{user.username}</h2>
-              <p className="text-gray-600">ID: {user.user_id}</p>
+              <h2 className="text-2xl font-bold dark:text-white">{user.username}</h2>
+              <p className="text-gray-600 dark:text-gray-400">ID: {user.user_id}</p>
             </div>
           </div>
         </div>
@@ -130,9 +130,9 @@ const Profile = () => {
         {/* Info Cards Grid */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Información Personal */}
-          <div className="backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg rounded-lg">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+          <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-lg">
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-lg font-semibold flex items-center gap-2 dark:text-white">
                 <Settings size={20} />
                 Información Personal
               </h3>
@@ -141,21 +141,21 @@ const Profile = () => {
               {isEditing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Nombre de usuario</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de usuario</label>
                     <input
                       type="text" 
                       value={editForm.username}
                       onChange={(e) => setEditForm({...editForm, username: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                     <input
                       type="email"
                       value={editForm.email}
                       onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -170,7 +170,7 @@ const Profile = () => {
                         setIsEditing(false);
                         setEditForm({username: user.username, email: user.email});
                       }}
-                      className="flex-1 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                      className="flex-1 py-2 px-4 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition"
                     >
                       Cancelar
                     </button>
@@ -178,13 +178,13 @@ const Profile = () => {
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center gap-3">
-                    <Mail className="text-gray-500" size={20} />
+                  <div className="flex items-center gap-3 dark:text-white">
+                    <Mail className="text-gray-500 dark:text-gray-400" size={20} />
                     <span>{user.email}</span>
                   </div>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="w-full py-2 px-4 bg-[#09fdfd] text-white rounded-lg hover:bg-blue-600 transition"
+                    className="w-full py-2 px-4 bg-[#09fdfd] text-white rounded-lg hover:bg-[#08e0e0] transition"
                   >
                     Editar Información
                   </button>
@@ -194,19 +194,19 @@ const Profile = () => {
           </div>
 
           {/* Seguridad */}
-          <div className="backdrop-blur-lg bg-white/80 border border-white/20 shadow-lg rounded-lg">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+          <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-lg">
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-lg font-semibold flex items-center gap-2 dark:text-white">
                 <Shield size={20} />
                 Seguridad
               </h3>
             </div>
             <div className="p-4 space-y-4">
-              <div className="flex items-center gap-3">
-                <Key className="text-gray-500" size={20} />
+              <div className="flex items-center gap-3 dark:text-white">
+                <Key className="text-gray-500 dark:text-gray-400" size={20} />
                 <span>Cambiar contraseña</span>
               </div>
-              <button className="w-full py-2 px-4 bg-[#09fdfd] text-white rounded-lg hover:bg-blue-600 transition">
+              <button className="w-full py-2 px-4 bg-[#09fdfd] text-white rounded-lg hover:bg-[#08e0e0] transition">
                 Actualizar Seguridad
               </button>
             </div>
@@ -214,14 +214,11 @@ const Profile = () => {
         </div>
 
         {/* Acciones de Cuenta */}
-        <div className="backdrop-blur-lg border border-white/20 shadow-lg rounded-lg">
-          <div>
-            
-          </div>
+        <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-lg">
           <div className="p-4 space-y-4">
             <button
               onClick={handleLogout}
-              className="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2"
+              className="w-full py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center justify-center gap-2"
             >
               <LogOut size={20} />
               Cerrar Sesión
@@ -239,19 +236,19 @@ const Profile = () => {
 
         {/* Modal de Confirmación */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
               <div className="flex items-center gap-2 mb-4">
                 <AlertTriangle className="h-5 w-5 text-red-500" />
-                <h3 className="text-lg font-semibold">Confirmar eliminación</h3>
+                <h3 className="text-lg font-semibold dark:text-white">Confirmar eliminación</h3>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 ¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.
               </p>
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition"
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition"
                 >
                   Cancelar
                 </button>

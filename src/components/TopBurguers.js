@@ -5,6 +5,7 @@ const TopBurgers = () => {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,10 +21,26 @@ const TopBurgers = () => {
     };
 
     fetchData();
+
+    // Check if dark mode is enabled
+    const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(darkModeEnabled);
+
+    // Listen for changes in dark mode
+    const handleDarkModeChange = (e) => {
+      setIsDarkMode(e.matches);
+    };
+
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addListener(handleDarkModeChange);
+
+    return () => {
+      darkModeMediaQuery.removeListener(handleDarkModeChange);
+    };
   }, []);
 
-  if (loading) return <div className="font-system">Loading...</div>;
-  if (error) return <div className="font-system">Error loading data</div>;
+  if (loading) return <div className="font-system dark:text-white">Loading...</div>;
+  if (error) return <div className="font-system dark:text-white">Error loading data</div>;
 
   const renderItem = (item) => {
     return (
@@ -45,7 +62,7 @@ const TopBurgers = () => {
             />
           )}
           {item.item_type === 'COMPANY' && (
-            <p className="font-extrabold mt-1 text-sm text-neutral-700 leading-4 flex items-center justify-center">
+            <p className="font-extrabold mt-1 text-sm text-neutral-700 dark:text-neutral-300 leading-4 flex items-center justify-center">
               <span className="inline-block w-1.5 h-1.5 bg-[#09fdfd] rounded-full mr-1"></span>
               {item.company_name}
             </p>
@@ -56,11 +73,11 @@ const TopBurgers = () => {
   };
 
   return (
-    <div className="flex flex-col gap-1 font-system">
+    <div className={`flex flex-col gap-1 font-system ${isDarkMode ? 'dark' : ''}`}>
       {sections.map((section) => (
         <section key={section.title} className="flex flex-col items-center">
           <div className="flex items-center gap-2 w-[100%] mb-2">
-            <h3 className="font-extrabold m-0 text-xl text-neutral-700">
+            <h3 className="font-extrabold m-0 text-xl text-neutral-700 dark:text-neutral-300">
               {section.title.split(' ').map((word, index, array) => {
                 const shouldBeColored = 
                   (array.includes('BURGUERS') && index === 2) || 
@@ -74,7 +91,7 @@ const TopBurgers = () => {
                 );
               })}
             </h3>
-            <p className="m-0 text-lg text-neutral-700">{section.location}</p>
+            <p className="m-0 text-lg text-neutral-700 dark:text-neutral-300">{section.location}</p>
             <svg
               id="Layer_1"
               height="10"
