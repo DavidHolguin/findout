@@ -9,8 +9,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
     let timeout;
     if (isOpen) {
       setIsAnimating(true);
-      // Retrasamos la aparición del contenido hasta que el modal esté casi desplegado
-      timeout = setTimeout(() => setContentVisible(true), 400);
+      timeout = setTimeout(() => setContentVisible(true), 300);
     } else {
       setContentVisible(false);
       timeout = setTimeout(() => setIsAnimating(false), 500);
@@ -24,15 +23,15 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
     <div 
       className={`fixed inset-0 z-50 flex items-end justify-center
         ${isOpen 
-          ? 'animate-in fade-in duration-700' 
-          : 'animate-out fade-out duration-500'
+          ? 'animate-in fade-in duration-500' 
+          : 'animate-out fade-out duration-300'
         }`}
       onClick={onClose}
     >
       <div className={`absolute inset-0 bg-black/40 backdrop-blur-sm
         ${isOpen 
-          ? 'animate-in fade-in duration-700' 
-          : 'animate-out fade-out duration-500'
+          ? 'animate-in fade-in duration-500' 
+          : 'animate-out fade-out duration-300'
         }`}
       />
 
@@ -44,8 +43,8 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
           }`}
         style={{
           animation: isOpen 
-            ? 'modal-open 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
-            : 'modal-close 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+            ? 'modal-open 0.6s cubic-bezier(0.33, 1, 0.68, 1) forwards'
+            : 'modal-close 0.5s cubic-bezier(0.32, 0, 0.67, 0) forwards'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -63,14 +62,14 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
             <img 
               src={product.image_url || "/api/placeholder/400/320"} 
               alt={product.name} 
-              className={`w-full h-auto object-cover transition-all duration-1000
-                ${contentVisible ? 'scale-100 opacity-100' : 'scale-125 opacity-0'}`}
+              className={`w-full h-auto object-cover transition-all duration-700
+                ${contentVisible ? 'scale-100 opacity-100' : 'scale-110 opacity-0'}`}
             />
           </div>
         </div>
 
         <div className={`p-6 space-y-4 transition-all duration-500
-          ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         >
           <h2 className="text-2xl font-bold">{product.name}</h2>
           <p className="text-green-600 font-bold text-xl">${product.price}</p>
@@ -89,18 +88,12 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
         <style jsx>{`
           @keyframes modal-open {
             0% {
-              transform: translateY(100%) scale(0.8);
+              transform: translateY(100%) scale(0.95);
               opacity: 0;
-            }
-            40% {
-              transform: translateY(-4%) scale(1.02);
-              opacity: 1;
-            }
-            70% {
-              transform: translateY(2%) scale(0.99);
             }
             100% {
               transform: translateY(0) scale(1);
+              opacity: 1;
             }
           }
 
@@ -109,12 +102,8 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
               transform: translateY(0) scale(1);
               opacity: 1;
             }
-            30% {
-              transform: translateY(2%) scale(0.99);
-              opacity: 1;
-            }
             100% {
-              transform: translateY(100%) scale(0.8);
+              transform: translateY(100%) scale(0.95);
               opacity: 0;
             }
           }
