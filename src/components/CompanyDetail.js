@@ -66,7 +66,6 @@ const CompanyDetail = () => {
         
         setProductsByCategory(grouped);
         
-        // Filter categories to only those with products
         const categoriesWithProducts = categoriesResponse.data.filter(
           category => grouped[category.id]
         );
@@ -126,22 +125,35 @@ const CompanyDetail = () => {
       {/* Company profile section */}
       <section className="w-full mb-8 flex flex-col items-center">
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden relative">
+          <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
             <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
               backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
               backgroundSize: '100% 400%',
               animation: 'rotating 2s linear infinite, gradientRotate 5s linear infinite'
-           
             }}></div>
             <ImageWithFallback 
               src={company.profile_picture_url} 
               alt={company.name} 
-              className="w-[88px] h-[88px] absolute rounded-full object-cover border-4	border-inherit	border-solid	"
+              className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
             />
+            {/* Icono de la bandera del país */}
+            {company.country?.flag_icon_url && (
+              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white rounded-full p-1 shadow-md overflow-hidden">
+                <img 
+                  src={company.country.flag_icon_url} 
+                  alt={`Bandera de ${company.country.name}`}
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/api/placeholder/32/32";
+                  }}
+                />
+              </div>
+            )}
           </div>
           <div className="mt-2 text-center">
             <h3 className="text-gray-600 text-2xl leading-4 font-extrabold">{company.name}</h3>
-            <p className="text-cyan-400 text-base font-medium ">
+            <p className="text-cyan-400 text-base font-medium">
               {company.category && typeof company.category === 'object' 
                 ? company.category.name 
                 : (company.category || 'Categoría de la empresa')}
@@ -172,7 +184,7 @@ const CompanyDetail = () => {
           </div>
         </div>
 
-        <div className="w-11/12 flex items-center	 justify-between">
+        <div className="w-11/12 flex items-center justify-between">
           <div className="text-center">
             <h3 className="text-green-600 text-xl leading-4 font-bold">OPEN NOW</h3>   
             <p className="text-sm">Hasta <span>11:50 pm</span></p>
@@ -183,7 +195,7 @@ const CompanyDetail = () => {
 
           <div className="w-2/3 border-l border-gray-400 pl-4">
             <p className="text-sm leading-4 text-gray-600 mb-4">{company.description}</p>
-            <a href="#" className=" bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full">
+            <a href="#" className="bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full">
               Escribir
             </a>
           </div>
