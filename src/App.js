@@ -9,6 +9,7 @@ import Register from './components/Register';
 import MenuBar from './components/MenuBar';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
+import CompanyCategory from './components/CompanyCategory';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -47,6 +48,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/company-categories/:categoryId" element={<CompanyCategory />} />
           </Routes>
         </main>
         <MenuBar />

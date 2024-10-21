@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ProductModal from './ProductModal'; // Asegúrate de que la ruta de importación sea correcta
 
 const FrasesDeBusqueda = [
   "Quizá un hot dog...",
@@ -157,6 +158,10 @@ const Search = () => {
   const { scrollDirection, isAtTop } = useScrollDirection();
   const shouldShowSearch = scrollDirection === "up" || isAtTop;
   const [companyLogos, setCompanyLogos] = useState({});
+  
+  // Nuevo estado para manejar el modal de producto
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Cargar parámetros de URL
   useEffect(() => {
@@ -313,6 +318,7 @@ const Search = () => {
 
     setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
   }, [query, companies, products, selectedCategories]);
+
   // Actualizar resultados cuando cambian los filtros
   useEffect(() => {
     filterResults();
@@ -339,6 +345,25 @@ const Search = () => {
     }
     return filteredResults.products.filter(product => product.company === company.id);
   }, [filteredResults.products, query, selectedCategories]);
+
+  // Nueva función para manejar la apertura del modal
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  // Nueva función para manejar el cierre del modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  // Nueva función para manejar la adición al carrito (puedes implementar la lógica real más tarde)
+  const handleAddToCart = (product) => {
+    console.log('Producto añadido al carrito:', product);
+    // Implementa la lógica real de añadir al carrito aquí
+    handleCloseModal();
+  };
 
   const renderCompanies = () => {
     return (
@@ -402,35 +427,35 @@ const Search = () => {
         const productCategory = categories.find(c => c.id === product.category);
         
         return (
-          <Link key={product.id} to={`/product/${product.id}`} className="block">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm border border-white/20 dark:border-gray-700/20"
-            >
-              <div className="relative">
-                <ImageFromS3 imageUrl={product.image_url} alt={product.name} />
-                <div className="absolute top-0 left-0 right-0 p-2 flex justify-between items-start">
-                  <CompanyLogo 
-                    logo={companyLogos[product.company]}
-                    companyName={productCompany?.name}
-                  />
-                  <div className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-bold">
-                    $ {product.price}
-                  </div>
+          <motion.div
+            key={product.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 cursor-pointer"
+            onClick={() => handleProductClick(product)}
+          >
+            <div className="relative">
+              <ImageFromS3 imageUrl={product.image_url} alt={product.name} />
+              <div className="absolute top-0 left-0 right-0 p-2 flex justify-between items-start">
+                <CompanyLogo 
+                  logo={companyLogos[product.company]}
+                  companyName={productCompany?.name}
+                />
+                <div className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-bold">
+                  $ {product.price}
                 </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold dark:text-white">{product.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 leading-4 line-clamp-2">{product.description}</p>
-                <div className="mt-2 flex justify-between items-center">
-                  <p className="text-sm text-[#09FDFD]">{productCompany?.name}</p>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{productCategory?.name}</span>
-                </div>
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold dark:text-white">{product.name}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-4 line-clamp-2">{product.description}</p>
+              <div className="mt-2 flex justify-between items-center">
+                <p className="text-sm text-[#09FDFD]">{productCompany?.name}</p>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{productCategory?.name}</span>
               </div>
-            </motion.div>
-          </Link>
+            </div>
+          </motion.div>
         );
       })}
     </div>
@@ -574,6 +599,15 @@ const Search = () => {
         </motion.div>
       </div>
 
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onAddToCart={handleAddToCart}
+        />
+      )}
+
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -588,3 +622,4 @@ const Search = () => {
 };
 
 export default Search;
+          
