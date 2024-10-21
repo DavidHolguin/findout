@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search as SearchIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SearchCategories = [
   "Quizá un hot dog...",
@@ -20,7 +21,45 @@ const MiniSearch = () => {
   const [isTyping, setIsTyping] = useState(true);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [isInputHovered, setIsInputHovered] = useState(false);
+  const [user, setUser] = useState(null);
+  const [typedUsername, setTypedUsername] = useState('');
   const navigate = useNavigate();
+
+  const API_URL = 'https://backendfindout-ea692e018a66.herokuapp.com/api/login/';
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const config = {
+          headers: {
+            'Authorization': `Token ${token}`
+          }
+        };
+
+        const response = await axios.get(API_URL, config);
+        setUser(response.data);
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (user?.username) {
+      const typeUsername = async () => {
+        for (let i = 0; i <= user.username.length; i++) {
+          setTypedUsername(user.username.slice(0, i));
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      };
+      typeUsername();
+    }
+  }, [user]);
 
   useEffect(() => {
     const animatePlaceholder = async () => {
@@ -77,7 +116,13 @@ const MiniSearch = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="text-2xl font-semibold mx-6 leading-8 text-[#09FDFD]"
       >
-        ¡Hola, qué gusto verte!
+        {user?.username ? (
+          <>
+            ¡Hola, <span className="text-white">{typedUsername}</span>!
+          </>
+        ) : (
+          "¡Hola, qué gusto verte!"
+        )}
       </motion.h2>
       <motion.p
         initial={{ opacity: 0, y: -10 }}
@@ -96,13 +141,15 @@ const MiniSearch = () => {
           onMouseEnter={() => handleInputHover(true)}
           onMouseLeave={() => handleInputHover(false)}
           className="w-full pl-12 pr-4 py-3 rounded-full border border-[#09FDFD] 
-                    bg-white/70 backdrop-blur-md 
+                    bg-white/70 backdrop-blur-md dark:bg-gray-800/70
                     focus:outline-none focus:ring-2 focus:ring-[#09FDFD]
-                    placeholder-gray-400 transition-all duration-300
+                    placeholder-gray-400 dark:placeholder-gray-500
+                    text-gray-900 dark:text-white
+                    transition-all duration-300
                     font-system text-lg"
         />
         <SearchIcon 
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" 
           size={24}
         />
       </form>
