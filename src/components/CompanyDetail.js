@@ -27,8 +27,8 @@ const CategoryButton = ({ category, isSelected, onClick }) => (
     onClick={() => onClick(category.id)}
     className={`flex-shrink-0 px-4 py-2 mx-2 rounded-full text-sm font-semibold transition-all duration-300 ${
       isSelected
-        ? 'bg-cyan-400 text-white shadow-lg'
-        : 'bg-white text-gray-700 hover:bg-gray-100'
+        ? 'bg-cyan-400 text-white shadow-lg dark:bg-cyan-600'
+        : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
     } backdrop-filter backdrop-blur-lg bg-opacity-30 shadow-md`}
   >
     {category.name}
@@ -143,10 +143,10 @@ const CompanyDetail = () => {
     closeProductModal();
   }, [closeProductModal]);
 
-  if (!company) return <div>Cargando...</div>;
+  if (!company) return <div className="dark:text-white">Cargando...</div>;
 
   return (
-    <div className="flex flex-col items-center font-poppins">
+    <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
       {/* Company profile section */}
       <section className="w-full mb-8 flex flex-col items-center">
         <div className="flex flex-col items-center">
@@ -162,7 +162,7 @@ const CompanyDetail = () => {
               className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
             />
             {company.country?.flag_icon_url && (
-              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white rounded-full border-2 shadow-md overflow-hidden">
+              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 shadow-md overflow-hidden">
                 <img 
                   src={company.country.flag_icon_url} 
                   alt={`Bandera de ${company.country.name}`}
@@ -176,8 +176,8 @@ const CompanyDetail = () => {
             )}
           </div>
           <div className="mt-2 text-center">
-            <h3 className="text-gray-600 text-2xl leading-4 font-extrabold">{company.name}</h3>
-            <p className="text-cyan-400 text-base font-medium">
+            <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
+            <p className="text-cyan-400 dark:text-cyan-300 text-base font-medium">
               {company.category && typeof company.category === 'object' 
                 ? company.category.name 
                 : (company.category || 'Categoría de la empresa')}
@@ -210,30 +210,30 @@ const CompanyDetail = () => {
 
         <div className="w-11/12 flex items-center justify-between">
           <div className="text-center">
-            <h3 className="text-green-600 text-xl leading-4 font-bold">OPEN NOW</h3>   
-            <p className="text-sm">Hasta <span>11:50 pm</span></p>
-            <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400">
+            <h3 className="text-green-600 dark:text-green-400 text-xl leading-4 font-bold">OPEN NOW</h3>   
+            <p className="text-sm dark:text-gray-300">Hasta <span>11:50 pm</span></p>
+            <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400 dark:text-cyan-300">
               <span>{company.address}</span>
             </a>
           </div>
 
-          <div className="w-2/3 border-l border-gray-400 pl-4">
-            <p className="text-sm leading-4 text-gray-600 mb-4">{company.description}</p>
+          <div className="w-2/3 border-l border-gray-400 dark:border-gray-600 pl-4">
+            <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mb-4">{company.description}</p>
             <div className="flex items-center gap-2">
               <a 
                 href="#" 
-                className="bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90"
+                className="bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90 dark:bg-cyan-600 dark:hover:shadow-cyan-600/50"
               >
-                <Send className="w-4 h-4" /> {/* Icono de avión de papel */}
+                <Send className="w-4 h-4" />
                 Escribir
               </a>
               <a 
                 href={company.instagram_url || '#'} 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full shadow-lg hover:shadow-pink-500/50 transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90"
+                className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full shadow-lg hover:shadow-pink-500/50 transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
               >
-                <Instagram className="w-5 h-5" /> {/* Icono de Instagram */}
+                <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -244,7 +244,7 @@ const CompanyDetail = () => {
       <section className="w-full">
         {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
           <div key={categoryId} className="mb-0">
-            <h4 className="text-lg font-bold mb-4 text-gray-700 px-4">
+            <h4 className="text-lg font-bold mb-4 text-gray-700 dark:text-gray-300 px-4">
               {categories.find(cat => cat.id === parseInt(categoryId))?.name || 'Categoría'}
             </h4>
             <div 
@@ -271,16 +271,16 @@ const CompanyDetail = () => {
                     style={{ scrollSnapAlign: 'start' }}
                     onClick={() => openProductModal(product)}
                   >
-                    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                       <ImageWithFallback 
                         src={product.image_url} 
                         alt={product.name} 
                         className="w-full h-40 object-cover"
                       />
                       <div className="p-4">
-                        <h4 className="text-lg font-semibold leading-4 mb-2">{product.name}</h4>
-                        <p className="text-gray-600 text-sm leading-4 line-clamp-2">{product.description}</p>
-                        <p className="text-green-600 font-bold mt-2">${product.price}</p>
+                        <h4 className="text-lg font-semibold leading-4 mb-2 dark:text-white">{product.name}</h4>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-4 line-clamp-2">{product.description}</p>
+                        <p className="text-green-600 dark:text-green-400 font-bold mt-2">${product.price}</p>
                       </div>
                     </div>
                   </div>

@@ -28,7 +28,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
         }`}
       onClick={onClose}
     >
-      <div className={`absolute inset-0 bg-white/40 backdrop-blur-sm
+      <div className={`absolute inset-0 bg-white/40 dark:bg-black/40 backdrop-blur-sm
         ${isOpen 
           ? 'animate-in fade-in duration-500' 
           : 'animate-out fade-out duration-300'
@@ -36,7 +36,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
       />
 
       <div 
-        className={`relative bg-white w-full max-w-md rounded-t-3xl overflow-hidden shadow-2xl
+        className={`relative bg-white dark:bg-gray-800 w-full max-w-md rounded-t-3xl overflow-hidden shadow-2xl
           ${isOpen 
             ? 'animate-modal-open' 
             : 'animate-modal-close'
@@ -51,8 +51,8 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
         <div className="relative">
           <button
             onClick={onClose}
-            className="absolute top-4 left-4 p-2 bg-white/80 backdrop-blur-sm rounded-full 
-              shadow-lg text-gray-500 hover:text-gray-700 transition-all duration-300 
+            className="absolute top-4 left-4 p-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full 
+              shadow-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-300 
               hover:rotate-180 hover:scale-110 active:scale-95 z-10"
           >
             <ChevronDown size={24} />
@@ -71,14 +71,14 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
         <div className={`p-6 space-y-4 transition-all duration-500
           ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         >
-          <h2 className="text-2xl font-bold">{product.name}</h2>
-          <p className="text-green-600 font-bold text-xl">${product.price}</p>
-          <p className="text-gray-600 leading-5">{product.description}</p>
+          <h2 className="text-2xl font-bold dark:text-white">{product.name}</h2>
+          <p className="text-green-600 dark:text-green-400 font-bold text-xl">${product.price}</p>
+          <p className="text-gray-600 dark:text-gray-300 leading-5">{product.description}</p>
           <button
             onClick={() => onAddToCart(product)}
-            className="w-full bg-cyan-400 text-white py-3 rounded-full font-bold
+            className="w-full bg-cyan-400 dark:bg-cyan-600 text-white py-3 rounded-full font-bold
               transition-all duration-300 
-              hover:bg-cyan-500 hover:shadow-lg hover:scale-105 
+              hover:bg-cyan-500 dark:hover:bg-cyan-700 hover:shadow-lg hover:scale-105 
               active:scale-95 active:shadow-inner"
           >
             Agregar al carrito
