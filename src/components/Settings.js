@@ -30,12 +30,13 @@ const Settings = () => {
 
   const loadSettings = () => {
     const storedSettings = JSON.parse(localStorage.getItem('userSettings')) || {};
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
     setSettings(prevSettings => ({
       ...prevSettings,
       ...storedSettings,
-      darkMode: localStorage.getItem('darkMode') === 'true',
+      darkMode: isDarkMode,
     }));
-    applyDarkMode(storedSettings.darkMode);
+    applyDarkMode(isDarkMode);
   };
 
   const saveSettings = (newSettings) => {
@@ -85,7 +86,6 @@ const Settings = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Aquí solo guardamos que la ubicación está activada, no las coordenadas
           saveSettings({ location: true });
         },
         (error) => {
@@ -121,7 +121,6 @@ const Settings = () => {
     if (isIOS) {
       setShowIOSInstructions(true);
     } else {
-      // Para Android u otros dispositivos, proporciona un enlace directo o al Play Store
       window.location.href = 'https://play.google.com/store/apps/details?id=your.app.id';
     }
   };

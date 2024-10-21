@@ -1,12 +1,20 @@
 module.exports = {
-  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-  darkMode: true,
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
+  darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#09fdfd',
+        'primary-dark': '#08e0e0',
+      },
+    },
   },
   variants: {
-    extend: {},
+    extend: {
+      backgroundColor: ['dark', 'dark-hover', 'dark-group-hover', 'dark-even', 'dark-odd'],
+      borderColor: ['dark', 'dark-focus', 'dark-focus-within'],
+      textColor: ['dark', 'dark-hover', 'dark-active'],
+    },
   },
   plugins: [],
 }
-
