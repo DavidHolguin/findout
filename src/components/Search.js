@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -190,7 +190,7 @@ const Search = () => {
     
     const newUrl = `${location.pathname}?${params.toString()}`;
     navigate(newUrl, { replace: true });
-  }, [query, activeTab, selectedCategories, navigate]);
+  }, [query, activeTab, selectedCategories, navigate, location.pathname]);
 
   // Animación del placeholder
   useEffect(() => {
@@ -261,37 +261,14 @@ const Search = () => {
     const lowercaseQuery = query.toLowerCase();
 
     const matchesSearchTerm = (text) => text?.toLowerCase().includes(lowercaseQuery);
-    const matchesCategory = (categoryId) => !selectedCategories.length || selectedCategories.includes(categoryId);
-
-    const getCategoryName = (categoryId) => {
-      const category = categories.find(cat => cat.id === categoryId);
-      return category?.name || '';
-    };
-
-    // Filtrar empresas
-    const filteredCompanies = companies.filter(company => {
-      // Buscar en la información de la empresa
-      const companyMatches = 
-        matchesSearchTerm(company.name) ||
-        matchesSearchTerm(company.description) ||
-        matchesSearchTerm(getCategoryName(company.category?.id));
-
-      // Buscar en los productos de la empresa
-      const companyProducts = products.filter(product => product.company === company.id);
-      const productMatches = companyProducts.some(product => 
-        matchesSearchTerm(product.name) ||
-        matchesSearchTerm(product.description) ||
-        matchesSearchTerm(getCategoryName(product.category))
+    
+    // Función auxiliar para verificar si una empresa tiene productos en las categorías seleccionadas
+    const companyHasProductsInSelectedCategories = (companyId) => {
+      return products.some(product => 
+        product.company === companyId && 
+        (!selectedCategories.length || selectedCategories.includes(product.category))
       );
-
-      // Verificar categorías seleccionadas
-      const categoryMatches = 
-        matchesCategory(company.category?.id) ||
-        companyProducts.some(product => matchesCategory(product.category));
-
-      return (companyMatches || productMatches) && 
-             (selectedCategories.length === 0 || categoryMatches);
-    });
+    };
 
     // Filtrar productos
     const filteredProducts = products.filter(product => {
@@ -300,20 +277,46 @@ const Search = () => {
       const matches = 
         matchesSearchTerm(product.name) ||
         matchesSearchTerm(product.description) ||
-        matchesSearchTerm(getCategoryName(product.category)) ||
         matchesSearchTerm(productCompany?.name) ||
         matchesSearchTerm(productCompany?.description);
 
-      return matches && matchesCategory(product.category);
+      return matches && (!selectedCategories.length || selectedCategories.includes(product.category));
+    });
+
+    // Filtrar empresas
+    const filteredCompanies = companies.filter(company => {
+      // Si hay término de búsqueda o categorías seleccionadas
+      if (query || selectedCategories.length > 0) {
+        // Si hay categorías seleccionadas, verificar si la empresa tiene productos en esas categorías
+        if (selectedCategories.length > 0) {
+          return companyHasProductsInSelectedCategories(company.id);
+        }
+
+        // Si solo hay término de búsqueda
+        const companyMatches = 
+          matchesSearchTerm(company.name) ||
+          matchesSearchTerm(company.description);
+
+        const hasMatchingProducts = products
+          .filter(product => product.company === company.id)
+          .some(product => 
+            matchesSearchTerm(product.name) || 
+            matchesSearchTerm(product.description)
+          );
+
+        return companyMatches || hasMatchingProducts;
+      }
+
+      // Si no hay búsqueda ni categorías seleccionadas, mostrar todas las empresas
+      return true;
     });
 
     setFilteredResults({ companies: filteredCompanies, products: filteredProducts });
-  }, [query, companies, products, categories, selectedCategories]);
-
+  }, [query, companies, products, selectedCategories]);
   // Actualizar resultados cuando cambian los filtros
   useEffect(() => {
     filterResults();
-  }, [filterResults]);
+  }, [filterResults, query, selectedCategories]);
 
   const handleCategoryToggle = useCallback((categoryId) => {
     setSelectedCategories(prev => 
@@ -331,80 +334,63 @@ const Search = () => {
   }, [currentCategoryIndex]);
 
   const getMatchingProducts = useCallback((company) => {
-    const lowercaseQuery = query.toLowerCase();
-    return products.filter(product => {
-      const productCategory = categories.find(cat => cat.id === product.category);
-      const categoryName = productCategory?.name?.toLowerCase() || '';
-      
-      return product.company === company.id && (
-        product.name.toLowerCase().includes(lowercaseQuery) ||
-        product.description?.toLowerCase().includes(lowercaseQuery) ||
-        categoryName.includes(lowercaseQuery)
-      ) && (
-        selectedCategories.length === 0 || 
-        selectedCategories.includes(product.category)
-      );
-    });
-  }, [products, categories, query, selectedCategories]);
+    if (!query && selectedCategories.length === 0) {
+      return [];
+    }
+    return filteredResults.products.filter(product => product.company === company.id);
+  }, [filteredResults.products, query, selectedCategories]);
 
   const renderCompanies = () => {
-    const filteredCompaniesWithProducts = filteredResults.companies
-      .map(company => ({
-        ...company,
-        matchingProducts: getMatchingProducts(company)
-      }))
-      .filter(company =>
-        selectedCategories.length === 0 || 
-        company.matchingProducts.length > 0 ||
-        selectedCategories.includes(company.category?.id)
-      );
-  
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredCompaniesWithProducts.map(company => (
-          <motion.div
-            key={company.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
-          >
-            <Link to={`/company/${company.id}`}>
-              <div className="relative">
-                {(!selectedCategories.length || !company.matchingProducts.length) && (
-                  <ImageFromS3
-                    imageUrl={company.cover_photo_url}
-                    alt={`${company.name} foto de portada`}
+        {filteredResults.companies.map(company => {
+          const matchingProducts = getMatchingProducts(company);
+          const shouldShowProducts = (query || selectedCategories.length > 0) && matchingProducts.length > 0;
+          
+          return (
+            <motion.div
+              key={company.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white rounded-lg border"
+            >
+              <Link to={`/company/${company.id}`}>
+                <div className="relative">
+                  {shouldShowProducts ? (
+                    <ProductCarousel products={matchingProducts} companyId={company.id} />
+                  ) : (
+                    <ImageFromS3
+                      imageUrl={company.cover_photo_url}
+                      alt={`${company.name} foto de portada`}
+                    />
+                  )}
+                  <CompanyLogo 
+                    logo={company.profile_picture_url}
+                    companyName={company.name}
+                    className="absolute top-2 right-2 w-[55px] h-[55px]"
                   />
-                )}
-                {selectedCategories.length > 0 && company.matchingProducts.length > 0 && (
-                  <ProductCarousel products={company.matchingProducts} companyId={company.id} />
-                )}
-                <CompanyLogo 
-                  logo={company.profile_picture_url}
-                  companyName={company.name}
-                  className="absolute top-2 right-2 w-[55px] h-[55px]"
-                />
-              </div>
-              
-              <div className="p-4">
-                <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
-                <Link 
-                  to={`/company-categories/${company.category?.id}`}
-                  className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
-                >
-                  {company.category?.name}
-                </Link>
-                <p className="text-sm leading-4 text-gray-600 mt-1 line-clamp-2">{company.description}</p>
-                {company.matchingProducts.length > 0 && (
-                  <p className="text-sm text-[#09FDFD] mt-2">
-                    {company.matchingProducts.length} producto{company.matchingProducts.length !== 1 ? 's' : ''} encontrado{company.matchingProducts.length !== 1 ? 's' : ''}
-                  </p>
-                )}
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+                </div>
+                
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold leading-4">{company.name}</h3>
+                  <Link 
+                    to={`/company-categories/${company.category?.id}`}
+                    className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
+                  >
+                    {company.category?.name}
+                  </Link>
+                  <p className="text-sm leading-4 text-gray-600 mt-1 line-clamp-2">{company.description}</p>
+                  {shouldShowProducts && (
+                    <p className="text-sm text-[#09FDFD] mt-2">
+                      {matchingProducts.length} producto{matchingProducts.length !== 1 ? 's' : ''} encontrado{matchingProducts.length !== 1 ? 's' : ''}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
     );
   };
