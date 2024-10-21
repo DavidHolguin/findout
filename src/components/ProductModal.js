@@ -26,7 +26,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
       onClick={onClose}
     >
       <div 
-        className={`bg-white bg-opacity-80 backdrop-blur-lg w-full max-w-md rounded-t-3xl overflow-hidden shadow-lg transform transition-all duration-300 ease-in-out ${
+        className={`bg-white bg-opacity-80 backdrop-blur-lg w-full max-w-md rounded-t-3xl overflow-hidden shadow-lg transform transition-all duration-400 ease-in-out ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
         style={{
