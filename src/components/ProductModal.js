@@ -28,7 +28,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
         }`}
       onClick={onClose}
     >
-      <div className={`absolute inset-0 bg-black/40 backdrop-blur-sm
+      <div className={`absolute inset-0 bg-white/40 backdrop-blur-sm
         ${isOpen 
           ? 'animate-in fade-in duration-500' 
           : 'animate-out fade-out duration-300'
