@@ -112,7 +112,7 @@ const CompanyCategory = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700"
+            className="relative overflow-hidden border border-[#09FDFD] dark:border-[#09FDFD] hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg"
           >
             <Link to={`/company/${company.id}`}>
               <div className="relative">
