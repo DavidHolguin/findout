@@ -20,7 +20,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
 
   return (
     <div 
-      className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-end justify-center transition-all duration-300 ease-in-out ${
+      className={`fixed inset-0 bg-white bg-opacity-50 backdrop-blur-sm z-50 flex items-end justify-center transition-all duration-300 ease-in-out ${
         isOpen ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={onClose}
