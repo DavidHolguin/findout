@@ -31,8 +31,6 @@ const TopBurgers = () => {
         <a 
           href={item.item_type === 'BANNER' ? item.custom_url : item.company_profile_url}
           className="block relative"
-          target="_blank"
-          rel="noopener noreferrer"
         >
           <img
             src={item.featured_image}
