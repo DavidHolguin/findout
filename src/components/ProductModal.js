@@ -19,10 +19,18 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
   if (!isOpen && !isAnimating) return null;
 
   return (
-    <div className={`fixed inset-0 bg-white bg-opacity-50 backdrop-blur-sm z-50 flex items-end justify-center transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+    <div 
+      className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-end justify-center transition-opacity duration-300 ease-in-out ${
+        isOpen ? 'opacity-100' : 'opacity-0'
+      }`}
+      onClick={onClose}
+    >
       <div 
-        className={`bg-white bg-opacity-80 backdrop-blur-lg w-full max-w-md rounded-t-3xl overflow-hidden shadow-lg transform transition-all duration-300 ease-in-out ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`bg-white bg-opacity-80 backdrop-blur-lg w-full max-w-md rounded-t-3xl overflow-hidden shadow-lg transform transition-all duration-300 ease-in-out ${
+          isOpen ? 'translate-y-0' : 'translate-y-full'
+        }`}
         onTransitionEnd={handleAnimationEnd}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
           <button
@@ -34,7 +42,7 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
           <img 
             src={product.image_url || "/api/placeholder/400/320"} 
             alt={product.name} 
-            className="w-full h-auto object-cover"
+            className="w-full h-56 object-cover"
           />
         </div>
         <div className="p-6">
