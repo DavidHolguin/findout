@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import ProductModal from './ProductModal';
+import { Send, Instagram } from 'lucide-react';
 
 const ImageWithFallback = ({ src, alt, className }) => {
   const [error, setError] = useState(false);
@@ -218,9 +219,23 @@ const CompanyDetail = () => {
 
           <div className="w-2/3 border-l border-gray-400 pl-4">
             <p className="text-sm leading-4 text-gray-600 mb-4">{company.description}</p>
-            <a href="#" className="bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full">
-              Escribir
-            </a>
+            <div className="flex items-center gap-2">
+              <a 
+                href="#" 
+                className="bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90"
+              >
+                <Send className="w-4 h-4" /> {/* Icono de avión de papel */}
+                Escribir
+              </a>
+              <a 
+                href={company.instagram_url || '#'} 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full shadow-lg hover:shadow-pink-500/50 transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90"
+              >
+                <Instagram className="w-5 h-5" /> {/* Icono de Instagram */}
+              </a>
+            </div>
           </div>
         </div>
       </section>
