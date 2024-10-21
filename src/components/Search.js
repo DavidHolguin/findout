@@ -464,7 +464,7 @@ const Search = () => {
             className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50"
             style={{ top: '56px' }}
           >
-            <div className="container mx-auto px-4 py-4">
+            <div className="container mx-auto px-4 pt-4 pb-3">
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
                   <div className="relative">
@@ -514,7 +514,7 @@ const Search = () => {
               </div>
 
               <div className="mt-3">
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                   {categories.map(category => (
                     <motion.button
                       key={category.id}
