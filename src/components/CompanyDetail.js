@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
+import ProductModal from './ProductModal';
 
 const ImageWithFallback = ({ src, alt, className }) => {
   const [error, setError] = useState(false);
@@ -38,12 +39,16 @@ const CompanyDetail = () => {
   const [productsByCategory, setProductsByCategory] = useState({});
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const carouselRefs = useRef({});
-  const categoryCarouselRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const { id } = useParams();
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const categoryCarouselRef = useRef(null);
+  const carouselRefs = useMemo(() => ({}), []);
 
   useEffect(() => {
     const fetchCompanyAndProducts = async () => {
@@ -78,45 +83,64 @@ const CompanyDetail = () => {
     fetchCompanyAndProducts();
   }, [id]);
 
-  const toggleCategory = (categoryId) => {
+  const toggleCategory = useCallback((categoryId) => {
     setSelectedCategories(prev => 
       prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
     );
-  };
+  }, []);
 
-  const filteredProductsByCategory = selectedCategories.length === 0
-    ? productsByCategory
-    : Object.fromEntries(
-        Object.entries(productsByCategory).filter(([categoryId]) => 
-          selectedCategories.includes(parseInt(categoryId))
-        )
-      );
+  const filteredProductsByCategory = useMemo(() => {
+    return selectedCategories.length === 0
+      ? productsByCategory
+      : Object.fromEntries(
+          Object.entries(productsByCategory).filter(([categoryId]) => 
+            selectedCategories.includes(parseInt(categoryId))
+          )
+        );
+  }, [productsByCategory, selectedCategories]);
 
-  const startDragging = (e, ref) => {
-    setIsDragging(true);
-    setStartX(e.pageX - ref.current.offsetLeft);
-    setScrollLeft(ref.current.scrollLeft);
-  };
+  const startDragging = useCallback((e, ref) => {
+    if (ref.current) {
+      setIsDragging(true);
+      setStartX(e.pageX - ref.current.offsetLeft);
+      setScrollLeft(ref.current.scrollLeft);
+    }
+  }, []);
 
-  const stopDragging = () => {
+  const stopDragging = useCallback(() => {
     setIsDragging(false);
-  };
+  }, []);
 
-  const onDrag = (e, ref) => {
-    if (!isDragging) return;
+  const onDrag = useCallback((e, ref) => {
+    if (!isDragging || !ref.current) return;
     e.preventDefault();
     const x = e.pageX - ref.current.offsetLeft;
     const walk = (x - startX) * 2;
     ref.current.scrollLeft = scrollLeft - walk;
-  };
+  }, [isDragging, startX, scrollLeft]);
 
-  const getCarouselProducts = (products) => {
+  const getCarouselProducts = useCallback((products) => {
     if (products.length <= 1) return products;
     if (products.length === 2) return products;
     return [...products, ...products, ...products];
-  };
+  }, []);
+
+  const openProductModal = useCallback((product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  }, []);
+
+  const closeProductModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
+
+  const addToCart = useCallback((product) => {
+    // Implement add to cart functionality
+    console.log('Adding to cart:', product);
+    closeProductModal();
+  }, [closeProductModal]);
 
   if (!company) return <div>Cargando...</div>;
 
@@ -136,7 +160,6 @@ const CompanyDetail = () => {
               alt={company.name} 
               className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
             />
-            {/* Icono de la bandera del país */}
             {company.country?.flag_icon_url && (
               <div className="absolute bottom-0 left-0 w-8 h-8 bg-white rounded-full border-2 shadow-md overflow-hidden">
                 <img 
@@ -167,10 +190,10 @@ const CompanyDetail = () => {
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
               }}
-              onMouseDown={(e) => startDragging(e, categoryCarouselRef)}
+              onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
               onMouseUp={stopDragging}
               onMouseLeave={stopDragging}
-              onMouseMove={(e) => onDrag(e, categoryCarouselRef)}
+              onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
             >
               {categories.map(category => (
                 <CategoryButton
@@ -214,23 +237,24 @@ const CompanyDetail = () => {
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               <div
-                ref={el => carouselRefs.current[categoryId] = el}
+                ref={el => carouselRefs[categoryId] = el}
                 className="flex gap-4 px-4 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
                 style={{
                   scrollBehavior: 'smooth',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                 }}
-                onMouseDown={(e) => startDragging(e, carouselRefs.current[categoryId])}
+                onMouseDown={(e) => carouselRefs[categoryId] && startDragging(e, { current: carouselRefs[categoryId] })}
                 onMouseUp={stopDragging}
                 onMouseLeave={stopDragging}
-                onMouseMove={(e) => onDrag(e, carouselRefs.current[categoryId])}
+                onMouseMove={(e) => carouselRefs[categoryId] && onDrag(e, { current: carouselRefs[categoryId] })}
               >
                 {getCarouselProducts(products).map((product, index) => (
                   <div
                     key={`${product.id}-${index}`}
                     className="flex-none w-[65%] snap-start"
                     style={{ scrollSnapAlign: 'start' }}
+                    onClick={() => openProductModal(product)}
                   >
                     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
                       <ImageWithFallback 
@@ -252,6 +276,13 @@ const CompanyDetail = () => {
         ))}
       </section>
       <MenuBar />
+
+      <ProductModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={closeProductModal}
+        onAddToCart={addToCart}
+      />
 
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
