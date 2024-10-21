@@ -54,6 +54,11 @@ const CompanyDetail = () => {
   const categoryCarouselRef = useRef(null);
   const carouselRefs = useMemo(() => ({}), []);
 
+  const formatTime = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':');
+    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+  };
+
   const checkBusinessHours = useCallback((businessHours) => {
     const now = new Date();
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -69,7 +74,7 @@ const CompanyDetail = () => {
     const closeTime = closeHour * 60 + closeMinute;
 
     if (currentTime >= openTime && currentTime < closeTime) {
-      return { isOpen: true, nextTime: todayHours.close };
+      return { isOpen: true, nextTime: formatTime(todayHours.close) };
     } else {
       // Find next opening time
       let nextDay = currentDay;
@@ -78,7 +83,7 @@ const CompanyDetail = () => {
         const nextDayIndex = (days.indexOf(nextDay) + 1) % 7;
         nextDay = days[nextDayIndex];
         if (businessHours[nextDay]) {
-          return { isOpen: false, nextTime: businessHours[nextDay].open };
+          return { isOpen: false, nextTime: formatTime(businessHours[nextDay].open) };
         }
         daysChecked++;
       }
