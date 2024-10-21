@@ -108,31 +108,37 @@ const MiniSearch = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-2xl mx-auto text-left"
+      className="w-full max-w-2xl mx-auto text-start"
     >
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-2xl font-semibold mx-6 leading-8 text-[#09FDFD]"
+        className="text-3xl md:text-4xl font-bold ml-4"
       >
         {user?.username ? (
-          <>
-            ¡Hola, <span className="text-white">{typedUsername}</span>!
-          </>
+          <span className="dark:text-white text-[#09FDFD]">
+            ¡Hola,{' '}
+            <span className="dark:text-[#09FDFD] text-[#09FDFD]">
+              {typedUsername}
+            </span>
+            !
+          </span>
         ) : (
-          "¡Hola, qué gusto verte!"
+          <span className="dark:text-white text-[#09FDFD]">
+            ¡Hola, qué gusto verte!
+          </span>
         )}
       </motion.h2>
       <motion.p
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-xl mb-2 mx-6 text-gray-400"
+        className="text-xl md:text-2xl mb-2 text-gray-400 ml-4 font-medium"
       >
         ¿Qué buscas hoy?
       </motion.p>
-      <form onSubmit={handleSubmit} className="relative">
+      <form onSubmit={handleSubmit} className="relative max-w-xl mx-auto">
         <input
           type="text"
           value={query}
@@ -140,17 +146,18 @@ const MiniSearch = () => {
           placeholder={placeholderText}
           onMouseEnter={() => handleInputHover(true)}
           onMouseLeave={() => handleInputHover(false)}
-          className="w-full pl-12 pr-4 py-3 rounded-full border border-[#09FDFD] 
+          className="w-full pl-14 pr-6 py-4 rounded-full border-2 border-[#09FDFD] 
                     bg-white/70 backdrop-blur-md dark:bg-gray-800/70
-                    focus:outline-none focus:ring-2 focus:ring-[#09FDFD]
+                    focus:outline-none focus:ring-4 focus:ring-[#09FDFD]/30
                     placeholder-gray-400 dark:placeholder-gray-500
                     text-gray-900 dark:text-white
                     transition-all duration-300
-                    font-system text-lg"
+                    font-system text-lg md:text-xl
+                    shadow-lg hover:shadow-xl"
         />
         <SearchIcon 
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" 
-          size={24}
+          className="absolute left-5 top-1/2 transform -translate-y-1/2 text-[#09FDFD]" 
+          size={28}
         />
       </form>
 
