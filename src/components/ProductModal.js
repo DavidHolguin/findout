@@ -26,13 +26,12 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
       onClick={onClose}
     >
       <div 
-        className={`bg-white bg-opacity-80 backdrop-blur-lg w-full max-w-md rounded-t-3xl overflow-hidden shadow-lg transform transition-all duration-700 ${
+        className={`bg-white bg-opacity-80 backdrop-blur-lg w-full max-w-md rounded-t-3xl overflow-hidden shadow-lg transform transition-transform duration-700 ${
           isOpen 
-            ? 'translate-y-0 scale-100' 
-            : 'translate-y-full scale-95'
+            ? 'translate-y-0' 
+            : 'translate-y-full'
         }`}
         style={{
-          transitionProperty: 'transform, opacity',
           transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
         }}
         onTransitionEnd={handleAnimationEnd}
