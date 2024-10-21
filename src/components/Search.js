@@ -261,6 +261,34 @@ const Search = () => {
     fetchData();
   }, []);
 
+
+  const formatTime = (time) => {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    return `${hour > 12 ? hour - 12 : hour}:${minutes} ${hour >= 12 ? 'PM' : 'AM'}`;
+  };
+  
+  const isBusinessOpen = (businessHours) => {
+    if (!businessHours) return null;
+  
+    const now = new Date();
+    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDay = daysOfWeek[now.getDay()];
+    const currentHours = businessHours[currentDay];
+  
+    if (!currentHours || !currentHours.open || !currentHours.close) return null;
+  
+    const currentTime = now.toLocaleTimeString('en-US', { hour12: false });
+    const isOpen = currentTime >= currentHours.open && currentTime <= currentHours.close;
+    
+    return {
+      isOpen,
+      openTime: formatTime(currentHours.open),
+      closeTime: formatTime(currentHours.close)
+    };
+  };
+
   // Función mejorada de filtrado
   const filterResults = useCallback(() => {
     const lowercaseQuery = query.toLowerCase();
@@ -366,59 +394,86 @@ const Search = () => {
   };
 
   const renderCompanies = () => {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredResults.companies.map(company => {
-          const matchingProducts = getMatchingProducts(company);
-          const shouldShowProducts = (query || selectedCategories.length > 0) && matchingProducts.length > 0;
-          
-          return (
-            <motion.div
-              key={company.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700"
-            >
-              <Link to={`/company/${company.id}`}>
-                <div className="relative">
-                  {shouldShowProducts ? (
-                    <ProductCarousel products={matchingProducts} companyId={company.id} />
-                  ) : (
-                    <ImageFromS3
-                      imageUrl={company.cover_photo_url}
-                      alt={`${company.name} foto de portada`}
-                    />
-                  )}
-                  <CompanyLogo 
-                    logo={company.profile_picture_url}
-                    companyName={company.name}
-                    className="absolute top-2 right-2 w-[55px] h-[55px]"
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {filteredResults.companies.map(company => {
+        const matchingProducts = getMatchingProducts(company);
+        const shouldShowProducts = (query || selectedCategories.length > 0) && matchingProducts.length > 0;
+        const businessStatus = isBusinessOpen(company.business_hours);
+        
+        return (
+          <motion.div
+            key={company.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 ${
+              businessStatus && !businessStatus.isOpen ? 'opacity-60' : ''
+            }`}
+          >
+            <Link to={`/company/${company.id}`}>
+              <div className="relative">
+                {shouldShowProducts ? (
+                  <ProductCarousel products={matchingProducts} companyId={company.id} />
+                ) : (
+                  <ImageFromS3
+                    imageUrl={company.cover_photo_url}
+                    alt={`${company.name} foto de portada`}
                   />
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold leading-4 dark:text-white">{company.name}</h3>
-                  <Link 
-                    to={`/company-categories/${company.category?.id}`}
-                    className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
-                  >
-                    {company.category?.name}
-                  </Link>
-                  <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{company.description}</p>
-                  {shouldShowProducts && (
-                    <p className="text-sm text-[#09FDFD] mt-2">
-                      {matchingProducts.length} producto{matchingProducts.length !== 1 ? 's' : ''} encontrado{matchingProducts.length !== 1 ? 's' : ''}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            </motion.div>
-          );
-        })}
-      </div>
-    );
-  };
+                )}
+                <CompanyLogo 
+                  logo={company.profile_picture_url}
+                  companyName={company.name}
+                  className="absolute top-2 right-2 w-[55px] h-[55px]"
+                />
+                {company.business_hours && businessStatus && (
+                  <div className="absolute top-2 left-2 min-w-[130px]">
+                    <div className={`
+                      rounded-full text-sm font-bold shadow-lg
+                      ${businessStatus.isOpen 
+                        ? 'bg-gradient-to-r from-cyan-400 to-cyan-300 text-white' 
+                        : 'bg-gradient-to-r from-red-500 to-red-400 text-white'}
+                    `}>
+                      <div className="flex items-center">
+                        <span className={`
+                          px-3 py-1 rounded-full
+                          ${businessStatus.isOpen ? 'bg-cyan-500' : 'bg-red-600'}
+                        `}>
+                          {businessStatus.isOpen ? 'OPEN NOW' : 'CLOSE'}
+                        </span>
+                        <span className="px-2 whitespace-nowrap">
+                          {businessStatus.isOpen 
+                            ? `HASTA ${businessStatus.closeTime}`
+                            : `OPEN ${businessStatus.openTime}`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="p-4">
+                <h3 className="text-xl font-semibold leading-4 dark:text-white">{company.name}</h3>
+                <Link 
+                  to={`/company-categories/${company.category?.id}`}
+                  className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
+                >
+                  {company.category?.name}
+                </Link>
+                <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{company.description}</p>
+                {shouldShowProducts && (
+                  <p className="text-sm text-[#09FDFD] mt-2">
+                    {matchingProducts.length} producto{matchingProducts.length !== 1 ? 's' : ''} encontrado{matchingProducts.length !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+            </Link>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
 
   const renderProducts = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
