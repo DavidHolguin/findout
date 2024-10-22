@@ -26,11 +26,11 @@ const PromotionBadge = ({ promotion }) => {
   const isPercentage = promotion.discount_type === 'PERCENTAGE';
 
   return (
-    <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+    <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
       <div className="relative group">
-        <div className="bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg animate-bounce-slow">
+        <div className="bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg animate-bounce-slow">
           <Flame 
-            className="w-6 h-6 text-orange-500 animate-pulse" 
+            className="w-5 h-5 text-orange-500 animate-pulse" 
             style={{
               filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))'
             }}
@@ -46,7 +46,7 @@ const PromotionBadge = ({ promotion }) => {
 
       <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-fade-in-right">
         {isPercentage ? (
-          <span>-{promotion.discount_display}</span>
+          <span>{promotion.discount_display} OFF</span>
         ) : (
           <span>Ahorra ${promotion.discount_value}</span>
         )}
@@ -326,7 +326,7 @@ const CompanyDetail = () => {
             <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {isOpen ? 'ABIERTO' : 'CERRADO'}
             </h3>   
-            <p className="text-sm dark:text-gray-300">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
             </p>
             <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400 dark:text-cyan-300">
@@ -337,9 +337,10 @@ const CompanyDetail = () => {
           <div className="w-2/3 border-l border-gray-400 dark:border-gray-600 pl-4">
             <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mb-4">{company.description}</p>
             <div className="flex items-center gap-2">
+              
               <a 
                 href="#" 
-                className="bg-cyan-400 text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90 dark:bg-cyan-600 dark:hover:shadow-cyan-600/50"
+                className="bg-[#09fdfd] text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90 dark:bg-cyan-600 dark:hover:shadow-cyan-600/50"
               >
                 <Send className="w-4 h-4" />
                 Escribir
@@ -348,7 +349,7 @@ const CompanyDetail = () => {
                 href={company.instagram_url || '#'} 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full shadow-lg hover:shadow-pink-500/50 transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
+                className="p-2 bg-[#09fdfd] rounded-full shadow-lg  transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
               >
                 <Instagram className="w-5 h-5" />
               </a>

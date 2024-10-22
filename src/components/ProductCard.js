@@ -3,13 +3,23 @@ import { Flame } from 'lucide-react';
 
 const PromotionBadge = ({ promotion }) => {
   const isPercentage = promotion.discount_type === 'PERCENTAGE';
+  
+  // Función para formatear el valor del descuento
+  const formatDiscount = (value) => {
+    // Si es un string, elimina el signo negativo y los decimales
+    if (typeof value === 'string') {
+      return value.replace('-', '').split('.')[0];
+    }
+    // Si es un número, lo convierte a entero positivo
+    return Math.abs(Math.floor(value));
+  };
 
   return (
-    <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+    <div className="absolute top-2 right-2 flex items-center gap-1.5 z-10">
       <div className="relative group">
-        <div className="bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg animate-bounce-slow">
+        <div className="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-lg">
           <Flame 
-            className="w-6 h-6 text-orange-500 animate-pulse" 
+            className="w-4 h-4 text-orange-500 animate-pulse" 
             style={{
               filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))'
             }}
@@ -23,11 +33,11 @@ const PromotionBadge = ({ promotion }) => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-fade-in-right">
+      <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-lg">
         {isPercentage ? (
-          <span>-{promotion.discount_display}</span>
+          <span>{formatDiscount(promotion.discount_display)}% OFF</span>
         ) : (
-          <span>Ahorra ${promotion.discount_value}</span>
+          <span>Ahorra ${formatDiscount(promotion.discount_value)}</span>
         )}
       </div>
     </div>
@@ -37,6 +47,12 @@ const PromotionBadge = ({ promotion }) => {
 const ProductCard = ({ product, onClick }) => {
   const hasPromotion = product.active_promotions && product.active_promotions.length > 0;
   const promotion = hasPromotion ? product.active_promotions[0] : null;
+
+  const calculateOriginalPrice = (currentPrice, promotion) => {
+    if (!promotion) return currentPrice;
+    const discountValue = Math.abs(parseFloat(promotion.discount_value));
+    return (parseFloat(currentPrice) * (1 + discountValue/100)).toFixed(2);
+  };
 
   return (
     <div
@@ -60,7 +76,7 @@ const ProductCard = ({ product, onClick }) => {
             </p>
             {hasPromotion && (
               <p className="text-gray-400 line-through text-sm">
-                ${(parseFloat(product.price) * (1 + parseFloat(promotion.discount_value)/100)).toFixed(2)}
+                ${calculateOriginalPrice(product.price, promotion)}
               </p>
             )}
           </div>
