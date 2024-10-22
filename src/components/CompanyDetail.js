@@ -290,7 +290,7 @@ const CompanyDetail = () => {
           </div>
           <div className="mt-2 text-center">
             <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
-            <p className="text-cyan-400 dark:text-cyan-300 text-base font-medium">
+            <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium">
               {company.category && typeof company.category === 'object' 
                 ? company.category.name 
                 : (company.category || 'Categoría de la empresa')}
@@ -329,7 +329,7 @@ const CompanyDetail = () => {
             <p className="text-sm text-gray-600 dark:text-gray-300">
               {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
             </p>
-            <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400 dark:text-cyan-300">
+            <a href="#" className="flex items-center justify-center mt-2 leading-4 text-[#09fdfd] dark:text-cyan-300">
               <span>{company.address}</span>
             </a>
           </div>
