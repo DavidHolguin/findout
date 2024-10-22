@@ -340,7 +340,7 @@ const CompanyDetail = () => {
               
               <a 
                 href="#" 
-                className="bg-[#09fdfd] text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90 dark:bg-cyan-600 dark:hover:shadow-cyan-600/50"
+                className="bg-cyan-600 text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90 dark:bg-cyan-600 dark:hover:shadow-cyan-600/50"
               >
                 <Send className="w-4 h-4" />
                 Escribir
@@ -349,7 +349,7 @@ const CompanyDetail = () => {
                 href={company.instagram_url || '#'} 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-[#09fdfd] rounded-full shadow-lg  transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
+                className="p-2 bg-cyan-600 dark:bg-cyan-600 rounded-full shadow-lg  transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
               >
                 <Instagram className="w-5 h-5" />
               </a>
