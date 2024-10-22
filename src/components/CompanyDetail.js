@@ -55,8 +55,10 @@ const CompanyDetail = () => {
   const carouselRefs = useMemo(() => ({}), []);
 
   const formatTime = (timeStr) => {
-    const [hours, minutes] = timeStr.split(':');
-    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12; // Convierte 0 a 12
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
   const checkBusinessHours = useCallback((businessHours) => {

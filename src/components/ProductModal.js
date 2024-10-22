@@ -1,21 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Tag } from 'lucide-react';
+
+const Badge = ({ children, className = '' }) => (
+  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 ${className}`}>
+    {children}
+  </div>
+);
 
 const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const [activePromotions, setActivePromotions] = useState([]);
 
   useEffect(() => {
     let timeout;
     if (isOpen) {
       setIsAnimating(true);
       timeout = setTimeout(() => setContentVisible(true), 300);
+      // Fetch active promotions when modal opens
+      fetchActivePromotions();
     } else {
       setContentVisible(false);
       timeout = setTimeout(() => setIsAnimating(false), 500);
     }
     return () => clearTimeout(timeout);
   }, [isOpen]);
+
+  const fetchActivePromotions = async () => {
+    if (product?.company_id) {
+      try {
+        const response = await fetch(`/api/companies/${product.company_id}/active_promotions/`);
+        const data = await response.json();
+        // Filter promotions that apply to this product
+        const productPromotions = data.filter(promo => 
+          promo.products.includes(product.id) || 
+          promo.categories.includes(product.category_id)
+        );
+        setActivePromotions(productPromotions);
+      } catch (error) {
+        console.error('Error fetching promotions:', error);
+      }
+    }
+  };
+
+  const calculateDiscountedPrice = () => {
+    if (!activePromotions.length) return product.price;
+    
+    // Find the best discount
+    const bestDiscount = activePromotions.reduce((best, promo) => {
+      const discountAmount = promo.discount_type === 'PERCENTAGE' 
+        ? product.price * (promo.discount_value / 100)
+        : promo.discount_value;
+      return discountAmount > best ? discountAmount : best;
+    }, 0);
+
+    return (product.price - bestDiscount).toFixed(2);
+  };
 
   if (!isOpen && !isAnimating) return null;
 
@@ -58,6 +98,15 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
             <ChevronDown size={24} />
           </button>
           
+          {activePromotions.length > 0 && (
+            <div className="absolute top-4 right-4 z-10">
+              <Badge className="flex items-center gap-1">
+                <Tag size={14} />
+                Oferta Especial
+              </Badge>
+            </div>
+          )}
+          
           <div className="overflow-hidden">
             <img 
               src={product.image_url || "/api/placeholder/400/320"} 
@@ -72,10 +121,39 @@ const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
           ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         >
           <h2 className="text-2xl font-bold dark:text-white">{product.name}</h2>
-          <p className="text-green-600 dark:text-green-400 font-bold text-xl">${product.price}</p>
+          
+          <div className="flex items-center gap-2">
+            {activePromotions.length > 0 && (
+              <span className="text-gray-500 dark:text-gray-400 line-through">${product.price}</span>
+            )}
+            <p className="text-green-600 dark:text-green-400 font-bold text-xl">
+              ${calculateDiscountedPrice()}
+            </p>
+          </div>
+
+          {activePromotions.length > 0 && (
+            <div className="space-y-2">
+              {activePromotions.map((promo) => (
+                <div key={promo.id} className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                  <p className="text-green-700 dark:text-green-300 text-sm font-medium">
+                    {promo.name}
+                  </p>
+                  <p className="text-green-600 dark:text-green-400 text-xs">
+                    {promo.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+          
           <p className="text-gray-600 dark:text-gray-300 leading-5">{product.description}</p>
+          
           <button
-            onClick={() => onAddToCart(product)}
+            onClick={() => onAddToCart({
+              ...product,
+              final_price: calculateDiscountedPrice(),
+              applied_promotions: activePromotions
+            })}
             className="w-full bg-cyan-400 dark:bg-cyan-600 text-white py-3 rounded-full font-bold
               transition-all duration-300 
               hover:bg-cyan-500 dark:hover:bg-cyan-700 hover:shadow-lg hover:scale-105 
