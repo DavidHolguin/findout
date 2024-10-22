@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import ProductModal from './ProductModal';
 import { Send, Instagram, Flame } from 'lucide-react';
+import PromotionSection from './PromotionSection';
+
 
 const ImageWithFallback = ({ src, alt, className }) => {
   const [error, setError] = useState(false);
@@ -340,7 +342,7 @@ const CompanyDetail = () => {
               
               <a 
                 href="#" 
-                className="bg-[#09fdfd] text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow-lg hover:shadow-cyan-400/50 transition-all duration-300 backdrop-blur-lg bg-opacity-90 bg-[#09fdfd] dark:hover:shadow-cyan-600/50"
+                className="text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow hover:shadow-md transition-all duration-300 backdrop-blur-lg bg-[#09fdfd] dark:bg-[#09fdfd] hover:shadow-cyan-300"
               >
                 <Send className="w-4 h-4" />
                 Escribir
@@ -349,7 +351,7 @@ const CompanyDetail = () => {
                 href={company.instagram_url || '#'} 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-[#09fdfd] dark:bg-[#09fdfd] rounded-full shadow-lg  transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
+                className="p-2 bg-[#09fdfd] dark:bg-[#09fdfd] rounded-full shadow hover:shadow-md  transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
               >
                 <Instagram className="w-5 h-5" />
               </a>
@@ -357,6 +359,7 @@ const CompanyDetail = () => {
           </div>
         </div>
       </section>
+      <PromotionSection promotions={company.active_promotions} />
 
       {/* Sección de productos por categoría */}
       <section className="w-full">

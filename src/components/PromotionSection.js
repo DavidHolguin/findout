@@ -1,97 +1,157 @@
-import React, { useState } from 'react';
-import Slider from 'react-slick';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Flame } from 'lucide-react';
 
 const PromotionSection = ({ promotions }) => {
-  const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPromotion, setSelectedPromotion] = useState(null);
+  const [timeLeft, setTimeLeft] = useState({});
 
-  const openModal = (promotion) => {
+  const calculateTimeLeft = (endDate) => {
+    const difference = new Date(endDate) - new Date();
+    let timeLeft = {};
+
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60)
+      };
+    }
+
+    return timeLeft;
+  };
+
+  useEffect(() => {
+    if (selectedPromotion) {
+      const timer = setInterval(() => {
+        setTimeLeft(calculateTimeLeft(selectedPromotion.end_date));
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [selectedPromotion]);
+
+  const handlePromotionClick = (promotion) => {
     setSelectedPromotion(promotion);
     setIsModalOpen(true);
+    setTimeLeft(calculateTimeLeft(promotion.end_date));
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedPromotion(null);
+  const handleModalClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsModalOpen(false);
+    }
   };
 
-  // Condicionar la configuración dependiendo del número de promociones
-  const settings = {
-    dots: true,
-    infinite: promotions.length > 1, // Solo habilita "infinite" si hay más de una promoción
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: false,
+  const formatDiscount = (value) => {
+    if (typeof value === 'string') {
+      return value.replace('-', '').split('.')[0];
+    }
+    return Math.abs(Math.floor(value));
   };
+
+  const truncateText = (text, maxLength = 100) => {
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  const filteredPromotions = promotions.filter(
+    promo => !promo.product && !promo.category
+  );
 
   return (
-    <section className="w-full mb-8">
-      <h3 className="text-lg font-bold mb-4 text-gray-700 dark:text-gray-300 px-4">Promociones activas</h3>
-      <Slider {...settings} className="px-4">
-        {promotions.map((promotion) => (
-          <div key={promotion.id} className="w-full flex items-center justify-center">
-            <div
-              className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden w-64 cursor-pointer"
-              onClick={() => openModal(promotion)}
-            >
-              <img
-                src={promotion.banner_url}
-                alt={promotion.title}
-                className="w-full h-32 object-cover"
+    <div className="max-w-4xl mx-auto px-4 space-y-4 mb-8">
+      {filteredPromotions.map((promotion) => (
+        <div 
+          key={promotion.id}
+          className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 cursor-pointer"
+          onClick={() => handlePromotionClick(promotion)}
+        >
+          <div className="p-4 flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-r from-orange-100 to-pink-100 rounded-full shadow-lg">
+              <Flame 
+                className="w-8 h-8 text-orange-500 animate-pulse" 
+                style={{
+                  filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))'
+                }}
               />
-              <div className="p-4">
-                <h4 className="text-lg font-semibold dark:text-white mb-2">{promotion.title}</h4>
-                <p className="text-green-600 dark:text-green-400 font-bold">
-                  {promotion.discount_display}
-                </p>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold truncate">{promotion.title}</h3>
+              <p className="text-gray-600 text-sm leading-4	">{truncateText(promotion.description)}</p>
+            </div>
+            
+          </div>
+        </div>
+      ))}
+
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleModalClick}
+        >
+          <div className="bg-white rounded-lg max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold">{selectedPromotion.title}</h2>
+                <p className="text-gray-600">{selectedPromotion.description}</p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex justify-center items-center gap-4">
+                  <div className="p-3 bg-gradient-to-r from-orange-100 to-pink-100 rounded-full shadow-lg">
+                    <Flame 
+                      className="w-8 h-8 text-orange-500 animate-pulse" 
+                      style={{
+                        filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))'
+                      }}
+                    />
+                  </div>
+                  <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full text-2xl font-bold shadow-lg">
+                    {selectedPromotion.discount_type === 'PERCENTAGE' ? (
+                      <span>{formatDiscount(selectedPromotion.discount_display)}% OFF</span>
+                    ) : (
+                      <span>Ahorra ${formatDiscount(selectedPromotion.discount_value)}</span>
+                    )}
+                  </div>
+                </div>
+
+                {Object.keys(timeLeft).length > 0 && (
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <p className="text-center font-semibold mb-2">Tiempo restante:</p>
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      <div>
+                        <span className="text-xl font-bold">{timeLeft.days}</span>
+                        <p className="text-sm">Días</p>
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold">{timeLeft.hours}</span>
+                        <p className="text-sm">Horas</p>
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold">{timeLeft.minutes}</span>
+                        <p className="text-sm">Min</p>
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold">{timeLeft.seconds}</span>
+                        <p className="text-sm">Seg</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-gray-100 p-4 rounded-lg">
+                  <p className="font-semibold mb-2">Términos y condiciones:</p>
+                  <p className="text-sm text-gray-600">
+                    {selectedPromotion.terms_conditions}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        ))}
-      </Slider>
-
-      {isModalOpen && selectedPromotion && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-gray-900 w-full md:w-1/2 lg:w-1/3 rounded-t-lg p-6">
-            <button
-              className="text-right text-xl font-bold text-gray-600 dark:text-gray-300 mb-4"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            <h2 className="text-2xl font-semibold dark:text-white mb-4">{selectedPromotion.title}</h2>
-            <p className="dark:text-gray-300 mb-4">{selectedPromotion.description}</p>
-            <p className="text-lg text-green-600 dark:text-green-400 font-bold mb-4">
-              {selectedPromotion.discount_display}
-            </p>
-
-            {selectedPromotion.related_products && (
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold dark:text-white mb-2">Productos relacionados:</h3>
-                <ul className="list-disc list-inside dark:text-gray-300">
-                  {selectedPromotion.related_products.map((product) => (
-                    <li key={product.id}>
-                      <Link to={`/product/${product.id}`} className="text-cyan-400 dark:text-cyan-300">
-                        {product.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <button
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
-              onClick={closeModal}
-            >
-              Cerrar
-            </button>
-          </div>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 
