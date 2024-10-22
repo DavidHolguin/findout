@@ -260,7 +260,7 @@ const CompanyDetail = () => {
               {isOpen ? 'OPEN NOW' : 'CLOSED'}
             </h3>   
             <p className="text-sm dark:text-gray-300">
-              {isOpen ? `Abierto hasta ${nextTime}` : `Abre a las ${nextTime}`}
+              {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
             </p>
             <a href="#" className="flex items-center justify-center mt-2 leading-4 text-cyan-400 dark:text-cyan-300">
               <span>{company.address}</span>
