@@ -78,8 +78,8 @@ const PromotionSection = ({ promotions }) => {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-bold truncate">{promotion.title}</h3>
-              <p className="text-gray-600 text-sm leading-5 line-clamp-2">{promotion.description}</p>
+              <h3 className="text-lg text-gray-600 font-bold truncate">{promotion.title}</h3>
+              <p className="text-gray-600 text-sm leading-4 line-clamp-2">{promotion.description}</p>
             </div>
           </div>
         </div>
