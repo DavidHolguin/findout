@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import ProductModal from './ProductModal';
-import { Send, Instagram } from 'lucide-react';
+import { Send, Instagram, Flame } from 'lucide-react';
 
 const ImageWithFallback = ({ src, alt, className }) => {
   const [error, setError] = useState(false);
@@ -19,6 +19,75 @@ const ImageWithFallback = ({ src, alt, className }) => {
       className={className}
       onError={() => setError(true)}
     />
+  );
+};
+
+const PromotionBadge = ({ promotion }) => {
+  const isPercentage = promotion.discount_type === 'PERCENTAGE';
+
+  return (
+    <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+      <div className="relative group">
+        <div className="bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg animate-bounce-slow">
+          <Flame 
+            className="w-6 h-6 text-orange-500 animate-pulse" 
+            style={{
+              filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))'
+            }}
+          />
+        </div>
+        
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute bottom-full right-0 mb-2 whitespace-nowrap">
+          <div className="bg-white dark:bg-gray-800 text-xs rounded-lg py-1 px-2 shadow-lg">
+            {promotion.title}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-fade-in-right">
+        {isPercentage ? (
+          <span>-{promotion.discount_display}</span>
+        ) : (
+          <span>Ahorra ${promotion.discount_value}</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ProductCard = ({ product, onClick }) => {
+  const hasPromotion = product.active_promotions && product.active_promotions.length > 0;
+  const promotion = hasPromotion ? product.active_promotions[0] : null;
+
+  return (
+    <div
+      className="flex-none w-[65%] snap-start cursor-pointer"
+      style={{ scrollSnapAlign: 'start' }}
+      onClick={onClick}
+    >
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden relative">
+        {hasPromotion && <PromotionBadge promotion={promotion} />}
+        <ImageWithFallback 
+          src={product.image_url} 
+          alt={product.name} 
+          className="w-full h-40 object-cover"
+        />
+        <div className="p-4">
+          <h4 className="text-lg font-semibold leading-4 mb-2 dark:text-white">{product.name}</h4>
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-4 line-clamp-2">{product.description}</p>
+          <div className="mt-2 flex items-center gap-2">
+            <p className="text-green-600 dark:text-green-400 font-bold">
+              ${product.price}
+            </p>
+            {hasPromotion && (
+              <p className="text-gray-400 line-through text-sm">
+                ${(parseFloat(product.price) * (1 + parseFloat(promotion.discount_value)/100)).toFixed(2)}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -57,7 +126,7 @@ const CompanyDetail = () => {
   const formatTime = (timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours % 12 || 12; // Convierte 0 a 12
+    const displayHours = hours % 12 || 12;
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
@@ -78,7 +147,6 @@ const CompanyDetail = () => {
     if (currentTime >= openTime && currentTime < closeTime) {
       return { isOpen: true, nextTime: formatTime(todayHours.close) };
     } else {
-      // Find next opening time
       let nextDay = currentDay;
       let daysChecked = 0;
       while (daysChecked < 7) {
@@ -123,7 +191,7 @@ const CompanyDetail = () => {
         );
         setCategories(categoriesWithProducts);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error al obtener datos:', error);
       }
     };
     
@@ -184,8 +252,7 @@ const CompanyDetail = () => {
   }, []);
 
   const addToCart = useCallback((product) => {
-    // Implement add to cart functionality
-    console.log('Adding to cart:', product);
+    console.log('Agregando al carrito:', product);
     closeProductModal();
   }, [closeProductModal]);
 
@@ -193,7 +260,7 @@ const CompanyDetail = () => {
 
   return (
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
-      {/* Company profile section */}
+      {/* Sección del perfil de la empresa */}
       <section className="w-full mb-8 flex flex-col items-center">
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
@@ -257,7 +324,7 @@ const CompanyDetail = () => {
         <div className="w-11/12 flex items-center justify-between">
           <div className="text-center">
             <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {isOpen ? 'OPEN NOW' : 'CLOSED'}
+              {isOpen ? 'ABIERTO' : 'CERRADO'}
             </h3>   
             <p className="text-sm dark:text-gray-300">
               {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
@@ -290,7 +357,7 @@ const CompanyDetail = () => {
         </div>
       </section>
 
-      {/* Products by category section */}
+      {/* Sección de productos por categoría */}
       <section className="w-full">
         {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
           <div key={categoryId} className="mb-0">
@@ -315,31 +382,18 @@ const CompanyDetail = () => {
                 onMouseMove={(e) => carouselRefs[categoryId] && onDrag(e, { current: carouselRefs[categoryId] })}
               >
                 {getCarouselProducts(products).map((product, index) => (
-                  <div
+                  <ProductCard
                     key={`${product.id}-${index}`}
-                    className="flex-none w-[65%] snap-start"
-                    style={{ scrollSnapAlign: 'start' }}
+                    product={product}
                     onClick={() => openProductModal(product)}
-                  >
-                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                      <ImageWithFallback 
-                        src={product.image_url} 
-                        alt={product.name} 
-                        className="w-full h-40 object-cover"
-                      />
-                      <div className="p-4">
-                        <h4 className="text-lg font-semibold leading-4 mb-2 dark:text-white">{product.name}</h4>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-4 line-clamp-2">{product.description}</p>
-                        <p className="text-green-600 dark:text-green-400 font-bold mt-2">${product.price}</p>
-                      </div>
-                    </div>
-                  </div>
+                  />
                 ))}
               </div>
             </div>
           </div>
         ))}
       </section>
+
       <MenuBar />
 
       <ProductModal
@@ -375,6 +429,32 @@ const CompanyDetail = () => {
         }
         .animate-spin-slow {
           animation: rotating 3s linear infinite;
+        }
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(-5%);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+          }
+          50% {
+            transform: translateY(0);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+          }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2s infinite;
+        }
+        @keyframes fade-in-right {
+          0% {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        .animate-fade-in-right {
+          animation: fade-in-right 0.5s ease-out;
         }
       `}</style>
     </div>
