@@ -290,11 +290,11 @@ const CompanyDetail = () => {
           </div>
           <div className="mt-2 text-center">
             <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
-            <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium">
-              {company.category && typeof company.category === 'object' 
-                ? company.category.name 
-                : (company.category || 'Categoría de la empresa')}
-            </p>
+            <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]">
+  {company.category && typeof company.category === 'object' 
+    ? company.category.name 
+    : (company.category || 'Categoría de la empresa')}
+</p>
             <div 
               ref={categoryCarouselRef}
               className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-2 pb-4"
