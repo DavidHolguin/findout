@@ -4,7 +4,8 @@ import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import ProductModal from './ProductModal';
 import { Send, Instagram, Flame } from 'lucide-react';
-import PromotionSection from './PromotionSection';
+import BadgesSection from './BadgesSection';
+
 
 
 const ImageWithFallback = ({ src, alt, className }) => {
@@ -324,11 +325,11 @@ const CompanyDetail = () => {
         </div>
 
         <div className="w-11/12 flex items-center justify-between">
-          <div className="text-center">
+          <div className="text-center pr-2">
             <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {isOpen ? 'ABIERTO' : 'CERRADO'}
             </h3>   
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2">
               {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
             </p>
             <a href="#" className="flex items-center justify-center mt-2 leading-4 text-[#09fdfd] dark:text-cyan-300">
@@ -359,7 +360,7 @@ const CompanyDetail = () => {
           </div>
         </div>
       </section>
-      <PromotionSection promotions={company.active_promotions} />
+      <BadgesSection badges={company.badges} />
 
       {/* Sección de productos por categoría */}
       <section className="w-full">
