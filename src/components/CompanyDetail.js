@@ -329,7 +329,7 @@ const CompanyDetail = () => {
             <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {isOpen ? 'ABIERTO' : 'CERRADO'}
             </h3>   
-            <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2">
+            <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2 py-1">
               {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
             </p>
             <a href="#" className="flex items-center justify-center mt-2 leading-4 text-[#09fdfd] dark:text-cyan-300">
