@@ -267,7 +267,7 @@ const CompanyDetail = () => {
       {/* Sección del perfil de la empresa */}
       <section className="w-full mb-6 flex flex-col items-center">
   {/* Profile Image and Name Section */}
-  <div className="flex flex-col items-center mb-6">
+  <div className="flex flex-col items-center mb-4 mt-2">
     <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
       <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
         backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
@@ -306,7 +306,7 @@ const CompanyDetail = () => {
   {/* Categories Carousel */}
   <div 
     ref={categoryCarouselRef}
-    className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-6 px-4"
+    className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-2 px-4"
     style={{ 
       scrollBehavior: 'smooth',
       WebkitOverflowScrolling: 'touch',
@@ -329,7 +329,7 @@ const CompanyDetail = () => {
   </div>
 
   {/* Info and Status Section */}
-  <div className="w-11/12  rounded-lg  p-4 ">
+  <div className="w-11/12  rounded-lg  py-4 ">
     <div className="flex items-start gap-4">
       {/* Status */}
       <div className="flex flex-col items-center min-w-fit">
