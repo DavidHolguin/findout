@@ -265,7 +265,7 @@ const CompanyDetail = () => {
   return (
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
       {/* Sección del perfil de la empresa */}
-      <section className="w-full mb-6 flex flex-col items-center">
+      <section className="w-full mb-3 flex flex-col items-center">
   {/* Profile Image and Name Section */}
   <div className="flex flex-col items-center mb-4 mt-2">
     <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
@@ -403,7 +403,6 @@ const CompanyDetail = () => {
 </section>
       <BadgesSection badges={company.badges} />
 
-      {/* Sección de productos por categoría */}
       <section className="w-full">
         {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
           <div key={categoryId} className="mb-0">

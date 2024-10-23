@@ -2,6 +2,11 @@ import React from 'react';
 import { Flame, Clock, Star } from 'lucide-react';
 
 const BadgesSection = ({ badges }) => {
+  // Si no hay insignias o badges es undefined/null, no renderizar nada
+  if (!badges || badges.length === 0) {
+    return null;
+  }
+
   const getBadgeContent = (badge) => {
     switch (badge.badge_type) {
       case 'RECORD_TIME':
@@ -103,7 +108,7 @@ const BadgesSection = ({ badges }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 space-y-4 mb-4">
+    <div className="max-w-4xl mx-auto px-4 space-y-4 mb-4 mt-2">
       {badges.map((badge) => {
         const badgeContent = getBadgeContent(badge);
         
