@@ -343,7 +343,7 @@ const CompanyDetail = () => {
 
       {/* Description */}
       <div className="flex-1 border-l border-gray-200 dark:border-gray-700 pl-4">
-        <p className="text-sm leading-5 text-gray-600 dark:text-gray-300">
+        <p className="text-sm leading-4  text-gray-600 dark:text-gray-300">
           {company.description}
         </p>
       </div>
@@ -351,7 +351,7 @@ const CompanyDetail = () => {
   </div>
 
   {/* Social Links Section */}
-  <div className="w-11/12 flex justify-center gap-3 mt-2 pr-5">
+  <div className="w-11/12 flex justify-center gap-3 ">
 
   {company.google_maps_url && (
       <a 
@@ -383,7 +383,7 @@ const CompanyDetail = () => {
         href={company.instagram_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+        className="p-2 w-10 h-10 flex items-center justify-center bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
       >
         <Instagram className="w-5 h-5" />
       </a>
@@ -394,7 +394,7 @@ const CompanyDetail = () => {
         href={company.facebook_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+        className="p-2 w-10 h-10 flex items-center justify-center bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
       >
         <Facebook className="w-5 h-5" />
       </a>
