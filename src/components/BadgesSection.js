@@ -9,7 +9,7 @@ const BadgesSection = ({ badges }) => {
           icon: (
             <div className="relative group">
               <Clock 
-                className="w-8 h-8 text-[#09fdfd] dark:text-[#09fdfd]"
+                className="w-6 h-6 text-[#09fdfd] dark:text-[#09fdfd]"
                 style={{
                   filter: 'drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
                 }}
@@ -39,14 +39,14 @@ const BadgesSection = ({ badges }) => {
             <div className="relative group">
               <div className="relative">
                 <Star 
-                  className="w-8 h-8 text-[#09fdfd] dark:text-[#09fdfd] transform transition-transform group-hover:scale-110"
+                  className="w-6 h-6 text-[#09fdfd] dark:text-[#09fdfd] transform transition-transform group-hover:scale-110"
                   style={{
                     filter: 'drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
                   }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Star 
-                    className="w-8 h-8 text-white/50 animate-pulse"
+                    className="w-6 h-6 text-white/50 animate-pulse"
                   />
                 </div>
               </div>
@@ -75,46 +75,21 @@ const BadgesSection = ({ badges }) => {
       case 'INTENSE_FIRE':
         return {
           icon: (
-            <div className="relative group">
-              {/* Fondo del icono para mejor contraste */}
-              <div className="absolute inset-0 bg-white/20 dark:bg-black/20 rounded-full" />
-              
-              {/* Icono principal */}
+            <div className="relative">
               <Flame 
-                className="relative w-8 h-8 text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" 
+                className="w-8 h-8 text-orange-500 animate-pulse" 
                 style={{
-                  filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.7))'
+                  filter: 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.5))'
                 }}
               />
-              
-              {/* Efecto de brillo */}
               <div className="absolute inset-0 animate-[ping_1.5s_ease-out_infinite]">
                 <Flame 
-                  className="w-8 h-8 text-white/30" 
+                  className="w-8 h-8 text-orange-500/30 dark:text-orange-400/30" 
                 />
-              </div>
-              
-              {/* Efecto de resplandor al hacer hover */}
-              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 rounded-full transition-all duration-300" />
-              
-              {/* Partículas de fuego */}
-              <div className="absolute inset-[-4px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-1 h-1 bg-white rounded-full"
-                    style={{
-                      top: '50%',
-                      left: '50%',
-                      transform: `rotate(${i * 60}deg) translateY(-10px)`,
-                      animation: `flicker 0.8s ease-in-out infinite ${i * 0.1}s`
-                    }}
-                  />
-                ))}
               </div>
             </div>
           ),
-          gradient: 'bg-gradient-to-r from-orange-500 to-pink-500',
+          gradient: 'from-orange-100 to-pink-100 dark:from-orange-950 dark:to-pink-950',
           textGradient: 'from-orange-500 to-pink-500'
         };
       
@@ -142,7 +117,7 @@ const BadgesSection = ({ badges }) => {
                 {badgeContent.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className={`text-lg font-bold bg-gradient-to-r ${badgeContent.textGradient} bg-clip-text text-transparent`}>
+                <h3 className={`text-base font-bold bg-gradient-to-r ${badgeContent.textGradient} bg-clip-text text-transparent`}>
                   {badge.name}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-4">
@@ -158,11 +133,6 @@ const BadgesSection = ({ badges }) => {
         @keyframes twinkle {
           0%, 100% { opacity: 0.2; }
           50% { opacity: 1; }
-        }
-        
-        @keyframes flicker {
-          0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg) translateY(-10px); }
-          50% { opacity: 0.8; transform: scale(1.2) rotate(180deg) translateY(-10px); }
         }
       `}</style>
     </div>
