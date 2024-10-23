@@ -69,17 +69,7 @@ const Header = () => {
             />
           </Link>
         </div>
-        <div className="absolute right-6 flex items-center gap-2">
-          {!user && (
-            <Link 
-              to="/login" 
-              className="flex items-center gap-2 text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <span className="text-sm hidden sm:block">Iniciar sesión</span>
-              <FaSignInAlt className="text-2xl" />
-            </Link>
-          )}
-        </div>
+        
       </nav>
     </header>
   );
