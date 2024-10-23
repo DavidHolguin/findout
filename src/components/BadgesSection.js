@@ -112,7 +112,7 @@ const BadgesSection = ({ badges }) => {
             key={badge.id}
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 dark:border-gray-700 group"
           >
-            <div className="px-4 py-2 flex items-center gap-4">
+            <div className="px-2 py-2 flex items-center gap-4">
               <div className={`p-3 rounded-full shadow-sm ${badgeContent.gradient}`}>
                 {badgeContent.icon}
               </div>
