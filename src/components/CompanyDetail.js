@@ -3,8 +3,9 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import ProductModal from './ProductModal';
-import { Send, Instagram, Flame } from 'lucide-react';
+import { Send, Instagram, Flame, MapPin, Facebook, MessageCircle } from 'lucide-react';
 import BadgesSection from './BadgesSection';
+
 
 
 
@@ -265,101 +266,131 @@ const CompanyDetail = () => {
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
       {/* Sección del perfil de la empresa */}
       <section className="w-full mb-6 flex flex-col items-center">
-        <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
-            <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
-              backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
-              backgroundSize: '100% 400%',
-              animation: 'rotating 2s linear infinite, gradientRotate 5s linear infinite'
-            }}></div>
-            <ImageWithFallback 
-              src={company.profile_picture_url} 
-              alt={company.name} 
-              className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
-            />
-            {company.country?.flag_icon_url && (
-              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 shadow-md overflow-hidden">
-                <img 
-                  src={company.country.flag_icon_url} 
-                  alt={`Bandera de ${company.country.name}`}
-                  className="w-full h-full object-cover rounded-full"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/api/placeholder/32/32";
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          <div className="mt-2 text-center">
-            <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
-            <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium">
-              {company.category && typeof company.category === 'object' 
-                ? company.category.name 
-                : (company.category || 'Categoría de la empresa')}
-            </p>
-            <div 
-              ref={categoryCarouselRef}
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-2 pb-4"
-              style={{ 
-                scrollBehavior: 'smooth',
-                WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
-              onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
-              onMouseUp={stopDragging}
-              onMouseLeave={stopDragging}
-              onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
-            >
-              {categories.map(category => (
-                <CategoryButton
-                  key={category.id}
-                  category={category}
-                  isSelected={selectedCategories.includes(category.id)}
-                  onClick={toggleCategory}
-                />
-              ))}
-            </div>
-          </div>
+  <div className="flex flex-col items-center">
+    <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
+      <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
+        backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
+        backgroundSize: '100% 400%',
+        animation: 'rotating 2s linear infinite, gradientRotate 5s linear infinite'
+      }}></div>
+      <ImageWithFallback 
+        src={company.profile_picture_url} 
+        alt={company.name} 
+        className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
+      />
+      {company.country?.flag_icon_url && (
+        <div className="absolute bottom-0 left-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 shadow-md overflow-hidden">
+          <img 
+            src={company.country.flag_icon_url} 
+            alt={`Bandera de ${company.country.name}`}
+            className="w-full h-full object-cover rounded-full"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/api/placeholder/32/32";
+            }}
+          />
         </div>
+      )}
+    </div>
+    <div className="mt-2 text-center">
+      <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
+      <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium">
+        {company.category && typeof company.category === 'object' 
+          ? company.category.name 
+          : (company.category || 'Categoría de la empresa')}
+      </p>
+      <div 
+        ref={categoryCarouselRef}
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-2 pb-4"
+        style={{ 
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+        onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
+        onMouseUp={stopDragging}
+        onMouseLeave={stopDragging}
+        onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
+      >
+        {categories.map(category => (
+          <CategoryButton
+            key={category.id}
+            category={category}
+            isSelected={selectedCategories.includes(category.id)}
+            onClick={toggleCategory}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
 
-        <div className="w-11/12 flex items-center justify-between">
-          <div className="text-center pr-2">
-            <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {isOpen ? 'ABIERTO' : 'CERRADO'}
-            </h3>   
-            <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2 py-1">
-              {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
-            </p>
-            <a href="#" className="flex items-center justify-center mt-2 leading-4 text-[#09fdfd] dark:text-cyan-300">
-              <span>{company.address}</span>
-            </a>
-          </div>
+  <div className="w-11/12 flex items-center mb-4">
+    <div className="text-center pr-2">
+      <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        {isOpen ? 'ABIERTO' : 'CERRADO'}
+      </h3>   
+      <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2 py-1">
+        {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
+      </p>
+    </div>
 
-          <div className="w-2/3 border-l border-gray-400 dark:border-gray-600 pl-4">
-            <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mb-4">{company.description}</p>
-            <div className="flex items-center gap-2">
-              
-              <a 
-                href="#" 
-                className="text-white font-bold text-sm px-6 py-2 rounded-full flex items-center gap-2 shadow hover:shadow-md transition-all duration-300 backdrop-blur-lg bg-[#09fdfd] dark:bg-[#09fdfd] hover:shadow-cyan-300"
-              >
-                <Send className="w-4 h-4" />
-                Escribir
-              </a>
-              <a 
-                href={company.instagram_url || '#'} 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 bg-[#09fdfd] dark:bg-[#09fdfd] rounded-full shadow hover:shadow-md  transition-all duration-300 text-white backdrop-blur-lg bg-opacity-90 dark:from-pink-600 dark:to-purple-600 dark:hover:shadow-pink-600/50"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="w-2/3 border-l border-gray-400 dark:border-gray-600 pl-4">
+      <p className="text-sm leading-4 text-gray-600 dark:text-gray-300">
+        {company.description}
+      </p>
+    </div>
+  </div>
+
+  <div className="w-11/12 flex flex-col items-center">
+  <div className="w-full flex flex-wrap items-center justify-center gap-3">
+  {company.whatsapp_url && (
+    <a 
+      href={company.whatsapp_url}
+      target="_blank"
+      rel="noopener noreferrer" 
+      className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#09fdfd] text-white font-bold text-sm shadow hover:shadow-md transition-all duration-300 hover:shadow-cyan-300"
+    >
+      <MessageCircle className="w-4 h-4" />
+      Escribir
+    </a>
+  )}
+  
+  {company.google_maps_url && (
+    <a 
+      href={company.google_maps_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 rounded-full border-2 border-[#09fdfd] hover:bg-[#09fdfd]/10 transition-all duration-300"
+    >
+      <MapPin className="w-5 h-5 text-[#09fdfd]" />
+    </a>
+  )}
+  
+  {company.instagram_url && (
+    <a 
+      href={company.instagram_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+    >
+      <Instagram className="w-5 h-5" />
+    </a>
+  )}
+  
+  {company.facebook_url && (
+    <a 
+      href={company.facebook_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+    >
+      <Facebook className="w-5 h-5" />
+    </a>
+  )}
+</div>
+  </div>
+</section>
       <BadgesSection badges={company.badges} />
 
       {/* Sección de productos por categoría */}
