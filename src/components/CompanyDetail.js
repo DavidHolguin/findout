@@ -264,7 +264,7 @@ const CompanyDetail = () => {
   return (
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
       {/* Sección del perfil de la empresa */}
-      <section className="w-full mb-8 flex flex-col items-center">
+      <section className="w-full mb-6 flex flex-col items-center">
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
             <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
