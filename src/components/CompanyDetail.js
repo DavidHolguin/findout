@@ -306,7 +306,7 @@ const CompanyDetail = () => {
   {/* Categories Carousel */}
   <div 
     ref={categoryCarouselRef}
-    className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-2 px-4"
+    className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-2 pb-2 px-4"
     style={{ 
       scrollBehavior: 'smooth',
       WebkitOverflowScrolling: 'touch',
@@ -329,14 +329,14 @@ const CompanyDetail = () => {
   </div>
 
   {/* Info and Status Section */}
-  <div className="w-11/12  rounded-lg  py-4 ">
+  <div className="w-11/12  rounded-lg  pb-4 ">
     <div className="flex items-start gap-4">
       {/* Status */}
       <div className="flex flex-col items-center min-w-fit">
         <h3 className={`text-xl font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {isOpen ? 'ABIERTO' : 'CERRADO'}
         </h3>   
-        <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2 px-3 py-1">
+        <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full  px-3 py-1">
           {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
         </p>
       </div>
