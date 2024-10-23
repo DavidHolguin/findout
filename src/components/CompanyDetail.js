@@ -266,7 +266,8 @@ const CompanyDetail = () => {
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
       {/* Sección del perfil de la empresa */}
       <section className="w-full mb-6 flex flex-col items-center">
-  <div className="flex flex-col items-center">
+  {/* Profile Image and Name Section */}
+  <div className="flex flex-col items-center mb-6">
     <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
       <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
         backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
@@ -299,96 +300,105 @@ const CompanyDetail = () => {
           ? company.category.name 
           : (company.category || 'Categoría de la empresa')}
       </p>
-      <div 
-        ref={categoryCarouselRef}
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide mt-2 pb-4"
-        style={{ 
-          scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-        onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
-        onMouseUp={stopDragging}
-        onMouseLeave={stopDragging}
-        onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
-      >
-        {categories.map(category => (
-          <CategoryButton
-            key={category.id}
-            category={category}
-            isSelected={selectedCategories.includes(category.id)}
-            onClick={toggleCategory}
-          />
-        ))}
+    </div>
+  </div>
+
+  {/* Categories Carousel */}
+  <div 
+    ref={categoryCarouselRef}
+    className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-6 px-4"
+    style={{ 
+      scrollBehavior: 'smooth',
+      WebkitOverflowScrolling: 'touch',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none',
+    }}
+    onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
+    onMouseUp={stopDragging}
+    onMouseLeave={stopDragging}
+    onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
+  >
+    {categories.map(category => (
+      <CategoryButton
+        key={category.id}
+        category={category}
+        isSelected={selectedCategories.includes(category.id)}
+        onClick={toggleCategory}
+      />
+    ))}
+  </div>
+
+  {/* Info and Status Section */}
+  <div className="w-11/12  rounded-lg  p-4 ">
+    <div className="flex items-start gap-4">
+      {/* Status */}
+      <div className="flex flex-col items-center min-w-fit">
+        <h3 className={`text-xl font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          {isOpen ? 'ABIERTO' : 'CERRADO'}
+        </h3>   
+        <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2 px-3 py-1">
+          {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
+        </p>
+      </div>
+
+      {/* Description */}
+      <div className="flex-1 border-l border-gray-200 dark:border-gray-700 pl-4">
+        <p className="text-sm leading-5 text-gray-600 dark:text-gray-300">
+          {company.description}
+        </p>
       </div>
     </div>
   </div>
 
-  <div className="w-11/12 flex items-center mb-4">
-    <div className="text-center pr-2">
-      <h3 className={`text-xl leading-4 font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-        {isOpen ? 'ABIERTO' : 'CERRADO'}
-      </h3>   
-      <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full mt-2 py-1">
-        {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
-      </p>
-    </div>
+  {/* Social Links Section */}
+  <div className="w-11/12 flex justify-center gap-3 mt-2 pr-5">
 
-    <div className="w-2/3 border-l border-gray-400 dark:border-gray-600 pl-4">
-      <p className="text-sm leading-4 text-gray-600 dark:text-gray-300">
-        {company.description}
-      </p>
-    </div>
-  </div>
-
-  <div className="w-11/12 flex flex-col items-center">
-  <div className="w-full flex flex-wrap items-center justify-center gap-3">
-  {company.whatsapp_url && (
-    <a 
-      href={company.whatsapp_url}
-      target="_blank"
-      rel="noopener noreferrer" 
-      className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#09fdfd] text-white font-bold text-sm shadow hover:shadow-md transition-all duration-300 hover:shadow-cyan-300"
-    >
-      <MessageCircle className="w-4 h-4" />
-      Escribir
-    </a>
-  )}
-  
   {company.google_maps_url && (
-    <a 
-      href={company.google_maps_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 rounded-full border-2 border-[#09fdfd] hover:bg-[#09fdfd]/10 transition-all duration-300"
-    >
-      <MapPin className="w-5 h-5 text-[#09fdfd]" />
-    </a>
-  )}
-  
-  {company.instagram_url && (
-    <a 
-      href={company.instagram_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
-    >
-      <Instagram className="w-5 h-5" />
-    </a>
-  )}
-  
-  {company.facebook_url && (
-    <a 
-      href={company.facebook_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
-    >
-      <Facebook className="w-5 h-5" />
-    </a>
-  )}
-</div>
+      <a 
+        href={company.google_maps_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 rounded-full border-2 border-[#09fdfd] hover:bg-[#09fdfd]/10 transition-all duration-300"
+      >
+        <MapPin className="w-5 h-5 text-[#09fdfd]" />
+      </a>
+    )}
+
+    {company.whatsapp_url && (
+      <a 
+        href={company.whatsapp_url}
+        target="_blank"
+        rel="noopener noreferrer" 
+        className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#09fdfd] text-white font-bold text-sm shadow hover:shadow-md transition-all duration-300 hover:shadow-cyan-300"
+      >
+        <MessageCircle className="w-4 h-4" />
+        Escribir
+      </a>
+    )}
+    
+    
+    
+    {company.instagram_url && (
+      <a 
+        href={company.instagram_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+      >
+        <Instagram className="w-5 h-5" />
+      </a>
+    )}
+    
+    {company.facebook_url && (
+      <a 
+        href={company.facebook_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+      >
+        <Facebook className="w-5 h-5" />
+      </a>
+    )}
   </div>
 </section>
       <BadgesSection badges={company.badges} />
