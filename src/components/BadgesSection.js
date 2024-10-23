@@ -7,87 +7,115 @@ const BadgesSection = ({ badges }) => {
       case 'RECORD_TIME':
         return {
           icon: (
-            <div className="relative">
+            <div className="relative group">
               <Clock 
-                className="w-8 h-8 text-blue-500 dark:text-blue-400"
+                className="w-8 h-8 text-[#09fdfd] dark:text-[#09fdfd]"
                 style={{
-                  filter: 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.5))'
+                  filter: 'drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
                 }}
               />
-              {/* Clock hands animation */}
-              <div className="absolute inset-0">
-                <div className="absolute top-1/2 left-1/2 w-[1px] h-[40%] bg-blue-500 dark:bg-blue-400 origin-bottom -translate-x-1/2 animate-[spin_2s_linear_infinite]" />
-                <div className="absolute top-1/2 left-1/2 w-[1px] h-[30%] bg-blue-600 dark:bg-blue-500 origin-bottom -translate-x-1/2 animate-[spin_24s_linear_infinite]" />
-              </div>
-              {/* Speedlines effect */}
-              <div className="absolute inset-0 animate-[spin_1.5s_linear_infinite]">
-                {[...Array(8)].map((_, i) => (
+              <div className="absolute inset-[-4px] rounded-full border-2 border-transparent border-t-[#09fdfd] animate-[spin_2s_linear_infinite]" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#09fdfd]/20 to-transparent animate-pulse" />
+              <div className="absolute inset-[-8px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute top-1/2 left-1/2 h-4 w-[1px] bg-gradient-to-t from-transparent to-blue-300 dark:to-blue-500 opacity-50"
+                    className="absolute inset-0 rounded-full border border-[#09fdfd]/30"
                     style={{
-                      transform: `rotate(${i * 45}deg) translateY(-8px)`
+                      animation: `ping 1s cubic-bezier(0, 0, 0.2, 1) infinite ${i * 0.2}s`
                     }}
                   />
                 ))}
               </div>
             </div>
           ),
-          gradient: 'from-blue-100 to-cyan-100 dark:from-blue-950 dark:to-cyan-950',
-          textGradient: 'from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400'
+          gradient: 'from-cyan-100 to-blue-100 dark:from-cyan-950 dark:to-blue-950',
+          textGradient: 'from-[#09fdfd] to-blue-500 dark:from-[#09fdfd] dark:to-blue-400'
         };
       
       case 'BEST_RATED':
         return {
           icon: (
-            <div className="relative">
-              <Star 
-                className="w-8 h-8 text-yellow-500 dark:text-yellow-400"
-                style={{
-                  filter: 'drop-shadow(0 0 4px rgba(234, 179, 8, 0.5))'
-                }}
-              />
-              {/* Rotating stars */}
-              <div className="absolute inset-0 animate-[spin_4s_linear_infinite]">
-                {[...Array(5)].map((_, i) => (
+            <div className="relative group">
+              <div className="relative">
+                <Star 
+                  className="w-8 h-8 text-[#09fdfd] dark:text-[#09fdfd] transform transition-transform group-hover:scale-110"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Star 
+                    className="w-8 h-8 text-white/50 animate-pulse"
+                  />
+                </div>
+              </div>
+              <div className="absolute inset-[-4px] animate-[spin_3s_linear_infinite]">
+                {[...Array(8)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-1 h-1 bg-yellow-200 dark:bg-yellow-300 rounded-full"
+                    className="absolute w-1.5 h-1.5 rounded-full bg-gradient-to-r from-[#09fdfd] to-transparent"
                     style={{
-                      top: `${Math.sin(i * 72 * Math.PI / 180) * 100 + 50}%`,
-                      left: `${Math.cos(i * 72 * Math.PI / 180) * 100 + 50}%`,
-                      animation: `twinkle ${1 + i * 0.2}s ease-in-out infinite alternate`
+                      top: '50%',
+                      left: '50%',
+                      transform: `rotate(${i * 45}deg) translateY(-12px)`,
+                      opacity: 0.6,
+                      animation: `twinkle 1.5s ease-in-out infinite ${i * 0.2}s`
                     }}
                   />
                 ))}
               </div>
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-yellow-200 dark:bg-yellow-300 rounded-full opacity-20 animate-pulse blur-xl" />
+              <div className="absolute inset-[-2px] bg-gradient-to-r from-[#09fdfd]/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
             </div>
           ),
-          gradient: 'from-yellow-100 to-amber-100 dark:from-yellow-950 dark:to-amber-950',
-          textGradient: 'from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400'
+          gradient: 'from-cyan-100 to-blue-100 dark:from-cyan-950 dark:to-blue-950',
+          textGradient: 'from-[#09fdfd] to-blue-500 dark:from-[#09fdfd] dark:to-blue-400'
         };
       
       case 'INTENSE_FIRE':
         return {
           icon: (
-            <div className="relative">
+            <div className="relative group">
+              {/* Fondo del icono para mejor contraste */}
+              <div className="absolute inset-0 bg-white/20 dark:bg-black/20 rounded-full" />
+              
+              {/* Icono principal */}
               <Flame 
-                className="w-8 h-8 text-orange-500 dark:text-orange-400 animate-pulse" 
+                className="relative w-8 h-8 text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" 
                 style={{
-                  filter: 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.5))'
+                  filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.7))'
                 }}
               />
+              
+              {/* Efecto de brillo */}
               <div className="absolute inset-0 animate-[ping_1.5s_ease-out_infinite]">
                 <Flame 
-                  className="w-8 h-8 text-orange-500/30 dark:text-orange-400/30" 
+                  className="w-8 h-8 text-white/30" 
                 />
+              </div>
+              
+              {/* Efecto de resplandor al hacer hover */}
+              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 rounded-full transition-all duration-300" />
+              
+              {/* Partículas de fuego */}
+              <div className="absolute inset-[-4px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 h-1 bg-white rounded-full"
+                    style={{
+                      top: '50%',
+                      left: '50%',
+                      transform: `rotate(${i * 60}deg) translateY(-10px)`,
+                      animation: `flicker 0.8s ease-in-out infinite ${i * 0.1}s`
+                    }}
+                  />
+                ))}
               </div>
             </div>
           ),
-          gradient: 'from-orange-100 to-pink-100 dark:from-orange-950 dark:to-pink-950',
-          textGradient: 'from-orange-500 to-pink-500 dark:from-orange-400 dark:to-pink-400'
+          gradient: 'bg-gradient-to-r from-orange-500 to-pink-500',
+          textGradient: 'from-orange-500 to-pink-500'
         };
       
       default:
@@ -107,10 +135,10 @@ const BadgesSection = ({ badges }) => {
         return (
           <div 
             key={badge.id}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 dark:border-gray-700"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 dark:border-gray-700 group"
           >
             <div className="px-4 py-2 flex items-center gap-4">
-              <div className={`p-3 bg-gradient-to-r ${badgeContent.gradient} rounded-full shadow-sm`}>
+              <div className={`p-3 rounded-full shadow-sm ${badgeContent.gradient}`}>
                 {badgeContent.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -125,6 +153,18 @@ const BadgesSection = ({ badges }) => {
           </div>
         );
       })}
+
+      <style jsx>{`
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
+        }
+        
+        @keyframes flicker {
+          0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg) translateY(-10px); }
+          50% { opacity: 0.8; transform: scale(1.2) rotate(180deg) translateY(-10px); }
+        }
+      `}</style>
     </div>
   );
 };
