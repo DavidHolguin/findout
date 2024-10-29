@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaSignInAlt, FaStore, FaShoppingCart, FaUserAlt, FaCog, FaSignOutAlt, FaFire } from 'react-icons/fa';
-import { RiMenLine, RiWomenLine, RiRestaurantLine, RiShieldLine } from 'react-icons/ri';
-import { BiWine } from 'react-icons/bi';
+import { Link } from 'react-router-dom';
+import { Menu, ShoppingBag, Sun, Moon } from 'lucide-react';
 import axios from 'axios';
+import MobileMenu from './MobileMenu';
 
 const Header = () => {
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const [darkMode, setDarkMode] = useState(() => 
+    localStorage.getItem('theme') === 'dark' || 
+    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  );
   
   const API_URL = 'https://backendfindout-ea692e018a66.herokuapp.com/api/login/';
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -63,132 +75,66 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full bg-[#09FDFD] dark:bg-gray-800 shadow-md dark:shadow-gray-900/50 z-50 font-['Poppins',sans-serif] transition-all duration-500 ease-in-out ${
+        className={`fixed top-0 left-0 w-full bg-primary dark:bg-gray-900 shadow-md dark:shadow-gray-900/50 z-50 font-['Poppins',sans-serif] transition-all duration-500 ease-in-out ${
           showHeader ? 'transform translate-y-0' : 'transform -translate-y-full'
         }`}
       >
         <nav className="container mx-auto flex justify-between items-center py-4 px-6">
+          {/* Menu Button */}
           <button
             onClick={toggleMenu}
-            className="text-gray-800 hover:text-gray-600 focus:outline-none"
+            className="text-gray-800 dark:text-white hover:opacity-80 transition-opacity focus:outline-none"
+            aria-label="Toggle menu"
           >
-            <div className="space-y-1.5">
-              <div className="w-6 h-0.5 bg-gray-800"></div>
-              <div className="w-6 h-0.5 bg-gray-800"></div>
-              <div className="w-6 h-0.5 bg-gray-800"></div>
-            </div>
+            <Menu className="w-6 h-6" />
           </button>
           
+          {/* Logo */}
           <div className="flex justify-center flex-1">
-            <Link to="/">
+            <Link to="/" className="relative">
               <img
                 src="/logoFindout.webp"
                 alt="Logo"
-                className="h-6 object-contain dark:filter dark:brightness-110"
+                className="h-6 object-contain dark:brightness-110 transition-all"
               />
             </Link>
           </div>
 
-          <div className="w-6"> {/* Empty div for spacing */}
-            <Link to="/cart" className="text-gray-800">
-              <FaShoppingCart className="w-6 h-6" />
+          {/* Right side icons */}
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="text-gray-800 dark:text-white hover:opacity-80 transition-opacity focus:outline-none"
+              aria-label="Toggle theme"
+            >
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-yellow-500" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+
+            {/* Cart */}
+            <Link 
+              to="/cart" 
+              className="text-gray-800 dark:text-white hover:opacity-80 transition-opacity"
+              aria-label="Shopping cart"
+            >
+              <ShoppingBag className="w-6 h-6" />
             </Link>
           </div>
         </nav>
+
+        {/* Progress bar indicator */}
+        <div className="h-0.5 bg-gradient-to-r from-primary-dark to-primary dark:from-gray-800 dark:to-gray-700" />
       </header>
 
-      {/* Slide-out Menu */}
-      <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="p-6 space-y-6">
-          <div className="text-lg font-medium">Hola, {user?.username || 'Fabian'}</div>
-          
-          <Link to="/register-business" className="inline-block">
-            <button className="bg-gray-900 text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2">
-              <span>Unirme a Findout</span>
-              <span className="text-[#09FDFD]">♥</span>
-            </button>
-          </Link>
-
-          <Link to="/orders" className="flex items-center space-x-2 text-gray-700">
-            <FaShoppingCart className="w-5 h-5" />
-            <span>Ver mi pedido</span>
-          </Link>
-
-          <div className="pt-4">
-            <div className="text-lg font-medium mb-4">Descubre</div>
-            <div className="space-y-4">
-              <Link to="/trending" className="flex items-center space-x-2 text-gray-700">
-                <FaFire className="w-5 h-5 text-orange-500" />
-                <span>Tendencia</span>
-              </Link>
-              
-              <Link to="/for-him" className="flex items-center space-x-2 text-gray-700">
-                <RiMenLine className="w-5 h-5" />
-                <span>Para ellos</span>
-              </Link>
-              
-              <Link to="/for-her" className="flex items-center space-x-2 text-gray-700">
-                <RiWomenLine className="w-5 h-5" />
-                <span>Para ellas</span>
-              </Link>
-              
-              <Link to="/restaurants" className="flex items-center space-x-2 text-gray-700">
-                <RiRestaurantLine className="w-5 h-5" />
-                <span>Restaurantes</span>
-              </Link>
-              
-              <Link to="/insurance" className="flex items-center space-x-2 text-gray-700">
-                <RiShieldLine className="w-5 h-5" />
-                <span>Seguros</span>
-              </Link>
-              
-              <Link to="/entertainment" className="flex items-center space-x-2 text-gray-700">
-                <BiWine className="w-5 h-5" />
-                <span>Pasar el rato</span>
-              </Link>
-            </div>
-          </div>
-
-          <Link to="/download" className="inline-block">
-            <button className="bg-gray-900 text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2">
-              <span>Descargar App</span>
-              <span>↓</span>
-            </button>
-          </Link>
-
-          <div className="pt-4 space-y-4">
-            <Link to="/profile" className="flex items-center space-x-2 text-gray-700">
-              <FaUserAlt className="w-5 h-5" />
-              <span>Perfil</span>
-            </Link>
-            
-            <Link to="/settings" className="flex items-center space-x-2 text-gray-700">
-              <FaCog className="w-5 h-5" />
-              <span>Configuración</span>
-            </Link>
-            
-            <button onClick={() => {
-              localStorage.removeItem('token');
-              navigate('/login');
-            }} className="flex items-center space-x-2 text-gray-700">
-              <FaSignOutAlt className="w-5 h-5" />
-              <span>Cerrar sesión</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Overlay */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={toggleMenu}
-        />
-      )}
+      <MobileMenu 
+        isOpen={isMenuOpen}
+        onClose={toggleMenu}
+        user={user}
+      />
     </>
   );
 };
