@@ -6,7 +6,6 @@ import {
   Settings, 
   LogOut, 
   Flame,
-  Store,
   Wine,
   Shield,
   MenuSquare,
@@ -22,6 +21,7 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
     localStorage.getItem('theme') === 'dark' || 
     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
   );
+  const [typedText, setTypedText] = useState('');
 
   useEffect(() => {
     if (darkMode) {
@@ -32,6 +32,21 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
       localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    const greeting = user?.username ? `Hola, ${user.username}` : 'Hola, ¿cómo estás?';
+    
+    const typeGreeting = async () => {
+      setTypedText('');
+      if (isOpen) {
+        for (let i = 0; i <= greeting.length; i++) {
+          setTypedText(greeting.slice(0, i));
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+    };
+    typeGreeting();
+  }, [user, isOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -77,6 +92,8 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
     }
   ];
 
+  const buttonClasses = "w-full bg-gray-900 hover:bg-gray-800 dark:bg-primary-dark dark:hover:bg-primary-dark/90 text-white px-4 py-2 rounded-full text-sm transition-all";
+
   return (
     <>
       <div
@@ -85,43 +102,60 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
           bg-white dark:bg-gray-900 text-gray-900 dark:text-white
           shadow-lg`}
       >
-        <div className="p-6 space-y-6">
-          {/* User and Theme Toggle Section */}
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-medium">
-              Hola, {user?.username || 'Invitado'}
-            </div>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {darkMode ? (
-                <Sun className="w-5 h-5 text-yellow-500" />
-              ) : (
-                <Moon className="w-5 h-5 text-gray-600" />
+        {/* Header Section */}
+        <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="mr-3 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {darkMode ? (
+              <Sun className="w-5 h-5 text-yellow-500" />
+            ) : (
+              <Moon className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+          <div className="text-lg font-medium">
+            <span className="dark:text-white text-gray-900">
+              {typedText && (
+                <span className="text-[#09FDFD]">
+                  {typedText}
+                </span>
               )}
-            </button>
+            </span>
           </div>
-          
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto h-[calc(100%-64px)] p-6 space-y-6">
           {/* Join Findout Button */}
-          <Link to="/register-business" className="inline-block" onClick={onClose}>
-            <button className="bg-gray-900 dark:bg-primary text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2 hover:opacity-90 transition-all">
-              <Store className="w-4 h-4" />
-              <span>Unirme a Findout</span>
-              <Heart className="w-4 h-4 text-primary dark:text-pink-300" />
-            </button>
-          </Link>
+          <div className="space-y-2">
+            <Link to="/register-business" className="block" onClick={onClose}>
+              <button className={buttonClasses}>
+                <span className="flex items-center justify-center space-x-2">
+                  <span className="flex-1 text-center">Unirme a Findout</span>
+                  <Heart className="w-4 h-4 text-primary" />
+                </span>
+              </button>
+            </Link>
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              Registra tu negocio
+            </p>
+          </div>
 
           {/* Orders Link */}
-          <Link 
-            to="/orders" 
-            className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" 
-            onClick={onClose}
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span>Ver mi pedido</span>
-          </Link>
+          <div className="space-y-4">
+            <Link 
+              to="/orders" 
+              className="flex items-center space-x-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" 
+              onClick={onClose}
+            >
+              <div className="w-5 flex justify-center">
+                <ShoppingBag className="w-5 h-5" />
+              </div>
+              <span>Ver mi pedido</span>
+            </Link>
+          </div>
 
           {/* Categories Section */}
           <div className="pt-4">
@@ -131,48 +165,57 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
                 <button
                   key={category.path}
                   onClick={() => handleCategorySearch(category.path)}
-                  className="flex items-center space-x-2 w-full text-left text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="flex items-center space-x-4 w-full text-left text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
-                  {category.icon}
+                  <div className="w-5 flex justify-center">
+                    {category.icon}
+                  </div>
                   <span>{category.name}</span>
                 </button>
               ))}
+
+              <Link to="/download" className="block" onClick={onClose}>
+                <button className={buttonClasses}>
+                  <span className="flex items-center justify-center space-x-2">
+                    <span className="flex-1 text-center">Descargar App</span>
+                    <Download className="w-4 h-4 text-primary" />
+                  </span>
+                </button>
+              </Link>
             </div>
           </div>
-
-          {/* Download App Button */}
-          <Link to="/download" className="inline-block" onClick={onClose}>
-            <button className="bg-primary dark:bg-primary-dark text-gray-900 dark:text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2 hover:opacity-90 transition-all">
-              <Download className="w-4 h-4" />
-              <span>Descargar App</span>
-            </button>
-          </Link>
 
           {/* Settings Section */}
           <div className="pt-4 space-y-4">
             <Link 
               to="/profile" 
-              className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" 
+              className="flex items-center space-x-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" 
               onClick={onClose}
             >
-              <User className="w-5 h-5" />
+              <div className="w-5 flex justify-center">
+                <User className="w-5 h-5" />
+              </div>
               <span>Perfil</span>
             </Link>
             
             <Link 
               to="/settings" 
-              className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" 
+              className="flex items-center space-x-4 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" 
               onClick={onClose}
             >
-              <Settings className="w-5 h-5" />
+              <div className="w-5 flex justify-center">
+                <Settings className="w-5 h-5" />
+              </div>
               <span>Configuración</span>
             </Link>
             
             <button 
               onClick={handleLogout} 
-              className="flex items-center space-x-2 w-full text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="flex items-center space-x-4 w-full text-left text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
-              <LogOut className="w-5 h-5" />
+              <div className="w-5 flex justify-center">
+                <LogOut className="w-5 h-5" />
+              </div>
               <span>Cerrar sesión</span>
             </button>
           </div>
