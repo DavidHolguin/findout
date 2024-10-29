@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProductModal from './ProductModal'; // Asegúrate de que la ruta de importación sea correcta
+import ProductModal from './ProductModal';
+import SearchResults from './SearchResults';
 
 const FrasesDeBusqueda = [
   "Quizá un hot dog...",
@@ -154,12 +155,11 @@ const Search = () => {
   const [isTyping, setIsTyping] = useState(true);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [isInputHovered, setIsInputHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const searchContainerRef = useRef(null);
   const { scrollDirection, isAtTop } = useScrollDirection();
   const shouldShowSearch = scrollDirection === "up" || isAtTop;
   const [companyLogos, setCompanyLogos] = useState({});
-  
-  // Nuevo estado para manejar el modal de producto
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -229,6 +229,7 @@ const Search = () => {
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
+      setIsLoading(true);
       try {
         const token = localStorage.getItem('authToken');
         const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -255,6 +256,9 @@ const Search = () => {
             ? 'No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.'
             : 'Ha ocurrido un error al cargar los datos. Por favor, intenta de nuevo más tarde.'
         );
+      }
+      finally {
+        setIsLoading(false);
       }
     };
 
@@ -564,7 +568,7 @@ const Search = () => {
                     <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                   </div>
                 </div>
-
+  
                 <div className="flex gap-2">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -578,7 +582,7 @@ const Search = () => {
                   >
                     <Building2 size={20} />
                   </motion.button>
-
+  
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -593,7 +597,7 @@ const Search = () => {
                   </motion.button>
                 </div>
               </div>
-
+  
               <div className="mt-3">
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                   {categories.map(category => (
@@ -617,12 +621,12 @@ const Search = () => {
                 </div>
               </div>
             </div>
-
+  
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/80 dark:from-gray-900/80 to-transparent pointer-events-none" />
           </motion.div>
         )}
       </AnimatePresence>
-
+  
       <div 
         className="container mx-auto px-4" 
         style={{ 
@@ -635,25 +639,27 @@ const Search = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === 'companies' && renderCompanies()}
-          {activeTab === 'products' && renderProducts()}
-
-          {((activeTab === 'companies' && filteredResults.companies.length === 0) ||
-            (activeTab === 'products' && filteredResults.products.length === 0)) && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-12"
-            >
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                No se encontraron resultados para tu búsqueda.
-                {selectedCategories.length > 0 && " Prueba ajustando los filtros de categoría."}
-              </p>
-            </motion.div>
-          )}
+          <SearchResults isLoading={isLoading} activeTab={activeTab}>
+            {activeTab === 'companies' && renderCompanies()}
+            {activeTab === 'products' && renderProducts()}
+  
+            {!isLoading && ((activeTab === 'companies' && filteredResults.companies.length === 0) ||
+              (activeTab === 'products' && filteredResults.products.length === 0)) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-12"
+              >
+                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                  No se encontraron resultados para tu búsqueda.
+                  {selectedCategories.length > 0 && " Prueba ajustando los filtros de categoría."}
+                </p>
+              </motion.div>
+            )}
+          </SearchResults>
         </motion.div>
       </div>
-
+  
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
@@ -662,7 +668,7 @@ const Search = () => {
           onAddToCart={handleAddToCart}
         />
       )}
-
+  
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
