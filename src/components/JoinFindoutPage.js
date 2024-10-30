@@ -21,8 +21,8 @@ const JoinFindoutPage = () => {
   ];
 
   return (
-    <div className="min-h-screen fixed z-50 flex flex-col justify-center bg-gradient-to-b from-white from-0% via-white via-50% to-[#09FDFD] to-100%">
-      <div className="max-w-md mx-auto overflow-hidden">
+    <div className="min-h-screen w-100% absolut z-50 flex flex-col  bg-gradient-to-b from-white from-0% via-white via-50% to-[#09FDFD] to-100%">
+      <div className=" overflow-hidden">
         {/* Header with Logo */}
        
         {/* Main Content */}
@@ -936,19 +936,19 @@ const JoinFindoutPage = () => {
                 <div className="flex-shrink-0 w-6 h-6 shadow-md rounded-full bg-[#09FDFD] flex items-center justify-center">
                   <Star className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 leading-4">{benefit.text}</p>
+                <p className="text-gray-700 dark:text-gary-900 leading-4">{benefit.text}</p>
               </div>
             ))}
           </div>
 
           {/* Join Button */}
           <div >
-            <button className="w-full bg-black dark:bg-[#09FDFD] text-white dark:text-black py-4 rounded-full font-medium flex items-center justify-center space-x-2 transition-transform hover:scale-105">
+            <button className="w-full bg-black text-white    py-4 rounded-full font-medium flex items-center justify-center space-x-2 transition-transform hover:scale-105">
               <span>Unirme a Findout</span>
               <Heart className="w-5 h-5 text-[#09FDFD]" />
             </button>
-            <p className="text-center text-gray-900 dark:text-white font-medium mt-2">
-              Por solo <span className="text-[#09FDFD] text-xl">$7,99</span> / mes
+            <p className="text-center text-gray-900  font-medium mt-2">
+              Por solo <span className="text-gray-900  font-bold text-xl">$7,99</span> / mes
             </p>
           </div>
         </div>

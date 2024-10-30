@@ -5,6 +5,11 @@ import { Home, Search, User, Settings } from 'lucide-react';
 const MenuBar = () => {
   const location = useLocation();
 
+  // Return null if we're on the register-business page
+  if (location.pathname === '/register-business') {
+    return null;
+  }
+
   const isActive = (path) => {
     return location.pathname === path;
   };
