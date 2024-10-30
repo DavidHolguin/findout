@@ -29,9 +29,9 @@ const JoinFindoutPage = () => {
             <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-6 pt-2 px-2 space-y-2">
             {/* Hero Image */}
-            <div className="relative h-48 w-full overflow-hidden rounded-xl">
+            <div className="relative h-38 w-full overflow-hidden rounded-xl">
               <img 
                 src="/vectorRegisterCompany.png"
                 alt="Register Company"
@@ -41,7 +41,7 @@ const JoinFindoutPage = () => {
 
             {/* Main Text */}
             <div className="text-center space-y-3">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white leading-6">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white leading-6">
                 Deja que tu negocio sea descubierto por la comunidad hispana
               </h1>
               <p className="text-gray-600 dark:text-gray-400 leading-4">
@@ -50,13 +50,13 @@ const JoinFindoutPage = () => {
             </div>
 
             {/* Benefits List */}
-            <div className="space-y-4">
+            <div className="space-y-2 pt-2">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-3">
                   <div className="flex-shrink-0 w-6 h-6 shadow-md rounded-full bg-[#09FDFD] dark:bg-[#077f7f] flex items-center justify-center">
                     <Star className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300 leading-4">{benefit.text}</p>
+                  <p className="text-gray-700 dark:text-gray-300 leading-4 text-sm">{benefit.text}</p>
                 </div>
               ))}
             </div>
