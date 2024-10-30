@@ -134,7 +134,7 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
               <button className={buttonClasses}>
                 <span className="flex items-center justify-center space-x-2">
                   <span className="flex-1 text-center">Unirme a Findout</span>
-                  <Heart className="w-4 h-4 text-primary" />
+                  <Heart className="w-4 h-4 text-primary dark:text-gray-900" />
                 </span>
               </button>
             </Link>
@@ -178,7 +178,7 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
                 <button className={buttonClasses}>
                   <span className="flex items-center justify-center space-x-2">
                     <span className="flex-1 text-center">Descargar App</span>
-                    <Download className="w-4 h-4 text-primary" />
+                    <Download className="w-4 h-4 text-primary dark:text-gray-900" />
                   </span>
                 </button>
               </Link>
