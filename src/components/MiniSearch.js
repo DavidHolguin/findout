@@ -108,7 +108,7 @@ const MiniSearch = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-2xl mx-auto text-start"
+      className="w-full max-w-2xl mx-auto mt-4 mb-4 text-start"
     >
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
@@ -117,7 +117,7 @@ const MiniSearch = () => {
         className="text-3xl md:text-4xl font-bold ml-4"
       >
         {user?.username ? (
-          <span className="dark:text-white text-[#09FDFD]">
+          <span className="dark:text-white text-neutral-700 text-[#09FDFD]">
             ¡Hola,{' '}
             <span className="dark:text-[#09FDFD] text-[#09FDFD]">
               {typedUsername}
