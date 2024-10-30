@@ -126,7 +126,7 @@ const MiniSearch = () => {
           </span>
         ) : (
           <span className="dark:text-white text-[#09FDFD]">
-            ¡Hola, qué gusto verte!
+            ¡Hola, <span className='text-[#09FDFD]'>qué gusto verte!</span> 
           </span>
         )}
       </motion.h2>
