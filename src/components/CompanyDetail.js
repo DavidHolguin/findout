@@ -5,7 +5,7 @@ import MenuBar from './MenuBar';
 import ProductModal from './ProductModal';
 import { Send, Instagram, Flame, MapPin, Facebook, MessageCircle } from 'lucide-react';
 import BadgesSection from './BadgesSection';
-
+import CompanyDetailSkeleton from './CompanyDetailSkeleton';
 
 
 
@@ -109,6 +109,7 @@ const CategoryButton = ({ category, isSelected, onClick }) => (
 );
 
 const CompanyDetail = () => {
+  const [loading, setLoading] = useState(true);
   const [company, setCompany] = useState(null);
   const [productsByCategory, setProductsByCategory] = useState({});
   const [categories, setCategories] = useState([]);
@@ -116,23 +117,21 @@ const CompanyDetail = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  const { id } = useParams();
-
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isOpen, setIsOpen] = useState(false);
   const [nextTime, setNextTime] = useState('');
 
+  const { id } = useParams();
   const categoryCarouselRef = useRef(null);
   const carouselRefs = useMemo(() => ({}), []);
 
-  const formatTime = (timeStr) => {
+  const formatTime = useCallback((timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours % 12 || 12;
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-  };
+  }, []);
 
   const checkBusinessHours = useCallback((businessHours) => {
     const now = new Date();
@@ -163,44 +162,7 @@ const CompanyDetail = () => {
       }
       return { isOpen: false, nextTime: 'N/A' };
     }
-  }, []);
-
-  useEffect(() => {
-    const fetchCompanyAndProducts = async () => {
-      try {
-        const companyResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`);
-        setCompany(companyResponse.data);
-        
-        const { isOpen, nextTime } = checkBusinessHours(companyResponse.data.business_hours);
-        setIsOpen(isOpen);
-        setNextTime(nextTime);
-        
-        const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`);
-        const companyProducts = productsResponse.data.filter(product => product.company === parseInt(id));
-        
-        const categoriesResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/`);
-        
-        const grouped = companyProducts.reduce((acc, product) => {
-          if (!acc[product.category]) {
-            acc[product.category] = [];
-          }
-          acc[product.category].push(product);
-          return acc;
-        }, {});
-        
-        setProductsByCategory(grouped);
-        
-        const categoriesWithProducts = categoriesResponse.data.filter(
-          category => grouped[category.id]
-        );
-        setCategories(categoriesWithProducts);
-      } catch (error) {
-        console.error('Error al obtener datos:', error);
-      }
-    };
-    
-    fetchCompanyAndProducts();
-  }, [id, checkBusinessHours]);
+  }, [formatTime]);
 
   const toggleCategory = useCallback((categoryId) => {
     setSelectedCategories(prev => 
@@ -260,7 +222,55 @@ const CompanyDetail = () => {
     closeProductModal();
   }, [closeProductModal]);
 
-  if (!company) return <div className="dark:text-white">Cargando...</div>;
+  useEffect(() => {
+    const fetchCompanyAndProducts = async () => {
+      setLoading(true);
+      try {
+        const companyResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`);
+        setCompany(companyResponse.data);
+        
+        const { isOpen: openStatus, nextTime: nextTimeValue } = checkBusinessHours(companyResponse.data.business_hours);
+        setIsOpen(openStatus);
+        setNextTime(nextTimeValue);
+        
+        const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`);
+        const companyProducts = productsResponse.data.filter(product => product.company === parseInt(id));
+        
+        const categoriesResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/`);
+        
+        const grouped = companyProducts.reduce((acc, product) => {
+          if (!acc[product.category]) {
+            acc[product.category] = [];
+          }
+          acc[product.category].push(product);
+          return acc;
+        }, {});
+        
+        setProductsByCategory(grouped);
+        
+        const categoriesWithProducts = categoriesResponse.data.filter(
+          category => grouped[category.id]
+        );
+        setCategories(categoriesWithProducts);
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+      }
+      setLoading(false);
+    };
+    
+    fetchCompanyAndProducts();
+  }, [id, checkBusinessHours]);
+
+  if (loading) {
+    return <CompanyDetailSkeleton />;
+  }
+
+  if (!company) {
+    return <div className="dark:text-white">No se encontró la empresa</div>;
+  }
+
+
+
 
   return (
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
