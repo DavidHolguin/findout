@@ -11,6 +11,7 @@ import Profile from './components/Profile';
 import Settings from './components/Settings';
 import CompanyCategory from './components/CompanyCategory';
 import JoinFindoutPage from './components/JoinFindoutPage'; // Add this import
+import QRScanner from './components/QRScanner';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -48,6 +49,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/scanQR" element={<QRScanner />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/company-categories/:categoryId" element={<CompanyCategory />} />
             <Route path="/register-business" element={<JoinFindoutPage />} /> {/* Add this route */}
