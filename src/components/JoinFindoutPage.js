@@ -29,7 +29,7 @@ const JoinFindoutPage = () => {
             <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
           </div>
 
-          <div className="p-6 pt-2 px-2 space-y-2">
+          <div className="p-6 pt-2 px-4 space-y-2">
             {/* Hero Image */}
             <div className="relative h-38 w-full overflow-hidden rounded-xl">
               <img 
@@ -67,7 +67,7 @@ const JoinFindoutPage = () => {
                 <span>Unirme a Findout</span>
                 <Heart className="w-5 h-5 text-[#09FDFD] dark:text-[#077f7f]" />
               </button>
-              <p className="text-center text-gray-900 dark:text-white font-medium mt-2">
+              <p className="text-center text-gray-900 dark:text-white font-medium">
                 Por solo <span className="text-gray-900 dark:text-white font-bold text-xl">$7,99</span> / mes
               </p>
             </div>
