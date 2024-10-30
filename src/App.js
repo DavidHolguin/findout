@@ -10,6 +10,7 @@ import MenuBar from './components/MenuBar';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
 import CompanyCategory from './components/CompanyCategory';
+import JoinFindoutPage from './components/JoinFindoutPage'; // Add this import
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -49,6 +50,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/company-categories/:categoryId" element={<CompanyCategory />} />
+            <Route path="/register-business" element={<JoinFindoutPage />} /> {/* Add this route */}
           </Routes>
         </main>
         <MenuBar />
