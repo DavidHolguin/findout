@@ -125,7 +125,7 @@ const MiniSearch = () => {
             !
           </span>
         ) : (
-          <span className="dark:text-white text-[#09FDFD]">
+          <span className="dark:text-white text-neutral-700">
             ¡Hola, <span className='text-[#09FDFD]'>qué gusto verte!</span> 
           </span>
         )}
