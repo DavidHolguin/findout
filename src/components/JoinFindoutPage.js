@@ -25,9 +25,7 @@ const JoinFindoutPage = () => {
       <div className="min-h-[90vh] w-full  overflow-hidden bg-gradient-to-b from-white dark:from-gray-900 from-0% via-white dark:via-gray-900 via-80% to-[#09FDFD] dark:to-[#077f7f] to-100% shadow-lg">
         <div className="relative h-full overflow-auto">
           {/* Handle bar for bottom sheet */}
-          <div className="sticky top-0 w-full flex justify-center pt-4 pb-2">
-            <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
-          </div>
+          
 
           <div className="p-6 pt-2 px-8 space-y-2">
             {/* Hero Image */}
