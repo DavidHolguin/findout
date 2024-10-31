@@ -21,7 +21,7 @@ const JoinFindoutPage = () => {
   ];
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col justify-end mt-[64px]">
+    <div className="fixed inset-0 z-20 flex flex-col justify-end mt-[84px] bg-white">
       <div className="min-h-[90vh] w-full  overflow-hidden bg-gradient-to-b from-white dark:from-gray-900 from-0% via-white dark:via-gray-900 via-80% to-[#09FDFD] dark:to-[#077f7f] to-100% shadow-lg">
         <div className="relative h-full overflow-auto">
           {/* Handle bar for bottom sheet */}
@@ -39,7 +39,7 @@ const JoinFindoutPage = () => {
 
             {/* Main Text */}
             <div className="text-center space-y-3">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white leading-6">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white leading-8">
                 Deja que tu negocio sea descubierto por la comunidad hispana
               </h1>
               <p className="text-gray-600 dark:text-gray-400 leading-4">
@@ -48,7 +48,7 @@ const JoinFindoutPage = () => {
             </div>
 
             {/* Benefits List */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-4 pt-4">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-3">
                   <div className="flex-shrink-0 w-6 h-6 shadow-md rounded-full bg-[#09FDFD] dark:bg-[#077f7f] flex items-center justify-center">
