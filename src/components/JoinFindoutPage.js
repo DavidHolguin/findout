@@ -29,7 +29,7 @@ const JoinFindoutPage = () => {
             <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
           </div>
 
-          <div className="p-6 pt-2 px-4 space-y-2">
+          <div className="p-6 pt-2 px-8 space-y-2">
             {/* Hero Image */}
             <div className="relative h-38 w-full overflow-hidden rounded-xl">
               <img 
