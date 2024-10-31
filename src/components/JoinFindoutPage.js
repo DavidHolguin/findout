@@ -22,14 +22,11 @@ const JoinFindoutPage = () => {
 
   return (
     <div className="fixed inset-0 z-20 flex flex-col justify-end mt-[84px] bg-white">
-      <div className="min-h-[90vh] w-full  overflow-hidden bg-gradient-to-b from-white dark:from-gray-900 from-0% via-white dark:via-gray-900 via-80% to-[#09FDFD] dark:to-[#077f7f] to-100% shadow-lg">
+      <div className="min-h-[90vh] w-full overflow-hidden bg-gradient-to-b from-white dark:from-gray-900 from-0% via-white dark:via-gray-900 via-80% to-[#09FDFD] dark:to-[#077f7f] to-100% shadow-lg">
         <div className="relative h-full overflow-auto">
-          {/* Handle bar for bottom sheet */}
-          
-
-          <div className="p-6 pt-2 px-8 space-y-2">
+          <div className="fixed bottom-0 p-6 pt-2 px-8 space-y-2 h-full flex flex-col justify-end gap-5">
             {/* Hero Image */}
-            <div className="relative h-38 w-full overflow-hidden rounded-xl">
+            <div className="fixed top-[10px] -left-10 relative h-38 w-full overflow-hidden rounded-xl">
               <img 
                 src="/vectorRegisterCompany.png"
                 alt="Register Company"
@@ -59,13 +56,23 @@ const JoinFindoutPage = () => {
               ))}
             </div>
 
-            {/* Join Button */}
+            {/* Join Button with Shimmer Effect */}
             <div className="pt-4">
-              <button className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-full font-medium flex items-center justify-center space-x-2 transition-transform hover:scale-105">
-                <span>Unirme a Findout</span>
-                <Heart className="w-5 h-5 text-[#09FDFD] dark:text-[#077f7f]" />
-              </button>
-              <p className="text-center text-gray-900 dark:text-white font-medium">
+              <div className="relative" style={{ padding: '1px' }}>
+                <div className="absolute inset-0 rounded-full overflow-hidden" 
+                     style={{
+                       background: 'linear-gradient(90deg, transparent, #09FDFD, transparent)',
+                       backgroundSize: '200% 100%',
+                       animation: 'shimmer 2s infinite',
+                       filter: 'blur(4px)'
+                     }}>
+                </div>
+                <button className="relative w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-full font-medium flex items-center justify-center space-x-2 transition-transform hover:scale-105">
+                  <span>Unirme a Findout</span>
+                  <Heart className="w-5 h-5 text-[#09FDFD] dark:text-[#077f7f]" />
+                </button>
+              </div>
+              <p className="text-center text-gray-900 dark:text-white font-medium mt-2">
                 Por solo <span className="text-gray-900 dark:text-white font-bold text-xl">$7,99</span> / mes
               </p>
             </div>
