@@ -124,4 +124,4 @@ const QRScanner = () => {
   );
 };
 
-export default QRScanner;567890'
+export default QRScanner;
