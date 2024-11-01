@@ -21,9 +21,9 @@ const JoinFindoutPage = () => {
   ];
 
   return (
-    <div className="fixed inset-0 z-20 flex flex-col mt-[84px] bg-white">
-      <div className="flex-1 overflow-auto bg-gradient-to-b from-white dark:from-gray-900 from-0% via-white dark:via-gray-900 via-80% to-[#09FDFD] dark:to-[#077f7f] to-100%">
-        <div className="container mx-auto px-8 py-6 max-w-lg">
+    <div className="fixed inset-0 z-20 flex flex-col mt-[84px] bg-gray-100">
+      <div className="flex-1 overflow-auto bg-gradient-to-b from-gray-100 dark:from-gray-900 from-0% via-gray-100 dark:via-gray-900 via-60% to-[#09FDFD] dark:to-[#077f7f] to-100%">
+        <div className="container mx-auto px-6 py-6 max-w-lg">
           {/* Imagen con posición mejorada */}
           <div className="relative w-full aspect-[2/1] mb-8 mt-4">
             <img 
@@ -56,7 +56,8 @@ const JoinFindoutPage = () => {
           </div>
 
           {/* Join Button with Single Light Animation */}
-          <div className="sticky bottom-0  pt-4 pb-6">
+          <div className="sticky bottom-0  pb-6 bg-gradient-to-b from-transparent from-0% via-[#09FDFD] via-40% to-[#09FDFD] dark:via-[#077f7f] dark:to-[#077f7f]">
+
             <div className="relative">
               {/* Animated light point */}
               <div className="absolute inset-0 rounded-full overflow-hidden">
@@ -74,7 +75,7 @@ const JoinFindoutPage = () => {
                 <Heart className="w-5 h-5 text-[#09FDFD] dark:text-[#077f7f]" />
               </button>
             </div>
-            <p className="text-center text-gray-900 dark:text-white font-medium mt-3">
+            <p className="text-center text-gray-900 dark:text-white font-medium mt-2">
               Por solo <span className="text-gray-900 dark:text-white font-bold text-xl">$7,99</span> / mes
             </p>
           </div>
