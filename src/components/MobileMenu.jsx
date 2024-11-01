@@ -22,6 +22,8 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
   );
   const [typedText, setTypedText] = useState('');
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
     if (darkMode) {
@@ -47,6 +49,45 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
     };
     typeGreeting();
   }, [user, isOpen]);
+
+  useEffect(() => {
+    // Escuchar el evento beforeinstallprompt
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // Comprobar si la app ya está instalada
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone;
+    setIsInstallable(!isStandalone);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      // Mostrar el prompt de instalación
+      deferredPrompt.prompt();
+      
+      // Esperar la respuesta del usuario
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+      }
+    } else {
+      // Si no hay prompt disponible o es iOS, redirigir a la página de descarga
+      navigate('/download');
+    }
+    onClose();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -174,14 +215,18 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
                 </button>
               ))}
 
-              <Link to="/download" className="block" onClick={onClose}>
-                <button className={buttonClasses}>
-                  <span className="flex items-center justify-center space-x-2">
-                    <span className="flex-1 text-center">Descargar App</span>
-                    <Download className="w-4 h-4 text-primary dark:text-gray-900" />
+              {/* Install/Download App Button */}
+              <button 
+                onClick={handleInstallClick}
+                className={buttonClasses}
+              >
+                <span className="flex items-center justify-center space-x-2">
+                  <span className="flex-1 text-center">
+                    {isInstallable ? 'Instalar App' : 'Descargar App'}
                   </span>
-                </button>
-              </Link>
+                  <Download className="w-4 h-4 text-primary dark:text-gray-900" />
+                </span>
+              </button>
             </div>
           </div>
 
