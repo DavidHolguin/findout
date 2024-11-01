@@ -1,5 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Share2, Heart, ChevronLeft } from 'lucide-react';
+
+// Correct Safari icon with proper chevron
+const SafariIcon = () => (
+  <svg viewBox="0 0 512 512" className="w-6 h-6">
+    <path
+      fill="currentColor"
+      d="M 256 48 C 141.1 48 48 141.1 48 256 s 93.1 208 208 208 s 208 -93.1 208 -208 S 370.9 48 256 48 z M 256 446.7 c -105.1 0 -190.7 -85.5 -190.7 -190.7 S 150.9 65.3 256 65.3 s 190.7 85.5 190.7 190.7 S 361.1 446.7 256 446.7 z M 256 121.3 c -74.2 0 -134.7 60.5 -134.7 134.7 s 60.5 134.7 134.7 134.7 s 134.7 -60.5 134.7 -134.7 S 330.2 121.3 256 121.3 z M 282.7 256 l 67.3 -67.3 c 7.4 -7.4 7.4 -19.4 0 -26.8 c -7.4 -7.4 -19.4 -7.4 -26.8 0 L 256 229.3 l -67.3 -67.3 c -7.4 -7.4 -19.4 -7.4 -26.8 0 c -7.4 7.4 -7.4 19.4 0 26.8 L 229.3 256 l -67.3 67.3 c -7.4 7.4 -7.4 19.4 0 26.8 c 3.7 3.7 8.5 5.5 13.4 5.5 s 9.7 -1.8 13.4 -5.5 L 256 282.7 l 67.3 67.3 c 3.7 3.7 8.5 5.5 13.4 5.5 s 9.7 -1.8 13.4 -5.5 c 7.4 -7.4 7.4 -19.4 0 -26.8 L 282.7 256 z"
+    />
+  </svg>
+);
 
 const AppleIcon = () => (
   <svg viewBox="0 0 384 512" className="w-6 h-6">
@@ -10,37 +21,19 @@ const AppleIcon = () => (
   </svg>
 );
 
-const SafariIcon = () => (
-  <svg viewBox="0 0 512 512" className="w-6 h-6">
-    <path
-      fill="currentColor"
-      d="M236.9 256l134.8-134.8c7.8-7.8 7.8-20.5 0-28.3s-20.5-7.8-28.3 0L208.6 227.7c-7.8 7.8-7.8 20.5 0 28.3l134.8 134.8c7.8 7.8 20.5 7.8 28.3 0s7.8-20.5 0-28.3L236.9 256z"
-    />
-  </svg>
-);
-
-const ShareIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-8 h-8 text-blue-500">
-    <path
-      fill="currentColor"
-      d="M16 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-2 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 8c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2s.9-2 2-2h12c1.1 0 2 .9 2 2z"
-    />
-  </svg>
-);
-
 const IOSInstallGuide = () => {
   const steps = [
     {
       id: 1,
       text: "Use el botón inferior en el medio de su navegador",
-      icon: <ShareIcon />,
+      icon: <Share2 className="w-8 h-8 text-blue-500" />,
     },
     {
       id: 2,
       text: "Deslice hacia abajo y busque el botón de 'Agregar a Inicio'",
       preview: (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-2 w-full max-w-xs mx-auto">
-          <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-2 w-full max-w-xs mx-auto border-2 border-blue-500">
+          <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-lg">
             <span>Agregar a Inicio</span>
             <span className="text-xl">+</span>
           </div>
@@ -51,14 +44,14 @@ const IOSInstallGuide = () => {
       id: 3,
       text: 'Use el botón superior derecho "Agregar" y listo.',
       preview: (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mt-2 w-full max-w-xs mx-auto border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mt-2 w-full max-w-xs mx-auto border-2 border-blue-500">
           <div className="flex items-center justify-between mb-2">
             <button className="text-gray-500 dark:text-gray-400">Cancelar</button>
             <span className="font-semibold">Agregar a Inicio</span>
             <button className="text-blue-500 font-semibold">Agregar</button>
           </div>
           <div className="flex items-center space-x-3 p-2">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-cyan-400 rounded-xl flex items-center justify-center">
               <span className="text-white text-lg font-bold">F</span>
             </div>
             <div>
@@ -93,7 +86,7 @@ const IOSInstallGuide = () => {
             className="flex flex-col items-center"
           >
             <div className="flex items-center space-x-4 w-full">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="flex-shrink-0 w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center text-white font-semibold">
                 {step.id}
               </div>
               <p className="flex-grow text-gray-700 dark:text-gray-300">{step.text}</p>
@@ -106,7 +99,7 @@ const IOSInstallGuide = () => {
 
       <div className="mt-8 flex flex-col items-center space-y-4">
         <div className="flex items-center space-x-2">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-cyan-400 rounded-xl flex items-center justify-center">
             <span className="text-white text-lg font-bold">F</span>
           </div>
           <p className="text-sm dark:text-gray-300">
@@ -115,8 +108,9 @@ const IOSInstallGuide = () => {
           </p>
         </div>
         <button className="w-full bg-black dark:bg-gray-700 text-white py-3 px-6 rounded-xl flex items-center justify-center space-x-2 hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
+          <ChevronLeft className="w-5 h-5" />
           <span>Volver al home</span>
-          <span className="text-primary">♥</span>
+          <Heart className="w-5 h-5 text-cyan-400" />
         </button>
       </div>
     </div>
