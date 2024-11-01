@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from '@/components/ui/motion';
+import { motion } from 'framer-motion';
 
 const AppleIcon = () => (
   <svg viewBox="0 0 384 512" className="w-6 h-6">
@@ -37,7 +37,7 @@ const IOSInstallGuide = () => {
     },
     {
       id: 2,
-      text: "Deslice hacia abajo y busque el botón de Agregar a Inicio",
+      text: "Deslice hacia abajo y busque el botón de 'Agregar a Inicio'",
       preview: (
         <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-2 w-full max-w-xs mx-auto">
           <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
