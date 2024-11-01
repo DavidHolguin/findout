@@ -32,7 +32,7 @@ const IOSInstallGuide = () => {
       id: 2,
       text: "Deslice hacia abajo y busque el botón de 'Agregar a Inicio'",
       preview: (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-2 w-full max-w-xs mx-auto border-2 border-blue-500">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-2 w-full max-w-xs mx-auto border-2 border-[#09FDFD]">
           <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-lg">
             <span>Agregar a Inicio</span>
             <span className="text-xl">+</span>
@@ -44,7 +44,7 @@ const IOSInstallGuide = () => {
       id: 3,
       text: 'Use el botón superior derecho "Agregar" y listo.',
       preview: (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mt-2 w-full max-w-xs mx-auto border-2 border-blue-500">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mt-2 w-full max-w-xs mx-auto border-2 border-[#09FDFD]">
           <div className="flex items-center justify-between mb-2">
             <button className="text-gray-500 dark:text-gray-400">Cancelar</button>
             <span className="font-semibold">Agregar a Inicio</span>
