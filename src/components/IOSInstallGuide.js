@@ -121,7 +121,7 @@ const IOSInstallGuide = () => {
   ];
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg transition-colors duration-200">
+    <div className="max-w-md mx-auto p-6 -mb-[40px] transition-colors duration-200">
       <div className="flex flex-col items-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-2">
           <div className="border-2 border-gray-500 rounded-lg">
@@ -145,7 +145,7 @@ const IOSInstallGuide = () => {
             className="flex flex-col items-center"
           >
             <div className="flex items-center space-x-4 w-full">
-              <div className="flex-shrink-0 w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="flex-shrink-0 w-8 h-8 bg-[#09FDFD] rounded-full flex items-center justify-center text-white font-semibold">
                 {step.id}
               </div>
               <p className="flex-grow text-gray-700 dark:text-gray-300 leading-5	">{step.text}</p>
