@@ -94,7 +94,7 @@ const PersonalizedCategorySlider = () => {
 
   return (
     <div className="w-full mt-4 mb-2">
-      <h2 className="text-lg text-gray-600 ms-4">Basado en tus intereses</h2>
+      <h2 className="text-lg text-gray-600 ms-5">Basado en tus intereses</h2>
       
       <div 
         ref={sliderRef}
@@ -117,12 +117,12 @@ const PersonalizedCategorySlider = () => {
               style={{ minWidth: '100%' }}
             >
               <div>
-                <div className="relative rounded-3xl overflow-hidden border-2 border-primary ">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-t from-primary/50 to-transparent via-transparent">
+                <div className="relative h-[58px] rounded-2xl overflow-hidden border-2 border-primary ">
+                  <div className="flex h-[58px] items-center justify-between p-4 bg-gradient-to-t from-primary/50 to-transparent via-transparent">
                     <div className="flex gap-4 items-center flex-row min-w-0 relative">
                       <div>
-                        <h3 className="text-2xl text-[#4d4d4d] font-bold truncate leading-5">Seguir explorando</h3>
-                        <p className="text-gray-600 text-lg truncate leading-6">{category.name}</p>
+                        <h3 className="text-xl text-[#4d4d4d] font-bold truncate leading-5">Seguir explorando</h3>
+                        <p className="text-gray-600 text-base truncate leading-6">{category.name}</p>
                       </div>
                       
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="33" fill="none" viewBox="0 0 20 33">
@@ -137,7 +137,7 @@ const PersonalizedCategorySlider = () => {
                       <img 
                         src={getFullImageUrl(category.image)} 
                         alt={category.name}
-                        className="w-12 h-12 object-cover rounded-lg"
+                        className="w-10 h-10 object-cover rounded-lg"
                       />
                     </div>
                   </div>
