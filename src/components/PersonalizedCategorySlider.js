@@ -117,7 +117,7 @@ const PersonalizedCategorySlider = () => {
               style={{ minWidth: '100%' }}
             >
               <div>
-                <div className="relative rounded-3xl overflow-hidden border-2 border-primary bg-white">
+                <div className="relative rounded-3xl overflow-hidden border-2 border-primary ">
                   <div className="flex items-center justify-between p-4 bg-gradient-to-t from-primary/50 to-transparent via-transparent">
                     <div className="flex gap-4 items-center flex-row min-w-0 relative">
                       <div>
@@ -125,9 +125,10 @@ const PersonalizedCategorySlider = () => {
                         <p className="text-gray-600 text-lg truncate leading-6">{category.name}</p>
                       </div>
                       
-                      <svg xmlns="http://www.w3.org/2000/svg" width="23" height="35" fill="none" viewBox="0 0 23 35">
-                        <path stroke="#09FDFD" stroke-width="8" d="m3 32 14-14.5L3 3"/>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="33" fill="none" viewBox="0 0 20 33">
+                        <path stroke="#09FDFD" stroke-width="5" d="m2 31 14-14.5L2 2"/>
                       </svg>
+
 
 
 
