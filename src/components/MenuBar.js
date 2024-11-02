@@ -5,8 +5,9 @@ import { Home, Search, User, Settings } from 'lucide-react';
 const MenuBar = () => {
   const location = useLocation();
 
-  // Return null if we're on the register-business page
-  if (location.pathname === '/register-business') {
+  // Return null if we're on either restricted page
+  const restrictedRoutes = ['/register-business', '/download'];
+  if (restrictedRoutes.includes(location.pathname)) {
     return null;
   }
 
