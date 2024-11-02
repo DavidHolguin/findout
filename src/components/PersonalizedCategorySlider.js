@@ -94,7 +94,7 @@ const PersonalizedCategorySlider = () => {
 
   return (
     <div className="w-full mt-4 mb-2">
-      <h2 className="text-lg text-gray-600 ms-5">Basado en tus intereses</h2>
+      <h2 className="text-base leading-4 text-gray-600 ms-5">Basado en tus intereses</h2>
       
       <div 
         ref={sliderRef}
@@ -121,8 +121,8 @@ const PersonalizedCategorySlider = () => {
                   <div className="flex h-[58px] items-center justify-between p-4 bg-gradient-to-t from-primary/50 to-transparent via-transparent">
                     <div className="flex gap-4 items-center flex-row min-w-0 relative">
                       <div>
-                        <h3 className="text-xl text-[#4d4d4d] font-bold truncate leading-5">Seguir explorando</h3>
-                        <p className="text-gray-600 text-base truncate leading-6">{category.name}</p>
+                        <h3 className="text-xl text-[#4d4d4d] font-bold leading-5">Seguir explorando</h3>
+                        <p className="text-gray-600 text-base  leading-6">{category.name}</p>
                       </div>
                       
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="33" fill="none" viewBox="0 0 20 33">
