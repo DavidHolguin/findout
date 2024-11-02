@@ -88,7 +88,12 @@ const IOSInstallGuide = () => {
         <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-2 w-full max-w-xs mx-auto border-2 border-[#09FDFD]">
           <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-700 rounded-lg">
             <span>Agregar a Inicio</span>
-            <span className="text-xl">+</span>
+            <span >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path fill="#242424" d="M0 4.167A4.167 4.167 0 0 1 4.167 0h11.666A4.167 4.167 0 0 1 20 4.167v11.666A4.167 4.167 0 0 1 15.833 20H4.167A4.167 4.167 0 0 1 0 15.833V4.167Zm4.167-2.5a2.5 2.5 0 0 0-2.5 2.5v11.666a2.5 2.5 0 0 0 2.5 2.5h11.666a2.5 2.5 0 0 0 2.5-2.5V4.167a2.5 2.5 0 0 0-2.5-2.5H4.167ZM10 4.167c.46 0 .833.373.833.833v4.167H15a.833.833 0 0 1 0 1.666h-4.167V15a.833.833 0 0 1-1.666 0v-4.167H5a.833.833 0 1 1 0-1.666h4.167V5c0-.46.373-.833.833-.833Z"/>
+            </svg>
+
+            </span>
           </div>
         </div>
       ),
@@ -118,7 +123,7 @@ const IOSInstallGuide = () => {
   return (
     <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg transition-colors duration-200">
       <div className="flex flex-col items-center mb-8">
-        <div className="flex items-center justify-center gap-2 mb-4">
+        <div className="flex items-center justify-center gap-2 mb-2">
           <div className="border-2 border-gray-500 rounded-lg">
             <AppleIcon />
           </div>
@@ -126,7 +131,8 @@ const IOSInstallGuide = () => {
             <SafariIcon />
           </div>
         </div>
-        <h2 className="text-2xl font-semibold dark:text-white">Instalación iOS</h2>
+        <h2 className="text-2xl font-semibold dark:text-white leading-6">Instalación iOS</h2>
+        <p className='text-gray-500 dark:text-gray-400 text-xl'>Safari</p>
       </div>
 
       <div className="space-y-8">
@@ -142,7 +148,7 @@ const IOSInstallGuide = () => {
               <div className="flex-shrink-0 w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center text-white font-semibold">
                 {step.id}
               </div>
-              <p className="flex-grow text-gray-700 dark:text-gray-300">{step.text}</p>
+              <p className="flex-grow text-gray-700 dark:text-gray-300 leading-5	">{step.text}</p>
               {step.icon && <div className="flex-shrink-0">{step.icon}</div>}
             </div>
             {step.preview && <div className="mt-4 w-full">{step.preview}</div>}
@@ -153,7 +159,7 @@ const IOSInstallGuide = () => {
       <div className="mt-8 flex flex-col items-center space-y-4">
         <div className="flex items-center space-x-2">
           <img src="logo512.png" alt="Findout Logo" className="w-10 h-10 rounded-xl" />
-          <p className="text-sm dark:text-gray-300">
+          <p className="text-sm dark:text-gray-300 leading-4">
             Ya puede buscar <span className="font-semibold">findout</span><br />
             en las aplicaciones de su teléfono
           </p>
