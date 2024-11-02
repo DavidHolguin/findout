@@ -93,8 +93,8 @@ const PersonalizedCategorySlider = () => {
   }
 
   return (
-    <div className="w-full mt-4 mb-6">
-      <h2 className="text-xl mb-2">Basado en tus intereses</h2>
+    <div className="w-full mt-4 mb-2">
+      <h2 className="text-lg text-gray-600 ms-4">Basado en tus intereses</h2>
       
       <div 
         ref={sliderRef}
@@ -116,20 +116,28 @@ const PersonalizedCategorySlider = () => {
               className="w-full flex-none"
               style={{ minWidth: '100%' }}
             >
-              <div className="pr-4">
-                <div className="relative rounded-xl overflow-hidden border-2 border-primary bg-white">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-t from-primary/20 to-transparent">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold truncate">Seguir explorando</h3>
-                      <p className="text-gray-600 text-sm truncate">{category.name}</p>
+              <div>
+                <div className="relative rounded-3xl overflow-hidden border-2 border-primary bg-white">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-t from-primary/50 to-transparent via-transparent">
+                    <div className="flex gap-4 items-center flex-row min-w-0 relative">
+                      <div>
+                        <h3 className="text-2xl text-[#4d4d4d] font-bold truncate leading-5">Seguir explorando</h3>
+                        <p className="text-gray-600 text-lg truncate leading-6">{category.name}</p>
+                      </div>
+                      
+                      <svg xmlns="http://www.w3.org/2000/svg" width="23" height="35" fill="none" viewBox="0 0 23 35">
+                        <path stroke="#09FDFD" stroke-width="8" d="m3 32 14-14.5L3 3"/>
+                      </svg>
+
+
+
                     </div>
-                    <div className="flex items-center flex-row-reverse ml-2">
+                    <div className="ml-8">
                       <img 
                         src={getFullImageUrl(category.image)} 
                         alt={category.name}
                         className="w-12 h-12 object-cover rounded-lg"
                       />
-                      <ChevronRight className="w-5 h-5 ml-2 text-primary" />
                     </div>
                   </div>
                 </div>
