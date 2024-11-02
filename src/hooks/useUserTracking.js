@@ -18,7 +18,11 @@ export const useUserTracking = () => {
       const newVisit = {
         companyId: companyData.id,
         companyName: companyData.name,
-        category: companyData.category?.name,
+        category: {
+          id: companyData.category?.id,
+          name: companyData.category?.name,
+          image: companyData.category?.image // Añadido el campo image
+        },
         timestamp,
       };
       
@@ -29,7 +33,13 @@ export const useUserTracking = () => {
       localStorage.setItem(STORAGE_KEYS.COMPANY_VISITS, JSON.stringify(updatedVisits));
       
       // Update user preferences based on categories
-      updateUserPreferences('categories', companyData.category?.name);
+      if (companyData.category?.id && companyData.category?.name) {
+        updateUserPreferences('categories', {
+          id: companyData.category.id,
+          name: companyData.category.name,
+          image: companyData.category.image // Añadido el campo image
+        });
+      }
     } catch (error) {
       console.error('Error tracking company visit:', error);
     }
@@ -56,7 +66,7 @@ export const useUserTracking = () => {
     }
   };
 
-  const trackCategoryClick = (categoryId, categoryName) => {
+  const trackCategoryClick = (categoryId, categoryName, categoryImage) => { // Añadido el parámetro categoryImage
     try {
       const clicks = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORY_CLICKS) || '[]');
       const timestamp = new Date().toISOString();
@@ -64,6 +74,7 @@ export const useUserTracking = () => {
       const newClick = {
         categoryId,
         categoryName,
+        categoryImage, // Añadido el campo image
         timestamp
       };
       
@@ -72,7 +83,11 @@ export const useUserTracking = () => {
       localStorage.setItem(STORAGE_KEYS.CATEGORY_CLICKS, JSON.stringify(updatedClicks));
       
       // Update user preferences based on categories
-      updateUserPreferences('categories', categoryName);
+      updateUserPreferences('categories', {
+        id: categoryId,
+        name: categoryName,
+        image: categoryImage // Añadido el campo image
+      });
     } catch (error) {
       console.error('Error tracking category click:', error);
     }
@@ -87,7 +102,13 @@ export const useUserTracking = () => {
           preferences.categories = {};
         }
         
-        preferences.categories[value] = (preferences.categories[value] || 0) + 1;
+        const categoryKey = `${value.id}-${value.name}`;
+        preferences.categories[categoryKey] = {
+          id: value.id,
+          name: value.name,
+          image: value.image, // Añadido el campo image
+          count: ((preferences.categories[categoryKey]?.count || 0) + 1)
+        };
       }
       
       localStorage.setItem(STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(preferences));
@@ -98,10 +119,53 @@ export const useUserTracking = () => {
 
   const getUserPreferences = () => {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PREFERENCES) || '{}');
+      const preferences = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PREFERENCES) || '{}');
+      return {
+        ...preferences,
+        categories: preferences.categories ? Object.values(preferences.categories) : []
+      };
     } catch (error) {
       console.error('Error getting user preferences:', error);
-      return {};
+      return {
+        categories: []
+      };
+    }
+  };
+
+  const getCompanyVisits = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPANY_VISITS) || '[]');
+    } catch (error) {
+      console.error('Error getting company visits:', error);
+      return [];
+    }
+  };
+
+  const getSearchHistory = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY) || '[]');
+    } catch (error) {
+      console.error('Error getting search history:', error);
+      return [];
+    }
+  };
+
+  const getCategoryClicks = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORY_CLICKS) || '[]');
+    } catch (error) {
+      console.error('Error getting category clicks:', error);
+      return [];
+    }
+  };
+
+  const clearAllUserData = () => {
+    try {
+      Object.values(STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
+    } catch (error) {
+      console.error('Error clearing user data:', error);
     }
   };
 
@@ -109,6 +173,10 @@ export const useUserTracking = () => {
     trackCompanyVisit,
     trackSearch,
     trackCategoryClick,
-    getUserPreferences
+    getUserPreferences,
+    getCompanyVisits,
+    getSearchHistory,
+    getCategoryClicks,
+    clearAllUserData
   };
 };
