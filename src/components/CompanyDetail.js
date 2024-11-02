@@ -6,10 +6,10 @@ import ProductModal from './ProductModal';
 import { Send, Instagram, Flame, MapPin, Facebook, MessageCircle } from 'lucide-react';
 import BadgesSection from './BadgesSection';
 import CompanyDetailSkeleton from './CompanyDetailSkeleton';
+import { useUserTracking } from '../hooks/useUserTracking';
 
-
-
-const ImageWithFallback = ({ src, alt, className }) => {
+// Memoized ImageWithFallback component
+const ImageWithFallback = React.memo(({ src, alt, className }) => {
   const [error, setError] = useState(false);
 
   if (error || !src) {
@@ -24,9 +24,10 @@ const ImageWithFallback = ({ src, alt, className }) => {
       onError={() => setError(true)}
     />
   );
-};
+});
 
-const PromotionBadge = ({ promotion }) => {
+// Memoized PromotionBadge component
+const PromotionBadge = React.memo(({ promotion }) => {
   const isPercentage = promotion.discount_type === 'PERCENTAGE';
 
   return (
@@ -57,17 +58,22 @@ const PromotionBadge = ({ promotion }) => {
       </div>
     </div>
   );
-};
+});
 
-const ProductCard = ({ product, onClick }) => {
+// Memoized ProductCard component
+const ProductCard = React.memo(({ product, onClick }) => {
   const hasPromotion = product.active_promotions && product.active_promotions.length > 0;
   const promotion = hasPromotion ? product.active_promotions[0] : null;
+
+  const handleClick = useCallback(() => {
+    onClick(product);
+  }, [product, onClick]);
 
   return (
     <div
       className="flex-none w-[65%] snap-start cursor-pointer"
       style={{ scrollSnapAlign: 'start' }}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden relative">
         {hasPromotion && <PromotionBadge promotion={promotion} />}
@@ -93,20 +99,27 @@ const ProductCard = ({ product, onClick }) => {
       </div>
     </div>
   );
-};
+});
 
-const CategoryButton = ({ category, isSelected, onClick }) => (
-  <button
-    onClick={() => onClick(category.id)}
-    className={`flex-shrink-0 px-4 py-2 mx-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-      isSelected
-        ? 'bg-cyan-400 text-white shadow-lg dark:bg-cyan-600'
-        : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-    } backdrop-filter backdrop-blur-lg bg-opacity-30 shadow-md`}
-  >
-    {category.name}
-  </button>
-);
+// Memoized CategoryButton component
+const CategoryButton = React.memo(({ category, isSelected, onClick }) => {
+  const handleClick = useCallback(() => {
+    onClick(category.id, category.name);
+  }, [category, onClick]);
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`flex-shrink-0 px-4 py-2 mx-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+        isSelected
+          ? 'bg-cyan-400 text-white shadow-lg dark:bg-cyan-600'
+          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+      } backdrop-filter backdrop-blur-lg bg-opacity-30 shadow-md`}
+    >
+      {category.name}
+    </button>
+  );
+});
 
 const CompanyDetail = () => {
   const [loading, setLoading] = useState(true);
@@ -121,10 +134,14 @@ const CompanyDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [nextTime, setNextTime] = useState('');
+  const [hasTrackedVisit, setHasTrackedVisit] = useState(false);
 
   const { id } = useParams();
   const categoryCarouselRef = useRef(null);
-  const carouselRefs = useMemo(() => ({}), []);
+  const carouselRefs = useRef({});
+  
+  // Initialize user tracking with stable reference
+  const { trackCompanyVisit, trackCategoryClick } = useUserTracking();
 
   const formatTime = useCallback((timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -164,30 +181,29 @@ const CompanyDetail = () => {
     }
   }, [formatTime]);
 
-  const toggleCategory = useCallback((categoryId) => {
+  const toggleCategory = useCallback((categoryId, categoryName) => {
+    trackCategoryClick(categoryId, categoryName);
     setSelectedCategories(prev => 
       prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
     );
-  }, []);
+  }, [trackCategoryClick]);
 
   const filteredProductsByCategory = useMemo(() => {
-    return selectedCategories.length === 0
-      ? productsByCategory
-      : Object.fromEntries(
-          Object.entries(productsByCategory).filter(([categoryId]) => 
-            selectedCategories.includes(parseInt(categoryId))
-          )
-        );
+    if (selectedCategories.length === 0) return productsByCategory;
+    return Object.fromEntries(
+      Object.entries(productsByCategory).filter(([categoryId]) => 
+        selectedCategories.includes(parseInt(categoryId))
+      )
+    );
   }, [productsByCategory, selectedCategories]);
 
   const startDragging = useCallback((e, ref) => {
-    if (ref.current) {
-      setIsDragging(true);
-      setStartX(e.pageX - ref.current.offsetLeft);
-      setScrollLeft(ref.current.scrollLeft);
-    }
+    if (!ref.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - ref.current.offsetLeft);
+    setScrollLeft(ref.current.scrollLeft);
   }, []);
 
   const stopDragging = useCallback(() => {
@@ -203,8 +219,7 @@ const CompanyDetail = () => {
   }, [isDragging, startX, scrollLeft]);
 
   const getCarouselProducts = useCallback((products) => {
-    if (products.length <= 1) return products;
-    if (products.length === 2) return products;
+    if (products.length <= 2) return products;
     return [...products, ...products, ...products];
   }, []);
 
@@ -223,21 +238,22 @@ const CompanyDetail = () => {
   }, [closeProductModal]);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchCompanyAndProducts = async () => {
-      setLoading(true);
       try {
-        const companyResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`);
-        setCompany(companyResponse.data);
+        const [companyResponse, productsResponse, categoriesResponse] = await Promise.all([
+          axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/companies/${id}/`),
+          axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`),
+          axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/`)
+        ]);
+
+        if (!isMounted) return;
+
+        const companyData = companyResponse.data;
+        const { isOpen: openStatus, nextTime: nextTimeValue } = checkBusinessHours(companyData.business_hours);
         
-        const { isOpen: openStatus, nextTime: nextTimeValue } = checkBusinessHours(companyResponse.data.business_hours);
-        setIsOpen(openStatus);
-        setNextTime(nextTimeValue);
-        
-        const productsResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/products/`);
         const companyProducts = productsResponse.data.filter(product => product.company === parseInt(id));
-        
-        const categoriesResponse = await axios.get(`https://backendfindout-ea692e018a66.herokuapp.com/api/categories/`);
-        
         const grouped = companyProducts.reduce((acc, product) => {
           if (!acc[product.category]) {
             acc[product.category] = [];
@@ -245,21 +261,37 @@ const CompanyDetail = () => {
           acc[product.category].push(product);
           return acc;
         }, {});
-        
-        setProductsByCategory(grouped);
-        
+
         const categoriesWithProducts = categoriesResponse.data.filter(
           category => grouped[category.id]
         );
+
+        setCompany(companyData);
+        setIsOpen(openStatus);
+        setNextTime(nextTimeValue);
+        setProductsByCategory(grouped);
         setCategories(categoriesWithProducts);
+
+        // Track visit only once when company data is loaded
+        if (!hasTrackedVisit) {
+          trackCompanyVisit(companyData);
+          setHasTrackedVisit(true);
+        }
       } catch (error) {
         console.error('Error al obtener datos:', error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
-    
+
     fetchCompanyAndProducts();
-  }, [id, checkBusinessHours]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, checkBusinessHours, trackCompanyVisit, hasTrackedVisit]);
 
   if (loading) {
     return <CompanyDetailSkeleton />;
@@ -268,9 +300,6 @@ const CompanyDetail = () => {
   if (!company) {
     return <div className="dark:text-white">No se encontró la empresa</div>;
   }
-
-
-
 
   return (
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
@@ -516,4 +545,4 @@ const CompanyDetail = () => {
   );
 };
 
-export default CompanyDetail;
+export default React.memo(CompanyDetail);
