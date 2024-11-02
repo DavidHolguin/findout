@@ -88,27 +88,41 @@ const TopBurgers = () => {
     const imageId = `${item.order}-${item.featured_image}`;
     const isImageLoaded = imagesLoaded[imageId];
 
+    if (isFullWidth) {
+      return (
+        <a 
+          href={item.custom_url}
+          className="block w-screen"
+        >
+          {!isImageLoaded && (
+            <div className="w-screen h-[248px] bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+          )}
+          <img
+            src={item.featured_image}
+            alt="Banner"
+            className={`w-full h-auto ${!isImageLoaded ? 'hidden' : ''}`}
+            onLoad={(e) => handleImageLoad(imageId, e)}
+          />
+        </a>
+      );
+    }
+
     return (
-      <div 
-        key={item.order} 
-        className={`text-center relative font-system ${isFullWidth ? '-mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12' : ''}`}
-      >
+      <div key={item.order} className="text-center relative font-system">
         <a 
           href={item.item_type === 'BANNER' ? item.custom_url : item.company_profile_url}
           className="block relative"
         >
           {!isImageLoaded && (
-            <div className={`bg-gray-200 dark:bg-gray-700 animate-pulse ${
-              isFullWidth ? 'w-screen h-[248px]' : 'w-full h-48 rounded-lg'
-            }`}></div>
+            <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
           )}
           <img
             src={item.featured_image}
             alt={item.item_type === 'BANNER' ? 'Banner' : item.company_name}
-            className={`w-full h-auto ${isFullWidth ? '' : 'rounded-lg'} ${!isImageLoaded ? 'hidden' : ''}`}
+            className={`w-full h-auto rounded-lg ${!isImageLoaded ? 'hidden' : ''}`}
             onLoad={(e) => handleImageLoad(imageId, e)}
           />
-          {item.item_type === 'COMPANY' && !isFullWidth && (
+          {item.item_type === 'COMPANY' && (
             <>
               <img 
                 src={item.company_logo}
@@ -143,6 +157,14 @@ const TopBurgers = () => {
       {sections.map((section) => {
         const fullWidthBanner = isFullWidthBanner(section);
         
+        if (fullWidthBanner) {
+          return (
+            <section key={section.title} className="w-screen -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12">
+              {renderItem(section.items[0], true)}
+            </section>
+          );
+        }
+
         return (
           <section key={section.title} className="flex flex-col items-center">
             <div className="flex items-center gap-2 w-[100%] mb-2">
@@ -175,8 +197,8 @@ const TopBurgers = () => {
               </svg>
             </div>
 
-            <div className={`flex ${fullWidthBanner ? 'w-screen' : 'justify-around gap-2 w-[100%]'} mb-2`}>
-              {section.items.map(item => renderItem(item, fullWidthBanner))}
+            <div className="flex justify-around gap-2 w-[100%] mb-2">
+              {section.items.map(item => renderItem(item, false))}
             </div>
           </section>
         );
