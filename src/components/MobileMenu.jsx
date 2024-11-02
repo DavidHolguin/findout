@@ -17,23 +17,38 @@ import {
 
 const MobileMenu = ({ isOpen, onClose, user }) => {
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(() => 
-    localStorage.getItem('theme') === 'dark' || 
-    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  );
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
   const [typedText, setTypedText] = useState('');
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    // Aplicar el modo oscuro al montar el componente
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    applyDarkMode(isDark);
+    setDarkMode(isDark);
+
+    // Escuchar cambios en la preferencia del sistema solo si no hay valor en localStorage
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => {
+      if (localStorage.getItem('darkMode') === null) {
+        const newDarkMode = e.matches;
+        applyDarkMode(newDarkMode);
+        setDarkMode(newDarkMode);
+        localStorage.setItem('darkMode', newDarkMode);
+      }
+    };
+
+    // Aplicar preferencia del sistema si no hay valor en localStorage
+    if (localStorage.getItem('darkMode') === null) {
+      handleChange(mediaQuery);
     }
-  }, [darkMode]);
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   useEffect(() => {
     const greeting = user?.username ? `Hola, ${user.username}` : 'Hola, ¿cómo estás?';
@@ -51,7 +66,6 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
   }, [user, isOpen]);
 
   useEffect(() => {
-    // Escuchar el evento beforeinstallprompt
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -70,12 +84,24 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
     };
   }, []);
 
+  const applyDarkMode = (isDark) => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode);
+    applyDarkMode(newDarkMode);
+  };
+
   const handleInstallClick = async () => {
     if (deferredPrompt) {
-      // Mostrar el prompt de instalación
       deferredPrompt.prompt();
-      
-      // Esperar la respuesta del usuario
       const { outcome } = await deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
@@ -83,7 +109,6 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
         setIsInstallable(false);
       }
     } else {
-      // Si no hay prompt disponible o es iOS, redirigir a la página de descarga
       navigate('/download');
     }
     onClose();
@@ -146,7 +171,7 @@ const MobileMenu = ({ isOpen, onClose, user }) => {
         {/* Header Section */}
         <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={toggleDarkMode}
             className="mr-3 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             aria-label="Toggle theme"
           >
