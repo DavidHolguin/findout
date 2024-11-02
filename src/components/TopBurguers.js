@@ -31,6 +31,7 @@ const TopBurgers = () => {
   const [error, setError] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState({});
+  const [imageDimensions, setImageDimensions] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,33 +63,52 @@ const TopBurgers = () => {
     };
   }, []);
 
-  const handleImageLoad = (imageId) => {
+  const handleImageLoad = (imageId, e) => {
     setImagesLoaded(prev => ({
       ...prev,
       [imageId]: true
     }));
+    setImageDimensions(prev => ({
+      ...prev,
+      [imageId]: {
+        width: e.target.naturalWidth,
+        height: e.target.naturalHeight
+      }
+    }));
   };
 
-  const renderItem = (item) => {
+  const isFullWidthBanner = (section) => {
+    return section.items.length === 1 && 
+           section.items[0].item_type === 'BANNER' &&
+           imageDimensions[`${section.items[0].order}-${section.items[0].featured_image}`]?.width === 681 &&
+           imageDimensions[`${section.items[0].order}-${section.items[0].featured_image}`]?.height === 248;
+  };
+
+  const renderItem = (item, isFullWidth = false) => {
     const imageId = `${item.order}-${item.featured_image}`;
     const isImageLoaded = imagesLoaded[imageId];
 
     return (
-      <div key={item.order} className="text-center relative font-system">
+      <div 
+        key={item.order} 
+        className={`text-center relative font-system ${isFullWidth ? '-mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12' : ''}`}
+      >
         <a 
           href={item.item_type === 'BANNER' ? item.custom_url : item.company_profile_url}
           className="block relative"
         >
           {!isImageLoaded && (
-            <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
+            <div className={`bg-gray-200 dark:bg-gray-700 animate-pulse ${
+              isFullWidth ? 'w-screen h-[248px]' : 'w-full h-48 rounded-lg'
+            }`}></div>
           )}
           <img
             src={item.featured_image}
             alt={item.item_type === 'BANNER' ? 'Banner' : item.company_name}
-            className={`w-full h-auto rounded-lg ${!isImageLoaded ? 'hidden' : ''}`}
-            onLoad={() => handleImageLoad(imageId)}
+            className={`w-full h-auto ${isFullWidth ? '' : 'rounded-lg'} ${!isImageLoaded ? 'hidden' : ''}`}
+            onLoad={(e) => handleImageLoad(imageId, e)}
           />
-          {item.item_type === 'COMPANY' && (
+          {item.item_type === 'COMPANY' && !isFullWidth && (
             <>
               <img 
                 src={item.company_logo}
@@ -120,43 +140,47 @@ const TopBurgers = () => {
 
   return (
     <div className={`flex flex-col gap-1 font-system ${isDarkMode ? 'dark' : ''}`}>
-      {sections.map((section) => (
-        <section key={section.title} className="flex flex-col items-center">
-          <div className="flex items-center gap-2 w-[100%] mb-2">
-            <h3 className="font-extrabold m-0 text-xl text-neutral-700 dark:text-neutral-300">
-              {section.title.split(' ').map((word, index, array) => {
-                const shouldBeColored = 
-                  (array.includes('BURGUERS') && index === 2) || 
-                  (array.includes('BARBER') && word === 'SHOP') ||
-                  (word === 'LATINOS');
-                
-                return shouldBeColored ? (
-                  <span key={index} className="text-[#09fdfd]">{word} </span>
-                ) : (
-                  word + ' '
-                );
-              })}
-            </h3>
-            <p className="m-0 text-lg text-neutral-700 dark:text-neutral-300">{section.location}</p>
-            <svg
-              id="Layer_1"
-              height="10"
-              viewBox="0 0 512 512"
-              width="10"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#09fdfd"
-            >
-              <g>
-                <path d="M229.001 40.03c-15.494-15.497-36.094-24.03-58.005-24.03s-42.51 8.532-58.007 24.025c-15.492 15.495-24.024 36.094-24.024 58.007 0 21.911 8.532 42.512 24.025 58.004l99.748 99.75-100.536 100.538c-15.885 15.885-24.412 37.004-24.013 59.469.399 22.458 9.687 43.271 26.153 58.606 14.955 13.929 34.593 21.601 55.293 21.601 22.186 0 43.924-9.015 59.644-24.735l179.783-179.783c19.682-19.682 19.682-51.709 0-71.391zm153.29 224.68-179.783 179.783c-8.672 8.672-20.653 13.646-32.872 13.646-11.092 0-21.565-4.066-29.489-11.446-8.88-8.27-13.887-19.482-14.102-31.572-.216-12.1 4.377-23.472 12.93-32.025l109.463-109.464c9.836-9.84 9.836-25.851-.002-35.693l-108.675-108.675c-8.341-8.342-12.935-19.433-12.935-31.232s4.594-22.893 12.935-31.235c8.344-8.342 19.436-12.936 31.235-12.936 11.798 0 22.89 4.595 31.233 12.939l180.062 180.062c4.921 4.921 4.921 12.927 0 17.848z" />
-              </g>
-            </svg>
-          </div>
+      {sections.map((section) => {
+        const fullWidthBanner = isFullWidthBanner(section);
+        
+        return (
+          <section key={section.title} className="flex flex-col items-center">
+            <div className="flex items-center gap-2 w-[100%] mb-2">
+              <h3 className="font-extrabold m-0 text-xl text-neutral-700 dark:text-neutral-300">
+                {section.title.split(' ').map((word, index, array) => {
+                  const shouldBeColored = 
+                    (array.includes('BURGUERS') && index === 2) || 
+                    (array.includes('BARBER') && word === 'SHOP') ||
+                    (word === 'LATINOS');
+                  
+                  return shouldBeColored ? (
+                    <span key={index} className="text-[#09fdfd]">{word} </span>
+                  ) : (
+                    word + ' '
+                  );
+                })}
+              </h3>
+              <p className="m-0 text-lg text-neutral-700 dark:text-neutral-300">{section.location}</p>
+              <svg
+                id="Layer_1"
+                height="10"
+                viewBox="0 0 512 512"
+                width="10"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="#09fdfd"
+              >
+                <g>
+                  <path d="M229.001 40.03c-15.494-15.497-36.094-24.03-58.005-24.03s-42.51 8.532-58.007 24.025c-15.492 15.495-24.024 36.094-24.024 58.007 0 21.911 8.532 42.512 24.025 58.004l99.748 99.75-100.536 100.538c-15.885 15.885-24.412 37.004-24.013 59.469.399 22.458 9.687 43.271 26.153 58.606 14.955 13.929 34.593 21.601 55.293 21.601 22.186 0 43.924-9.015 59.644-24.735l179.783-179.783c19.682-19.682 19.682-51.709 0-71.391zm153.29 224.68-179.783 179.783c-8.672 8.672-20.653 13.646-32.872 13.646-11.092 0-21.565-4.066-29.489-11.446-8.88-8.27-13.887-19.482-14.102-31.572-.216-12.1 4.377-23.472 12.93-32.025l109.463-109.464c9.836-9.84 9.836-25.851-.002-35.693l-108.675-108.675c-8.341-8.342-12.935-19.433-12.935-31.232s4.594-22.893 12.935-31.235c8.344-8.342 19.436-12.936 31.235-12.936 11.798 0 22.89 4.595 31.233 12.939l180.062 180.062c4.921 4.921 4.921 12.927 0 17.848z" />
+                </g>
+              </svg>
+            </div>
 
-          <div className="flex justify-around mb-2 gap-2 w-[100%]">
-            {section.items.map(renderItem)}
-          </div>
-        </section>
-      ))}
+            <div className={`flex ${fullWidthBanner ? 'w-screen' : 'justify-around gap-2 w-[100%]'} mb-2`}>
+              {section.items.map(item => renderItem(item, fullWidthBanner))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 };

@@ -4,7 +4,7 @@ import MenuBar from './MenuBar';
 import { Link } from 'react-router-dom';
 import TopBurgers from './TopBurguers';
 import Slider from './Slider';
-import BannerSection from './BannerSection';
+
 import MiniSearch from './MiniSearch';
 
 
@@ -46,7 +46,7 @@ const CompanyList = () => {
       <div className="my-4"> {/* Añadido margen vertical */}
         <TopBurgers />
       </div>
-      <BannerSection />
+      
       <MenuBar />
     </div>
   );
