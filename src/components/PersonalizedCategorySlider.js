@@ -93,7 +93,7 @@ const PersonalizedCategorySlider = () => {
   }
 
   return (
-    <div className="w-full mt-4 mb-2">
+    <div className="w-full mt-2 mb-2">
       <h2 className="text-base leading-6 text-gray-600 ms-5">Basado en tus intereses</h2>
       
       <div 
