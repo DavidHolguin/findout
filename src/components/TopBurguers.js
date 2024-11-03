@@ -175,7 +175,7 @@ const TopBurgers = () => {
         }
 
         return (
-          <section key={section.title} className="flex flex-col items-center w-full px-4">
+          <section key={section.title} className="flex flex-col items-center w-full">
             <div className="flex items-center gap-2 w-full mb-2">
               <h3 className="font-extrabold m-0 text-xl text-neutral-700 dark:text-neutral-300">
                 {section.title.split(' ').map((word, index, array) => {
