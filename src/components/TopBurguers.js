@@ -31,9 +31,15 @@ const TopBurgers = () => {
   const [error, setError] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState({});
-  const [imageDimensions, setImageDimensions] = useState({});
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
+    const checkIsIOS = () => {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      return /iphone|ipad|ipod/.test(userAgent);
+    };
+    setIsIOS(checkIsIOS());
+
     const fetchData = async () => {
       try {
         const response = await axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/top-burgers/');
@@ -63,25 +69,15 @@ const TopBurgers = () => {
     };
   }, []);
 
-  const handleImageLoad = (imageId, e) => {
+  const handleImageLoad = (imageId) => {
     setImagesLoaded(prev => ({
       ...prev,
       [imageId]: true
     }));
-    setImageDimensions(prev => ({
-      ...prev,
-      [imageId]: {
-        width: e.target.naturalWidth,
-        height: e.target.naturalHeight
-      }
-    }));
   };
 
   const isFullWidthBanner = (section) => {
-    return section.items.length === 1 && 
-           section.items[0].item_type === 'BANNER' &&
-           imageDimensions[`${section.items[0].order}-${section.items[0].featured_image}`]?.width === 681 &&
-           imageDimensions[`${section.items[0].order}-${section.items[0].featured_image}`]?.height === 248;
+    return section.items.length === 1 && section.items[0].item_type === 'BANNER';
   };
 
   const renderItem = (item, isFullWidth = false) => {
@@ -90,20 +86,22 @@ const TopBurgers = () => {
 
     if (isFullWidth) {
       return (
-        <a 
-          href={item.custom_url}
-          className="block w-screen"
-        >
-          {!isImageLoaded && (
-            <div className="w-screen h-[248px] bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-          )}
-          <img
-            src={item.featured_image}
-            alt="Banner"
-            className={`w-full h-auto ${!isImageLoaded ? 'hidden' : ''}`}
-            onLoad={(e) => handleImageLoad(imageId, e)}
-          />
-        </a>
+        <div className="relative w-screen">
+          <a 
+            href={item.custom_url}
+            className="block"
+          >
+            {!isImageLoaded && (
+              <div className="w-full h-[248px] bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+            )}
+            <img
+              src={item.featured_image}
+              alt="Banner"
+              className={`w-full h-auto object-cover ${!isImageLoaded ? 'hidden' : ''}`}
+              onLoad={() => handleImageLoad(imageId)}
+            />
+          </a>
+        </div>
       );
     }
 
@@ -120,7 +118,7 @@ const TopBurgers = () => {
             src={item.featured_image}
             alt={item.item_type === 'BANNER' ? 'Banner' : item.company_name}
             className={`w-full h-auto rounded-lg ${!isImageLoaded ? 'hidden' : ''}`}
-            onLoad={(e) => handleImageLoad(imageId, e)}
+            onLoad={() => handleImageLoad(imageId)}
           />
           {item.item_type === 'COMPANY' && (
             <>
@@ -159,15 +157,20 @@ const TopBurgers = () => {
         
         if (fullWidthBanner) {
           return (
-            <section key={section.title} className="w-screen -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12">
-              {renderItem(section.items[0], true)}
+            <section 
+              key={section.title} 
+              className="relative w-full"
+            >
+              <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+                {renderItem(section.items[0], true)}
+              </div>
             </section>
           );
         }
 
         return (
-          <section key={section.title} className="flex flex-col items-center">
-            <div className="flex items-center gap-2 w-[100%] mb-2">
+          <section key={section.title} className="flex flex-col items-center w-full px-4">
+            <div className="flex items-center gap-2 w-full mb-2">
               <h3 className="font-extrabold m-0 text-xl text-neutral-700 dark:text-neutral-300">
                 {section.title.split(' ').map((word, index, array) => {
                   const shouldBeColored = 
@@ -197,7 +200,7 @@ const TopBurgers = () => {
               </svg>
             </div>
 
-            <div className="flex justify-around gap-2 w-[100%] mb-2">
+            <div className="flex justify-around gap-2 w-full mb-2">
               {section.items.map(item => renderItem(item, false))}
             </div>
           </section>
