@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Share2, ChevronLeft, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+
 
 // Browser detection function
 const getBrowser = () => {
@@ -107,6 +109,8 @@ const ChromeShareIcon = () => (
 
 const IOSInstallGuide = () => {
   const [browser, setBrowser] = useState('safari');
+  const navigate = useNavigate(); // Usa useNavigate para navegar
+
 
   useEffect(() => {
     setBrowser(getBrowser());
@@ -232,7 +236,8 @@ const IOSInstallGuide = () => {
             en las aplicaciones de su teléfono
           </p>
         </div>
-        <button className="w-full bg-black dark:bg-gray-700 text-white py-3 px-6 rounded-xl flex items-center justify-center space-x-2 hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
+        
+        <button onClick={() => navigate('/')} className="w-full bg-black dark:bg-gray-700 text-white py-3 px-6 rounded-xl flex items-center justify-center space-x-2 hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
           <ChevronLeft className="w-5 h-5" />
           <span>Volver al home</span>
           <Heart className="w-5 h-5 text-cyan-400" />
