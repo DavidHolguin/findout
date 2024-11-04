@@ -32,7 +32,7 @@ const CategoryHeader = ({ category, companiesCount }) => {
         </div>
 
         {/* Title and content section */}
-        <div className="flex-1 rounded-xl border-2 border-[#09FDFD] bg-white dark:bg-gray-900 dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
+        <div className="flex-1 rounded-lg border-2 border-[#09FDFD] bg-white dark:bg-gray-900 dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
           <div className="flex h-full items-center justify-between items-center p-1 px-3">
             <div className="flex flex-col">
               <h1 className="text-xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-4">
