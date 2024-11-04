@@ -22,7 +22,7 @@ const CategoryHeader = ({ category, companiesCount }) => {
         <div className=" rounded-xl flex items-center justify-center border-2 border-[#09FDFD] bg-white dark:bg-gray-900">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-5 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors"
+            className="w-8 h-5 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors"
             aria-label="Volver atrás"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="21" fill="none" viewBox="0 0 17 21">
@@ -32,10 +32,10 @@ const CategoryHeader = ({ category, companiesCount }) => {
         </div>
 
         {/* Title and content section */}
-        <div className="flex-1 rounded-2xl border-2 border-[#09FDFD] bg-white dark:bg-gray-900">
-          <div className="flex h-full items-center justify-between p-2 px-3">
+        <div className="flex-1 rounded-xl border-2 border-[#09FDFD] bg-white dark:bg-gray-900 dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
+          <div className="flex h-full items-center justify-between items-center p-1 px-3">
             <div className="flex flex-col">
-              <h1 className="text-xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-6">
+              <h1 className="text-xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-4">
                 {category?.name || 'Fast Food'}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm leading-4">
@@ -140,7 +140,7 @@ const CompanyCategory = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500" />
         </div>
@@ -150,7 +150,7 @@ const CompanyCategory = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -167,7 +167,7 @@ const CompanyCategory = () => {
   const category = companies[0]?.category;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-4">
       <CategoryHeader category={category} companiesCount={companies.length} />
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
