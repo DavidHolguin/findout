@@ -17,7 +17,7 @@ const CategoryHeader = ({ category, companiesCount }) => {
   return (
     <div className="mb-3">
       <div className="relative  rounded-2xl overflow-hidden border-2 border-primary">
-        <div className="flex h-full items-center justify-between p-4 py-2 bg-gradient-to-t from-primary/50 to-transparent via-transparent dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
+        <div className="flex h-full items-center justify-between p-4 py-2 bg-white dark:bg-gray-900 dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
           <div className="flex gap-6 items-center flex-row min-w-0 relative">
             <div className="flex flex-col">
               <h1 className="text-2xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-6">
