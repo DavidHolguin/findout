@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Layers, AlertCircle } from 'lucide-react';
@@ -12,36 +12,49 @@ const getFullImageUrl = (imageUrl) => {
   return `${CLOUDINARY_BASE_URL}${imageUrl}`;
 };
 
-// Updated CategoryHeader to match slider style
 const CategoryHeader = ({ category, companiesCount }) => {
+  const navigate = useNavigate();
+  
   return (
     <div className="mb-3">
-      <div className="relative  rounded-2xl overflow-hidden border-2 border-primary">
-        <div className="flex h-full items-center justify-between p-4 py-2 bg-white dark:bg-gray-900 dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
-          <div className="flex gap-6 items-center flex-row min-w-0 relative">
+      <div className="flex gap-1">
+        {/* Back button section */}
+        <div className=" rounded-xl flex items-center justify-center border-2 border-[#09FDFD] bg-white dark:bg-gray-900">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-10 h-5 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-full transition-colors"
+            aria-label="Volver atrás"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="21" fill="none" viewBox="0 0 17 21">
+                <path fill="#0FF" d="M8.349 10.5c.736.784 1.456 1.543 2.175 2.302 2.04 2.165 4.07 4.321 6.119 6.486.313.339.457.71.254 1.139-.195.42-.576.573-1.041.573-1.913 0-3.825-.008-5.738 0-.39 0-.694-.145-.948-.42a6489.84 6489.84 0 0 0-7.135-7.568c-.567-.606-1.142-1.204-1.7-1.81-.44-.468-.45-.952-.01-1.413L9.188.388A1.18 1.18 0 0 1 10.084 0h5.806c.448 0 .82.153 1.015.557.195.412.076.792-.237 1.123-2.64 2.803-5.29 5.605-7.93 8.4-.127.13-.245.258-.389.42Z"/>
+              </svg>
+          </button>
+        </div>
+
+        {/* Title and content section */}
+        <div className="flex-1 rounded-2xl border-2 border-[#09FDFD] bg-white dark:bg-gray-900">
+          <div className="flex h-full items-center justify-between p-2 px-3">
             <div className="flex flex-col">
-              <h1 className="text-2xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-6">
-                {category?.name || 'Categoría'}
+              <h1 className="text-xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-6">
+                {category?.name || 'Fast Food'}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-lg leading-6">
-                {companiesCount} {companiesCount === 1 ? 'empresa' : 'empresas'} disponibles
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-4">
+                {companiesCount} {companiesCount === 1 ? 'lugar encontrado' : 'lugares encontrados'}
               </p>
             </div>
-            
-            
-          </div>
-          <div className="ml-8">
-            {category?.image ? (
-              <img
-                src={getFullImageUrl(category.image)}
-                alt={category.name}
-                className="w-12 h-12 object-cover "
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-lg bg-white/10 flex items-center justify-center">
-                <Layers className="w-10 h-10 text-white" />
-              </div>
-            )}
+            <div className="ml-8">
+              {category?.image ? (
+                <img
+                  src={getFullImageUrl(category.image)}
+                  alt={category.name}
+                  className="w-10 h-10 object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
+                  <Layers className="w-6 h-6 text-primary" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
