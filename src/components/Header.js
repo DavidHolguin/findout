@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import MobileMenu from './MobileMenu';
@@ -9,6 +9,7 @@ const Header = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
   
   const API_URL = 'https://backendfindout-ea692e018a66.herokuapp.com/api/login/';
 
@@ -58,6 +59,25 @@ const Header = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    const savedCart = localStorage.getItem('shopping_cart');
+    if (savedCart) {
+      const cart = JSON.parse(savedCart);
+      const companyIds = Object.keys(cart);
+      if (companyIds.length > 0) {
+        // Navegar al carrito de la primera empresa que encontremos
+        navigate(`/cart/${companyIds[0]}`);
+      } else {
+        // Si no hay compañías en el carrito, navegar a la página principal
+        navigate('/');
+      }
+    } else {
+      // Si no hay carrito guardado, navegar a la página principal
+      navigate('/');
+    }
+  };
+
   return (
     <>
       <header
@@ -87,13 +107,13 @@ const Header = () => {
           </div>
 
           {/* Cart */}
-          <Link 
-            to="/cart" 
+          <button 
+            onClick={handleCartClick}
             className="text-white hover:opacity-80 transition-opacity"
             aria-label="Shopping cart"
           >
             <ShoppingBag className="w-6 h-6" />
-          </Link>
+          </button>
         </nav>
 
         {/* Progress bar indicator */}

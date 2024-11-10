@@ -8,7 +8,154 @@ import BadgesSection from './BadgesSection';
 import CompanyDetailSkeleton from './CompanyDetailSkeleton';
 import { useUserTracking } from '../hooks/useUserTracking';
 
-// Memoized ImageWithFallback component
+// Toast Component
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
+  return (
+    <div className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up`}>
+      {message}
+    </div>
+  );
+};
+
+// Toast Hook
+const useToast = () => {
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
+
+  const hideToast = () => {
+    setToast(null);
+  };
+
+  return { toast, showToast, hideToast };
+};
+
+// Shopping Cart Hook
+const useShoppingCart = (companyId) => {
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('shopping_cart');
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      return parsedCart[companyId] || { items: {}, company: null };
+    }
+    return { items: {}, company: null };
+  });
+
+  const updateLocalStorage = useCallback((newCart) => {
+    const savedCart = JSON.parse(localStorage.getItem('shopping_cart') || '{}');
+    savedCart[companyId] = newCart;
+    localStorage.setItem('shopping_cart', JSON.stringify(savedCart));
+  }, [companyId]);
+
+  const addToCart = useCallback((product, company) => {
+    setCart(prevCart => {
+      const existingItem = prevCart.items[product.id];
+      const newCart = {
+        items: {
+          ...prevCart.items,
+          [product.id]: {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            final_price: product.active_promotions?.length > 0 
+              ? calculateDiscountedPrice(product.price, product.active_promotions[0])
+              : product.price,
+            image_url: product.image_url,
+            quantity: (existingItem?.quantity || 0) + 1,
+            active_promotions: product.active_promotions
+          }
+        },
+        company: company ? {
+          id: company.id,
+          name: company.name
+        } : prevCart.company
+      };
+      updateLocalStorage(newCart);
+      return newCart;
+    });
+  }, [updateLocalStorage]);
+
+  const removeFromCart = useCallback((productId) => {
+    setCart(prevCart => {
+      const newItems = { ...prevCart.items };
+      delete newItems[productId];
+      const newCart = {
+        items: newItems,
+        company: Object.keys(newItems).length > 0 ? prevCart.company : null
+      };
+      updateLocalStorage(newCart);
+      return newCart;
+    });
+  }, [updateLocalStorage]);
+
+  const updateQuantity = useCallback((productId, quantity) => {
+    if (quantity < 1) {
+      removeFromCart(productId);
+      return;
+    }
+
+    setCart(prevCart => {
+      const newCart = {
+        ...prevCart,
+        items: {
+          ...prevCart.items,
+          [productId]: {
+            ...prevCart.items[productId],
+            quantity
+          }
+        }
+      };
+      updateLocalStorage(newCart);
+      return newCart;
+    });
+  }, [removeFromCart, updateLocalStorage]);
+
+  const getCartTotal = useCallback(() => {
+    return Object.values(cart.items).reduce((total, item) => {
+      return total + (parseFloat(item.final_price) * item.quantity);
+    }, 0);
+  }, [cart.items]);
+
+  const clearCart = useCallback(() => {
+    setCart({ items: {}, company: null });
+    const savedCart = JSON.parse(localStorage.getItem('shopping_cart') || '{}');
+    delete savedCart[companyId];
+    localStorage.setItem('shopping_cart', JSON.stringify(savedCart));
+  }, [companyId]);
+
+  return {
+    cart,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    getCartTotal,
+    clearCart
+  };
+};
+
+// Utility function to calculate discounted price
+const calculateDiscountedPrice = (price, promotion) => {
+  if (!promotion) return price;
+  const basePrice = parseFloat(price);
+  if (promotion.discount_type === 'PERCENTAGE') {
+    return (basePrice * (1 - parseFloat(promotion.discount_value) / 100)).toFixed(2);
+  }
+  return (basePrice - parseFloat(promotion.discount_value)).toFixed(2);
+};
+
+// ImageWithFallback Component
 const ImageWithFallback = React.memo(({ src, alt, className }) => {
   const [error, setError] = useState(false);
 
@@ -26,7 +173,7 @@ const ImageWithFallback = React.memo(({ src, alt, className }) => {
   );
 });
 
-// Memoized PromotionBadge component
+// PromotionBadge Component
 const PromotionBadge = React.memo(({ promotion }) => {
   const isPercentage = promotion.discount_type === 'PERCENTAGE';
 
@@ -60,7 +207,7 @@ const PromotionBadge = React.memo(({ promotion }) => {
   );
 });
 
-// Memoized ProductCard component
+// ProductCard Component
 const ProductCard = React.memo(({ product, onClick }) => {
   const hasPromotion = product.active_promotions && product.active_promotions.length > 0;
   const promotion = hasPromotion ? product.active_promotions[0] : null;
@@ -87,11 +234,11 @@ const ProductCard = React.memo(({ product, onClick }) => {
           <p className="text-gray-600 dark:text-gray-300 text-sm leading-4 line-clamp-2">{product.description}</p>
           <div className="mt-2 flex items-center gap-2">
             <p className="text-green-600 dark:text-green-400 font-bold">
-              ${product.price}
+              ${hasPromotion ? calculateDiscountedPrice(product.price, promotion) : product.price}
             </p>
             {hasPromotion && (
               <p className="text-gray-400 line-through text-sm">
-                ${(parseFloat(product.price) * (1 + parseFloat(promotion.discount_value)/100)).toFixed(2)}
+                ${product.price}
               </p>
             )}
           </div>
@@ -101,7 +248,7 @@ const ProductCard = React.memo(({ product, onClick }) => {
   );
 });
 
-// Memoized CategoryButton component
+// CategoryButton Component
 const CategoryButton = React.memo(({ category, isSelected, onClick }) => {
   const handleClick = useCallback(() => {
     onClick(category.id, category.name);
@@ -121,6 +268,7 @@ const CategoryButton = React.memo(({ category, isSelected, onClick }) => {
   );
 });
 
+// Main CompanyDetail Component
 const CompanyDetail = () => {
   const [loading, setLoading] = useState(true);
   const [company, setCompany] = useState(null);
@@ -140,8 +288,9 @@ const CompanyDetail = () => {
   const categoryCarouselRef = useRef(null);
   const carouselRefs = useRef({});
   
-  // Initialize user tracking with stable reference
   const { trackCompanyVisit, trackCategoryClick } = useUserTracking();
+  const { addToCart: addToCartHook, cart } = useShoppingCart(id);
+  const { toast, showToast, hideToast } = useToast();
 
   const formatTime = useCallback((timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -233,9 +382,10 @@ const CompanyDetail = () => {
   }, []);
 
   const addToCart = useCallback((product) => {
-    console.log('Agregando al carrito:', product);
+    addToCartHook(product, company);
     closeProductModal();
-  }, [closeProductModal]);
+    showToast(`${product.name} agregado al carrito`, 'success'); // <- Corrección aquí
+  }, [addToCartHook, company, closeProductModal, showToast]); // Añadir showToast a las dependencias
 
   useEffect(() => {
     let isMounted = true;
@@ -272,7 +422,6 @@ const CompanyDetail = () => {
         setProductsByCategory(grouped);
         setCategories(categoriesWithProducts);
 
-        // Track visit only once when company data is loaded
         if (!hasTrackedVisit) {
           trackCompanyVisit(companyData);
           setHasTrackedVisit(true);
@@ -305,143 +454,142 @@ const CompanyDetail = () => {
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
       {/* Sección del perfil de la empresa */}
       <section className="w-full mb-3 flex flex-col items-center">
-  {/* Profile Image and Name Section */}
-  <div className="flex flex-col items-center mb-4 mt-2">
-    <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
-      <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
-        backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
-        backgroundSize: '100% 400%',
-        animation: 'rotating 2s linear infinite, gradientRotate 5s linear infinite'
-      }}></div>
-      <ImageWithFallback 
-        src={company.profile_picture_url} 
-        alt={company.name} 
-        className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
-      />
-      {company.country?.flag_icon_url && (
-        <div className="absolute bottom-0 left-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 shadow-md overflow-hidden">
-          <img 
-            src={company.country.flag_icon_url} 
-            alt={`Bandera de ${company.country.name}`}
-            className="w-full h-full object-cover rounded-full"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "/api/placeholder/32/32";
-            }}
-          />
+        {/* Profile Image and Name Section */}
+        <div className="flex flex-col items-center mb-4 mt-2">
+          <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
+            <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
+              backgroundImage: 'linear-gradient(0deg, #09fdfd, #66ffff, #ff9dd1, #ff69b4, #09fdfd)',
+              backgroundSize: '100% 400%',
+              animation: 'rotating 2s linear infinite, gradientRotate 5s linear infinite'
+            }}></div>
+            <ImageWithFallback 
+              src={company.profile_picture_url} 
+              alt={company.name} 
+              className="w-[88px] h-[88px] absolute rounded-full object-cover border-4 border-inherit border-solid"
+            />
+            {company.country?.flag_icon_url && (
+              <div className="absolute bottom-0 left-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 shadow-md overflow-hidden">
+                <img 
+                  src={company.country.flag_icon_url} 
+                  alt={`Bandera de ${company.country.name}`}
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/api/placeholder/32/32";
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="mt-2 text-center">
+            <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
+            <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium">
+              {company.category && typeof company.category === 'object' 
+                ? company.category.name 
+                : (company.category || 'Categoría de la empresa')}
+            </p>
+          </div>
         </div>
-      )}
-    </div>
-    <div className="mt-2 text-center">
-      <h3 className="text-gray-600 dark:text-gray-300 text-2xl leading-4 font-extrabold">{company.name}</h3>
-      <p className="text-[#09fdfd] dark:text-[#09fdfd] text-base font-medium">
-        {company.category && typeof company.category === 'object' 
-          ? company.category.name 
-          : (company.category || 'Categoría de la empresa')}
-      </p>
-    </div>
-  </div>
 
-  {/* Categories Carousel */}
-  <div 
-    ref={categoryCarouselRef}
-    className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-2 pb-2 px-4"
-    style={{ 
-      scrollBehavior: 'smooth',
-      WebkitOverflowScrolling: 'touch',
-      scrollbarWidth: 'none',
-      msOverflowStyle: 'none',
-    }}
-    onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
-    onMouseUp={stopDragging}
-    onMouseLeave={stopDragging}
-    onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
-  >
-    {categories.map(category => (
-      <CategoryButton
-        key={category.id}
-        category={category}
-        isSelected={selectedCategories.includes(category.id)}
-        onClick={toggleCategory}
-      />
-    ))}
-  </div>
+        {/* Categories Carousel */}
+        <div 
+          ref={categoryCarouselRef}
+          className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-2 pb-2 px-4"
+          style={{ 
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+          onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
+          onMouseUp={stopDragging}
+          onMouseLeave={stopDragging}
+          onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
+        >
+          {categories.map(category => (
+            <CategoryButton
+              key={category.id}
+              category={category}
+              isSelected={selectedCategories.includes(category.id)}
+              onClick={toggleCategory}
+            />
+          ))}
+        </div>
 
-  {/* Info and Status Section */}
-  <div className="w-full px-3  rounded-lg  pb-4 ">
-    <div className="flex items-start gap-2">
-      {/* Status */}
-      <div className="flex flex-col items-center min-w-fit">
-        <h3 className={`text-xl font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-          {isOpen ? 'ABIERTO' : 'CERRADO'}
-        </h3>   
-        <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full  px-3 py-1">
-          {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
-        </p>
-      </div>
+        {/* Info and Status Section */}
+        <div className="w-full px-3 rounded-lg pb-4">
+          <div className="flex items-start gap-2">
+            {/* Status */}
+            <div className="flex flex-col items-center min-w-fit">
+              <h3 className={`text-xl font-bold ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {isOpen ? 'ABIERTO' : 'CERRADO'}
+              </h3>   
+              <p className="text-sm text-gray-600 dark:text-gray-300 border rounded-full px-3 py-1">
+                {isOpen ? `Hasta ${nextTime}` : `Abre ${nextTime}`}
+              </p>
+            </div>
 
-      {/* Description */}
-      <div className="flex-1 border-l border-gray-200 dark:border-gray-700 pl-4">
-        <p className="text-sm leading-4  text-gray-600 dark:text-gray-300">
-          {company.description}
-        </p>
-      </div>
-    </div>
-  </div>
+            {/* Description */}
+            <div className="flex-1 border-l border-gray-200 dark:border-gray-700 pl-4">
+              <p className="text-sm leading-4 text-gray-600 dark:text-gray-300">
+                {company.description}
+              </p>
+            </div>
+          </div>
+        </div>
 
-  {/* Social Links Section */}
-  <div className="w-11/12 flex justify-center gap-3 ">
+        {/* Social Links Section */}
+        <div className="w-11/12 flex justify-center gap-3">
+          {company.google_maps_url && (
+            <a 
+              href={company.google_maps_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-full border-2 border-[#09fdfd] hover:bg-[#09fdfd]/10 transition-all duration-300"
+            >
+              <MapPin className="w-5 h-5 text-[#09fdfd]" />
+            </a>
+          )}
 
-  {company.google_maps_url && (
-      <a 
-        href={company.google_maps_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="p-2 rounded-full border-2 border-[#09fdfd] hover:bg-[#09fdfd]/10 transition-all duration-300"
-      >
-        <MapPin className="w-5 h-5 text-[#09fdfd]" />
-      </a>
-    )}
+          {company.whatsapp_url && (
+            <a 
+              href={company.whatsapp_url}
+              target="_blank"
+              rel="noopener noreferrer" 
+              className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#09fdfd] text-white font-bold text-sm shadow hover:shadow-md transition-all duration-300 hover:shadow-cyan-300"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Escribir
+            </a>
+          )}
+          
+          {company.instagram_url && (
+            <a 
+              href={company.instagram_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 w-10 h-10 flex items-center justify-center bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
+          )}
+          
+          {company.facebook_url && (
+            <a 
+              href={company.facebook_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 w-10 h-10 flex items-center justify-center bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
+            >
+              <Facebook className="w-5 h-5" />
+            </a>
+          )}
+        </div>
+      </section>
 
-    {company.whatsapp_url && (
-      <a 
-        href={company.whatsapp_url}
-        target="_blank"
-        rel="noopener noreferrer" 
-        className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#09fdfd] text-white font-bold text-sm shadow hover:shadow-md transition-all duration-300 hover:shadow-cyan-300"
-      >
-        <MessageCircle className="w-4 h-4" />
-        Escribir
-      </a>
-    )}
-    
-    
-    
-    {company.instagram_url && (
-      <a 
-        href={company.instagram_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="p-2 w-10 h-10 flex items-center justify-center bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
-      >
-        <Instagram className="w-5 h-5" />
-      </a>
-    )}
-    
-    {company.facebook_url && (
-      <a 
-        href={company.facebook_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="p-2 w-10 h-10 flex items-center justify-center bg-[#09fdfd] rounded-full shadow hover:shadow-md transition-all duration-300 text-white"
-      >
-        <Facebook className="w-5 h-5" />
-      </a>
-    )}
-  </div>
-</section>
       <BadgesSection badges={company.badges} />
 
+      {/* Products Section */}
       <section className="w-full">
         {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
           <div key={categoryId} className="mb-0">
