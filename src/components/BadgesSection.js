@@ -2,7 +2,6 @@ import React from 'react';
 import { Flame, Clock, Star } from 'lucide-react';
 
 const BadgesSection = ({ badges }) => {
-  // Si no hay insignias o badges es undefined/null, no renderizar nada
   if (!badges || badges.length === 0) {
     return null;
   }
@@ -14,18 +13,18 @@ const BadgesSection = ({ badges }) => {
           icon: (
             <div className="relative group">
               <Clock 
-                className="w-6 h-6 text-[#09fdfd] dark:text-[#09fdfd]"
+                className="w-6 h-6 text-slate-900 dark:text-[#09fdfd]"
                 style={{
-                  filter: 'drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
+                  filter: 'drop-shadow(0 0 4px rgba(15, 23, 42, 0.5)) dark:drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
                 }}
               />
-              <div className="absolute inset-[-4px] rounded-full border-2 border-transparent border-t-[#09fdfd] animate-[spin_2s_linear_infinite]" />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#09fdfd]/20 to-transparent animate-pulse" />
+              <div className="absolute inset-[-4px] rounded-full border-2 border-transparent border-t-slate-900 dark:border-t-[#09fdfd] animate-[spin_2s_linear_infinite]" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-slate-900/20 dark:from-[#09fdfd]/20 to-transparent animate-pulse" />
               <div className="absolute inset-[-8px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute inset-0 rounded-full border border-[#09fdfd]/30"
+                    className="absolute inset-0 rounded-full border border-slate-900/30 dark:border-[#09fdfd]/30"
                     style={{
                       animation: `ping 1s cubic-bezier(0, 0, 0.2, 1) infinite ${i * 0.2}s`
                     }}
@@ -34,8 +33,8 @@ const BadgesSection = ({ badges }) => {
               </div>
             </div>
           ),
-          gradient: 'from-cyan-100 to-blue-100 dark:from-cyan-950 dark:to-blue-950',
-          textGradient: 'from-[#09fdfd] to-blue-500 dark:from-[#09fdfd] dark:to-blue-400'
+          gradient: 'from-slate-100 to-slate-200 dark:from-cyan-950 dark:to-blue-950',
+          textGradient: 'from-slate-900 to-slate-700 dark:from-[#09fdfd] dark:to-blue-400'
         };
       
       case 'BEST_RATED':
@@ -44,9 +43,9 @@ const BadgesSection = ({ badges }) => {
             <div className="relative group">
               <div className="relative">
                 <Star 
-                  className="w-6 h-6 text-[#09fdfd] dark:text-[#09fdfd] transform transition-transform group-hover:scale-110"
+                  className="w-6 h-6 text-slate-900 dark:text-[#09fdfd] transform transition-transform group-hover:scale-110"
                   style={{
-                    filter: 'drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
+                    filter: 'drop-shadow(0 0 4px rgba(15, 23, 42, 0.5)) dark:drop-shadow(0 0 4px rgba(9, 253, 253, 0.5))'
                   }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -59,7 +58,7 @@ const BadgesSection = ({ badges }) => {
                 {[...Array(8)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-1.5 h-1.5 rounded-full bg-gradient-to-r from-[#09fdfd] to-transparent"
+                    className="absolute w-1.5 h-1.5 rounded-full bg-gradient-to-r from-slate-900 dark:from-[#09fdfd] to-transparent"
                     style={{
                       top: '50%',
                       left: '50%',
@@ -70,11 +69,11 @@ const BadgesSection = ({ badges }) => {
                   />
                 ))}
               </div>
-              <div className="absolute inset-[-2px] bg-gradient-to-r from-[#09fdfd]/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
+              <div className="absolute inset-[-2px] bg-gradient-to-r from-slate-900/20 dark:from-[#09fdfd]/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
             </div>
           ),
-          gradient: 'from-cyan-100 to-blue-100 dark:from-cyan-950 dark:to-blue-950',
-          textGradient: 'from-[#09fdfd] to-blue-500 dark:from-[#09fdfd] dark:to-blue-400'
+          gradient: 'from-slate-100 to-slate-200 dark:from-cyan-950 dark:to-blue-950',
+          textGradient: 'from-slate-900 to-slate-700 dark:from-[#09fdfd] dark:to-blue-400'
         };
       
       case 'INTENSE_FIRE':

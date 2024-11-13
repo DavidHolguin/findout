@@ -66,14 +66,11 @@ const Header = () => {
       const cart = JSON.parse(savedCart);
       const companyIds = Object.keys(cart);
       if (companyIds.length > 0) {
-        // Navegar al carrito de la primera empresa que encontremos
         navigate(`/cart/${companyIds[0]}`);
       } else {
-        // Si no hay compañías en el carrito, navegar a la página principal
         navigate('/');
       }
     } else {
-      // Si no hay carrito guardado, navegar a la página principal
       navigate('/');
     }
   };
@@ -81,7 +78,7 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full bg-primary dark:bg-gray-900 shadow-md dark:shadow-gray-900/50 z-50 font-['Poppins',sans-serif] transition-all duration-500 ease-in-out ${
+        className={`fixed top-0 left-0 w-full bg-slate-900 dark:bg-gray-900 shadow-md dark:shadow-gray-900/50 z-50 font-['Poppins',sans-serif] transition-all duration-500 ease-in-out ${
           showHeader ? 'transform translate-y-0' : 'transform -translate-y-full'
         }`}
       >
@@ -117,7 +114,7 @@ const Header = () => {
         </nav>
 
         {/* Progress bar indicator */}
-        <div className="h-0.5 bg-gradient-to-r from-primary-dark to-primary dark:from-gray-800 dark:to-gray-700" />
+        <div className="h-0.5 bg-gradient-to-r from-slate-900 to-slate-800 dark:from-gray-800 dark:to-gray-700" />
       </header>
 
       <MobileMenu 
