@@ -191,7 +191,7 @@ const TopBurgers = () => {
                   );
                 })}
               </h3>
-              <p className="m-0 text-[15px] text-neutral-700 dark:text-neutral-300">{section.location}</p>
+              <p className="m-0 text-[15px] text-gray-400 dark:text-gray-400">{section.location}</p>
               <svg
                 id="Layer_1"
                 height="10"
