@@ -13,7 +13,11 @@ import CompanyCategory from './components/CompanyCategory';
 import JoinFindoutPage from './components/JoinFindoutPage';
 import QRScanner from './components/QRScanner';
 import ShoppingCartComponent from './components/ShoppingCartComponent';
-import IOSInstallGuide from './components/IOSInstallGuide'; // Add this import
+import IOSInstallGuide from './components/IOSInstallGuide'; // Add this importim
+import DeliveryTracker from './components/DeliveryTracker';
+
+
+
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -38,7 +42,18 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   };
-
+  const orderData = {
+    // Coordenadas del restaurante
+    pickup_latitude: 40.4168, // Ejemplo: Madrid
+    pickup_longitude: -3.7038,
+    
+    // Coordenadas del punto de entrega
+    delivery_latitude: 40.4154,
+    delivery_longitude: -3.7106,
+    
+    // Estado inicial del pedido
+    status: 'pending', // Valores posibles: 'pending', 'pickup', 'in_transit', 'delivered', 'cancelled'
+  };
   return (
     <Router>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
@@ -56,7 +71,11 @@ function App() {
             <Route path="/company-categories/:categoryId" element={<CompanyCategory />} />
             <Route path="/register-business" element={<JoinFindoutPage />} />
             <Route path="/download" element={<IOSInstallGuide />} /> 
-            
+         
+            <Route path="/tracker" element={<DeliveryTracker 
+  orderId="123" 
+  initialOrder={orderData} 
+/>} /> 
             <Route path="/cart/:companyId" element={<ShoppingCartComponent />} />     
           </Routes>
         </main>
