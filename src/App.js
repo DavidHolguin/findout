@@ -12,9 +12,14 @@ import Settings from './components/Settings';
 import CompanyCategory from './components/CompanyCategory';
 import JoinFindoutPage from './components/JoinFindoutPage';
 import QRScanner from './components/QRScanner';
-import ShoppingCartComponent from './components/ShoppingCartComponent';
+
 import IOSInstallGuide from './components/IOSInstallGuide'; // Add this importim
 import DeliveryTracker from './components/DeliveryTracker';
+import AddressManager from './components/AddressManager';
+import CheckoutProcess from './components/CheckoutProcess';
+
+
+
 
 
 
@@ -71,12 +76,10 @@ function App() {
             <Route path="/company-categories/:categoryId" element={<CompanyCategory />} />
             <Route path="/register-business" element={<JoinFindoutPage />} />
             <Route path="/download" element={<IOSInstallGuide />} /> 
-         
-            <Route path="/tracker" element={<DeliveryTracker 
-  orderId="123" 
-  initialOrder={orderData} 
-/>} /> 
-            <Route path="/cart/:companyId" element={<ShoppingCartComponent />} />     
+            <Route path="/adress" element={<AddressManager />} />
+            <Route path="/checkout" element={<CheckoutProcess />} /> 
+            <Route path="/tracker" element={<DeliveryTracker orderId="123" initialOrder={orderData} />} /> 
+        
           </Routes>
         </main>
         <MenuBar />
