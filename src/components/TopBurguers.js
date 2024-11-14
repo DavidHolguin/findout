@@ -86,7 +86,7 @@ const TopBurgers = () => {
 
     if (isFullWidth) {
       return (
-        <div className="relative w-full">
+        <div className="relative w-full pb-3 pt-1">
           <a 
             href={item.custom_url}
             className="block"
@@ -159,7 +159,7 @@ const TopBurgers = () => {
           return (
             <section 
               key={section.title} 
-              className="relative w-full"
+              className="relative w-full pb-3 pt-1"
             >
               <div className={`${isIOS ? 'w-full overflow-hidden' : 'w-screen relative left-1/2 right-1/2 -mx-[50vw]'}`}
                    style={isIOS ? {
