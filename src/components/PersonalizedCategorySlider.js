@@ -118,7 +118,7 @@ const PersonalizedCategorySlider = () => {
             >
               <div>
                 <div className="relative h-[58px] rounded-2xl overflow-hidden border-2 border-primary">
-                  <div className="flex h-[58px] bg-gray-100 items-center justify-between p-4  dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
+                  <div className="flex h-[58px]  items-center justify-between p-4  dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
                     <div className="flex gap-4 items-center flex-row min-w-0 relative">
                       <div>
                         <h3 className="text-xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-5">Seguir explorando</h3>
