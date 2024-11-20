@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import CompanyList from './components/CompanyList';
-import CompanyDetail from './components/CompanyDetail';
+
 import Search from './components/Search';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -12,11 +12,12 @@ import Settings from './components/Settings';
 import CompanyCategory from './components/CompanyCategory';
 import JoinFindoutPage from './components/JoinFindoutPage';
 import QRScanner from './components/QRScanner';
-
+import ShoppingCartComponent from './components/ShoppingCartComponent';
 import IOSInstallGuide from './components/IOSInstallGuide'; // Add this importim
 import DeliveryTracker from './components/DeliveryTracker';
 import AddressManager from './components/AddressManager';
 import CheckoutProcess from './components/CheckoutProcess';
+import CompanyDetail from './components/CompanyDetail';
 
 
 
@@ -66,7 +67,7 @@ function App() {
         <main className="container mx-auto pt-16 pb-14 text-gray-900 dark:text-white">
           <Routes>
             <Route path="/" element={<CompanyList />} />
-            <Route path="/company/:id" element={<CompanyDetail />} />
+        
             <Route path="/search" element={<Search />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -79,7 +80,10 @@ function App() {
             <Route path="/adress" element={<AddressManager />} />
             <Route path="/checkout" element={<CheckoutProcess />} /> 
             <Route path="/tracker" element={<DeliveryTracker orderId="123" initialOrder={orderData} />} /> 
-        
+            <Route path="/cart/:companyId" element={<ShoppingCartComponent />} />
+            <Route path="/company/:id" element={<CompanyDetail />} />
+       
+            
           </Routes>
         </main>
         <MenuBar />

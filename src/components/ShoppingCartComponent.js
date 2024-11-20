@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Check } from 'lucide-react';
+import { Plus, UserRoundPen, Trash2, Check } from 'lucide-react';
 
 const ShoppingCartComponent = () => {
   // Obtener companyId de los parámetros de la URL
@@ -303,9 +303,9 @@ const ShoppingCartComponent = () => {
           className="w-full bg-cyan-400 text-black dark:text-white py-4 rounded-xl font-medium flex items-center justify-center hover:bg-cyan-500 transition-colors group"
           onClick={() => console.log('Proceder al pago')}
         >
-          <span>Proceder al pago</span>
+          <span>Negociar el domicilio</span>
           <div className="ml-2 w-6 h-6 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-white/10 transition-colors">
-            <Plus className="h-4 w-4" />
+            <UserRoundPen className="h-4 w-4" />
           </div>
         </button>
         
@@ -315,10 +315,7 @@ const ShoppingCartComponent = () => {
         >
           Vaciar carrito
         </button>
-        
-        <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-2">
-          Estoy listo, quiero hacer el pago
-        </p>
+    
       </div>
     </div>
   );
