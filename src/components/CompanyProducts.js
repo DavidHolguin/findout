@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Grid, List, StretchVertical, ChevronDown, Star, X, LayoutGrid } from 'lucide-react';
+import { Search, Grid, List, StretchVertical, ChevronDown, Star, X, LayoutGrid, CirclePlus } from 'lucide-react';
 
 const ViewTypes = {
   GRID: 'grid',
@@ -18,14 +18,14 @@ const CategorySelector = ({ categories, selectedCategories, onToggle }) => {
       >
         <span className="text-sm">
           {selectedCategories.length === 0 
-            ? 'Categorías' 
+            ? 'Todo' 
             : `${selectedCategories.length} seleccionadas`}
         </span>
         <ChevronDown size={16} />
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50 min-w-[200px]">
+        <div className="absolute left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50 min-w-[200px]">
           <button
             onClick={() => {
               onToggle([]);
@@ -33,7 +33,7 @@ const CategorySelector = ({ categories, selectedCategories, onToggle }) => {
             }}
             className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
           >
-            TODO
+            Todo
           </button>
           {categories.map(category => (
             <button
@@ -66,10 +66,9 @@ const ViewSelector = ({ viewType, setViewType }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded bg-gray-100 dark:bg-gray-700 flex items-center gap-1"
+        className="p-2 rounded bg-gray-100 dark:bg-gray-700 flex items-center"
       >
         <LayoutGrid size={20} />
-        <ChevronDown size={16} />
       </button>
       
       {isOpen && (
@@ -159,7 +158,13 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
   }, [searchTerm, productsByCategory, selectedCategories]);
 
   const renderSearchBar = () => (
-    <div className="flex items-center gap-4 p-4">
+    <div className="flex items-center gap-2 p-4">
+      <CategorySelector 
+        categories={categories}
+        selectedCategories={selectedCategories}
+        onToggle={setSelectedCategories}
+      />
+      <ViewSelector viewType={viewType} setViewType={setViewType} />
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <input
@@ -170,12 +175,6 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
           className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
-      <CategorySelector 
-        categories={categories}
-        selectedCategories={selectedCategories}
-        onToggle={setSelectedCategories}
-      />
-      <ViewSelector viewType={viewType} setViewType={setViewType} />
     </div>
   );
 
@@ -223,24 +222,24 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
           </div>
         )}
         <button 
-          className="absolute bottom-2 right-2 p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors shadow-lg"
+          className="absolute bottom-2 right-2 p-2 bg-primary rounded-full text-white hover:bg-primary transition-colors shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
             console.log('Add to cart:', product);
           }}
         >
-          +
+          <CirclePlus size={20} stroke='#111827' />
         </button>
       </div>
-      <div className="p-3">
-        <h3 className="font-medium text-sm dark:text-white truncate">{product.name}</h3>
-        <p className="text-blue-600 dark:text-blue-400 font-bold text-sm mt-1">${product.price}</p>
+      <div className="p-2">
+        <h3 className="text-xs dark:text-white leading-tight h-8">{product.name}</h3>
+        <p className="text-primary dark:text-primary font-bold text-sm mt-1">${product.price}</p>
       </div>
     </div>
   );
 
   const renderGridView = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 p-4">
       {Object.values(filteredProducts).flat().map(renderProductCard)}
     </div>
   );
@@ -277,7 +276,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
               console.log('Add to cart:', product);
             }}
           >
-            +
+            <CirclePlus size={20} />
           </button>
         </div>
       ))}
