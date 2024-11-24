@@ -251,7 +251,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
         className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
         onClick={() => setSelectedProduct(product)}
       >
-        <div className="relative aspect-square">
+        <div className="relative aspect-square flex justify-center">
           <img
             src={product.image_url || "/api/placeholder/400/400"}
             alt={product.name}
@@ -278,8 +278,8 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             </div>
           )}
         </div>
-        <div className="p-2">
-          <h3 className="text-xs dark:text-white leading-tight h-8">{product.name}</h3>
+        <div className="p-2 ">
+          <h3 className="text-xs font-bold	flex items-center  dark:text-white leading-tight h-8">{product.name}</h3>
         </div>
       </div>
     );
