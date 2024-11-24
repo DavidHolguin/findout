@@ -182,7 +182,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
     if (selectedCategories.length === 0) return null;
     
     return (
-      <div className="px-4 pb-4">
+      <div className="px-4 py-2">
         <div className="flex flex-wrap gap-2">
           {categories
             .filter(category => selectedCategories.includes(category.id))
@@ -216,7 +216,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             <img
               src={product.image_url || "/api/placeholder/400/400"}
               alt={product.name}
-              className="absolute top-0 left-0 w-full h-full object-cover"
+              className="absolute top-0 left-0 w-full h-full object-cover px-2"
             />
             {product.featured && (
               <div className="absolute top-2 right-2">
@@ -251,7 +251,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
         className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
         onClick={() => setSelectedProduct(product)}
       >
-        <div className="relative aspect-square flex justify-center">
+        <div className="relative aspect-square flex justify-center px-2">
           <img
             src={product.image_url || "/api/placeholder/400/400"}
             alt={product.name}
@@ -286,7 +286,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
   };
 
   const renderGridView = () => (
-    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 p-4">
       {Object.values(filteredProducts).flat().map(product => renderProductCard(product))}
     </div>
   );
@@ -303,7 +303,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             <img
               src={product.image_url || "/api/placeholder/400/400"}
               alt={product.name}
-              className="w-full h-full object-cover rounded"
+              className="w-full h-full object-cover px-2 rounded"
             />
             {product.featured && (
               <div className="absolute top-1 right-1">
