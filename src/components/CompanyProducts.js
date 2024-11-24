@@ -14,7 +14,7 @@ const CategorySelector = ({ categories, selectedCategories, onToggle }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center gap-1"
+        className="p-2 rounded bg-gray-100 dark:bg-gray-700 flex items-center gap-1"
       >
         <span className="text-sm">
           {selectedCategories.length === 0 
@@ -25,7 +25,7 @@ const CategorySelector = ({ categories, selectedCategories, onToggle }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute left-0 mt-2 bg-white dark:bg-gray-800 rounded-full shadow-lg border dark:border-gray-700 z-50 min-w-[200px]">
+        <div className="absolute left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50 min-w-[200px]">
           <button
             onClick={() => {
               onToggle([]);
@@ -66,7 +66,7 @@ const ViewSelector = ({ viewType, setViewType }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center"
+        className="p-2 rounded bg-gray-100 dark:bg-gray-700 flex items-center"
       >
         <LayoutGrid size={20} />
       </button>
@@ -81,7 +81,7 @@ const ViewSelector = ({ viewType, setViewType }) => {
                 setIsOpen(false);
               }}
               className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                viewType === value ? 'bg-primary/10 dark:bg-primary/20' : ''
+                viewType === value ? 'bg-blue-50 dark:bg-primary' : ''
               }`}
             >
               {icons[value]}
@@ -128,7 +128,7 @@ const ProductModal = ({ product, onClose }) => {
               console.log('Adding to cart:', product);
               onClose();
             }}
-            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary transition-colors"
           >
             Agregar al carrito
           </button>
@@ -172,7 +172,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
           placeholder="Buscar aquí"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
     </div>
@@ -204,8 +204,8 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
     );
   };
 
-  const renderProductCard = (product, includeDescription = false) => {
-    if (viewType === ViewTypes.GRID) {
+  const renderProductCard = (product, isCarousel = false) => {
+    if (isCarousel) {
       return (
         <div 
           key={product.id} 
@@ -223,8 +223,12 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
                 <Star className="text-yellow-400 fill-yellow-400" size={24} />
               </div>
             )}
-            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-3 bg-white/30 backdrop-blur-md">
-              <span className="text-white font-bold text-lg">${product.price}</span>
+          </div>
+          <div className="p-3">
+            <h3 className="text-sm font-medium dark:text-white mb-1 line-clamp-2">{product.name}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">{product.description}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-primary font-bold">${product.price}</span>
               <button 
                 className="p-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
                 onClick={(e) => {
@@ -236,16 +240,60 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
               </button>
             </div>
           </div>
-          <div className="p-4">
-            <h3 className="text-sm dark:text-white font-medium">{product.name}</h3>
-          </div>
         </div>
       );
     }
 
-    // List view card
-    if (viewType === ViewTypes.LIST) {
-      return (
+    // Original card for grid view
+    return (
+      <div 
+        key={product.id} 
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
+        onClick={() => setSelectedProduct(product)}
+      >
+        <div className="relative aspect-square">
+          <img
+            src={product.image_url || "/api/placeholder/400/400"}
+            alt={product.name}
+            className="absolute top-0 left-0 w-full h-full object-cover"
+          />
+          {/* Glass effect price tag */}
+          <div className="absolute bottom-1 flex gap-1">
+            <div className="flex items-center px-3 py-1 rounded-full bg-gray-900/30 backdrop-blur-md border border-white/30">
+              <span className="text-white font-bold text-sm">${product.price}</span>
+            </div>
+            <button 
+              className="p-1.5 rounded-full bg-gray-900/30 backdrop-blur-md border border-white/30 text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Add to cart:', product);
+              }}
+            >
+              <CirclePlus size={16} />
+            </button>
+          </div>
+          {product.featured && (
+            <div className="absolute top-2 right-2">
+              <Star className="text-yellow-400 fill-yellow-400" size={24} />
+            </div>
+          )}
+        </div>
+        <div className="p-2">
+          <h3 className="text-xs dark:text-white leading-tight h-8">{product.name}</h3>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGridView = () => (
+    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+      {Object.values(filteredProducts).flat().map(product => renderProductCard(product))}
+    </div>
+  );
+
+  const renderListView = () => (
+    <div className="space-y-4 p-4">
+      {Object.values(filteredProducts).flat().map(product => (
         <div 
           key={product.id} 
           className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 cursor-pointer hover:scale-[1.02] transition-transform"
@@ -266,10 +314,10 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold dark:text-white">{product.name}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">{product.description}</p>
-            <p className="text-primary font-bold mt-2">${product.price}</p>
+            <p className="text-primary dark:text-primary font-bold mt-2">${product.price}</p>
           </div>
           <button 
-            className="p-2 bg-primary rounded-full text-white hover:bg-primary/90 transition-colors"
+            className="p-2 bg-primary rounded-full text-white hover:bg-primary transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               console.log('Add to cart:', product);
@@ -278,61 +326,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             <CirclePlus size={20} />
           </button>
         </div>
-      );
-    }
-
-    // Carousel view card
-    return (
-      <div 
-        key={product.id} 
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
-        onClick={() => setSelectedProduct(product)}
-      >
-        <div className="relative aspect-square">
-          <img
-            src={product.image_url || "/api/placeholder/400/400"}
-            alt={product.name}
-            className="absolute top-0 left-0 w-full h-full object-cover"
-          />
-          {product.featured && (
-            <div className="absolute top-2 right-2">
-              <Star className="text-yellow-400 fill-yellow-400" size={24} />
-            </div>
-          )}
-        </div>
-        <div className="p-4">
-          <h3 className="text-sm dark:text-white font-medium mb-2">{product.name}</h3>
-          {includeDescription && (
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
-              {product.description}
-            </p>
-          )}
-          <div className="flex items-center justify-between">
-            <span className="text-primary font-bold">${product.price}</span>
-            <button 
-              className="p-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('Add to cart:', product);
-              }}
-            >
-              <CirclePlus size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderGridView = () => (
-    <div className="grid grid-cols-3 gap-4 p-4">
-      {Object.values(filteredProducts).flat().map(product => renderProductCard(product))}
-    </div>
-  );
-
-  const renderListView = () => (
-    <div className="space-y-4 p-4">
-      {Object.values(filteredProducts).flat().map(product => renderProductCard(product))}
+      ))}
     </div>
   );
 
