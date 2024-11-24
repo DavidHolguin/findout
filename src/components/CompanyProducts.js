@@ -258,7 +258,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             className="absolute top-0 left-0 w-full h-full object-cover"
           />
           {/* Glass effect price tag */}
-          <div className="absolute bottom-1 flex gap-1">
+          <div className="absolute bottom-1 flex gap-1 px-2">
             <div className="flex items-center px-3 py-1 rounded-full bg-gray-900/30 backdrop-blur-md border border-white/30">
               <span className="text-white font-bold text-sm">${product.price}</span>
             </div>
