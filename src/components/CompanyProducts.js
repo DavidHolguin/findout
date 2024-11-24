@@ -216,7 +216,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             <img
               src={product.image_url || "/api/placeholder/400/400"}
               alt={product.name}
-              className="absolute top-0 left-0 w-full h-full object-cover px-2"
+              className="absolute top-0 left-0 w-full h-full object-cover "
             />
             {product.featured && (
               <div className="absolute top-2 right-2">
@@ -251,14 +251,14 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
         className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
         onClick={() => setSelectedProduct(product)}
       >
-        <div className="relative aspect-square flex justify-center  px-2">
+        <div className="relative aspect-square flex justify-center  ">
           <img
             src={product.image_url || "/api/placeholder/400/400"}
             alt={product.name}
             className="absolute top-0 left-0 w-full h-full object-cover"
           />
           {/* Glass effect price tag */}
-          <div className="absolute bottom-1 flex justify-center gap-[5px] px-2">
+          <div className="absolute bottom-1 flex justify-center gap-[5px] ">
             <div className="flex items-center px-3 py-1 rounded-full bg-[#111827a1] backdrop-blur-md border border-white/30">
               <span className="text-white font-bold text-xs">${product.price}</span>
             </div>
@@ -303,7 +303,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             <img
               src={product.image_url || "/api/placeholder/400/400"}
               alt={product.name}
-              className="w-full h-full object-cover px-2 rounded"
+              className="w-full h-full object-cover  rounded"
             />
             {product.featured && (
               <div className="absolute top-1 right-1">
