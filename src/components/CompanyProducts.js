@@ -258,18 +258,18 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             className="absolute top-0 left-0 w-full h-full object-cover"
           />
           {/* Glass effect price tag */}
-          <div className="absolute bottom-1 flex gap-1  w-[90%] px-2">
-            <div className="flex items-center px-3 py-1 rounded-full bg-gray-[#111827a1] backdrop-blur-md border border-white/30">
-              <span className="text-white font-bold text-sm">${product.price}</span>
+          <div className="absolute bottom-1 flex gap-1  w-[95%] px-2">
+            <div className="flex items-center px-3 py-1 rounded-full bg-[#111827a1] backdrop-blur-md border border-white/30">
+              <span className="text-white font-bold text-xs">${product.price}</span>
             </div>
             <button 
-              className="p-1.5 rounded-full bg-gray-900/30 backdrop-blur-md border border-white/30 text-primary"
+              className="p-1 rounded-full bg-[#111827a1] backdrop-blur-md border border-white/30 text-primary"
               onClick={(e) => {
                 e.stopPropagation();
                 console.log('Add to cart:', product);
               }}
             >
-              <CirclePlus size={16} />
+              <CirclePlus size={14} />
             </button>
           </div>
           {product.featured && (
