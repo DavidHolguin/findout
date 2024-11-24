@@ -76,7 +76,7 @@ const JoinFindoutPage = () => {
               </button>
             </div>
             <p className="text-center text-gray-900 dark:text-white font-medium mt-2">
-              Por solo <span className="text-gray-900 dark:text-white font-bold text-xl">$7,99</span> / mes
+              Por solo <span className="text-gray-900 dark:text-white font-bold text-xl">$9,99</span> / mes
             </p>
           </div>
         </div>
