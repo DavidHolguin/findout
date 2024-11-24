@@ -14,7 +14,7 @@ const CategorySelector = ({ categories, selectedCategories, onToggle }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded bg-gray-100 dark:bg-gray-700 flex items-center gap-1"
+        className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center gap-1"
       >
         <span className="text-sm">
           {selectedCategories.length === 0 
@@ -25,7 +25,7 @@ const CategorySelector = ({ categories, selectedCategories, onToggle }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50 min-w-[200px]">
+        <div className="absolute left-0 mt-2 bg-white dark:bg-gray-800 rounded-full shadow-lg border dark:border-gray-700 z-50 min-w-[200px]">
           <button
             onClick={() => {
               onToggle([]);
@@ -66,7 +66,7 @@ const ViewSelector = ({ viewType, setViewType }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded bg-gray-100 dark:bg-gray-700 flex items-center"
+        className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center"
       >
         <LayoutGrid size={20} />
       </button>
@@ -81,7 +81,7 @@ const ViewSelector = ({ viewType, setViewType }) => {
                 setIsOpen(false);
               }}
               className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                viewType === value ? 'bg-blue-50 dark:bg-blue-900' : ''
+                viewType === value ? 'bg-primary/10 dark:bg-primary/20' : ''
               }`}
             >
               {icons[value]}
@@ -128,7 +128,7 @@ const ProductModal = ({ product, onClose }) => {
               console.log('Adding to cart:', product);
               onClose();
             }}
-            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary transition-colors"
+            className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
           >
             Agregar al carrito
           </button>
@@ -172,7 +172,7 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
           placeholder="Buscar aquí"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bg-primary dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className="w-full pl-10 pr-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
     </div>
@@ -204,53 +204,48 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
     );
   };
 
-  const renderProductCard = (product) => (
-    <div 
-      key={product.id} 
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
-      onClick={() => setSelectedProduct(product)}
-    >
-      <div className="relative aspect-square">
-        <img
-          src={product.image_url || "/api/placeholder/400/400"}
-          alt={product.name}
-          className="absolute top-0 left-0 w-full h-full object-cover"
-        />
-        {product.featured && (
-          <div className="absolute top-2 right-2">
-            <Star className="text-yellow-400 fill-yellow-400" size={24} />
+  const renderProductCard = (product, includeDescription = false) => {
+    if (viewType === ViewTypes.GRID) {
+      return (
+        <div 
+          key={product.id} 
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
+          onClick={() => setSelectedProduct(product)}
+        >
+          <div className="relative aspect-square">
+            <img
+              src={product.image_url || "/api/placeholder/400/400"}
+              alt={product.name}
+              className="absolute top-0 left-0 w-full h-full object-cover"
+            />
+            {product.featured && (
+              <div className="absolute top-2 right-2">
+                <Star className="text-yellow-400 fill-yellow-400" size={24} />
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-3 bg-white/30 backdrop-blur-md">
+              <span className="text-white font-bold text-lg">${product.price}</span>
+              <button 
+                className="p-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Add to cart:', product);
+                }}
+              >
+                <CirclePlus size={16} />
+              </button>
+            </div>
           </div>
-        )}
-        {/* Price tag at bottom with dark background */}
-        <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm p-2 flex justify-between items-center">
-          <span className="text-white font-bold text-lg">${product.price}</span>
-          <button 
-            className="p-1.5 rounded-full bg-primary text-white hover:bg-primary transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Add to cart:', product);
-            }}
-          >
-            <CirclePlus size={20} />
-          </button>
+          <div className="p-4">
+            <h3 className="text-sm dark:text-white font-medium">{product.name}</h3>
+          </div>
         </div>
-      </div>
-      <div className="p-4">
-        <h3 className="text-base font-medium dark:text-white leading-tight mb-2">{product.name}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{product.description}</p>
-      </div>
-    </div>
-  );
+      );
+    }
 
-  const renderGridView = () => (
-    <div className="grid grid-cols-3 gap-4 p-4">
-      {Object.values(filteredProducts).flat().map(renderProductCard)}
-    </div>
-  );
-
-  const renderListView = () => (
-    <div className="space-y-4 p-4">
-      {Object.values(filteredProducts).flat().map(product => (
+    // List view card
+    if (viewType === ViewTypes.LIST) {
+      return (
         <div 
           key={product.id} 
           className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 cursor-pointer hover:scale-[1.02] transition-transform"
@@ -269,12 +264,12 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg dark:text-white mb-1">{product.name}</h3>
+            <h3 className="font-semibold dark:text-white">{product.name}</h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">{product.description}</p>
-            <p className="text-primary dark:text-primary font-bold mt-2 text-lg">${product.price}</p>
+            <p className="text-primary font-bold mt-2">${product.price}</p>
           </div>
           <button 
-            className="p-2 bg-primary rounded-full text-white hover:bg-primary transition-colors"
+            className="p-2 bg-primary rounded-full text-white hover:bg-primary/90 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               console.log('Add to cart:', product);
@@ -283,7 +278,61 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
             <CirclePlus size={20} />
           </button>
         </div>
-      ))}
+      );
+    }
+
+    // Carousel view card
+    return (
+      <div 
+        key={product.id} 
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
+        onClick={() => setSelectedProduct(product)}
+      >
+        <div className="relative aspect-square">
+          <img
+            src={product.image_url || "/api/placeholder/400/400"}
+            alt={product.name}
+            className="absolute top-0 left-0 w-full h-full object-cover"
+          />
+          {product.featured && (
+            <div className="absolute top-2 right-2">
+              <Star className="text-yellow-400 fill-yellow-400" size={24} />
+            </div>
+          )}
+        </div>
+        <div className="p-4">
+          <h3 className="text-sm dark:text-white font-medium mb-2">{product.name}</h3>
+          {includeDescription && (
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
+              {product.description}
+            </p>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-primary font-bold">${product.price}</span>
+            <button 
+              className="p-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Add to cart:', product);
+              }}
+            >
+              <CirclePlus size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGridView = () => (
+    <div className="grid grid-cols-3 gap-4 p-4">
+      {Object.values(filteredProducts).flat().map(product => renderProductCard(product))}
+    </div>
+  );
+
+  const renderListView = () => (
+    <div className="space-y-4 p-4">
+      {Object.values(filteredProducts).flat().map(product => renderProductCard(product))}
     </div>
   );
 
@@ -294,12 +343,12 @@ const CompanyProducts = ({ productsByCategory, categories }) => {
         
         const category = categories.find(cat => cat.id === parseInt(categoryId));
         return (
-          <div key={categoryId} className="space-y-4">
-            <h2 className="font-bold text-xl dark:text-white px-2">{category?.name || 'Productos'}</h2>
+          <div key={categoryId} className="space-y-2">
+            <h2 className="font-bold text-xl dark:text-white">{category?.name || 'Productos'}</h2>
             <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory gap-4 pb-4">
               {products.map(product => (
-                <div key={product.id} className="w-72 flex-shrink-0 snap-start">
-                  {renderProductCard(product)}
+                <div key={product.id} className="w-64 flex-shrink-0 snap-start">
+                  {renderProductCard(product, true)}
                 </div>
               ))}
             </div>
