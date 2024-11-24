@@ -1,159 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import MenuBar from './MenuBar';
-import ProductModal from './ProductModal';
-import { Send, Instagram, Flame, MapPin, Facebook, MessageCircle } from 'lucide-react';
+import { Instagram, MapPin, Facebook, MessageCircle } from 'lucide-react';
 import BadgesSection from './BadgesSection';
 import CompanyDetailSkeleton from './CompanyDetailSkeleton';
+import CompanyProducts from './CompanyProducts';
 import { useUserTracking } from '../hooks/useUserTracking';
-
-// Toast Component
-const Toast = ({ message, type, onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
-  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-
-  return (
-    <div className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up`}>
-      {message}
-    </div>
-  );
-};
-
-// Toast Hook
-const useToast = () => {
-  const [toast, setToast] = useState(null);
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-  };
-
-  const hideToast = () => {
-    setToast(null);
-  };
-
-  return { toast, showToast, hideToast };
-};
-
-// Shopping Cart Hook
-const useShoppingCart = (companyId) => {
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('shopping_cart');
-    if (savedCart) {
-      const parsedCart = JSON.parse(savedCart);
-      return parsedCart[companyId] || { items: {}, company: null };
-    }
-    return { items: {}, company: null };
-  });
-
-  const updateLocalStorage = useCallback((newCart) => {
-    const savedCart = JSON.parse(localStorage.getItem('shopping_cart') || '{}');
-    savedCart[companyId] = newCart;
-    localStorage.setItem('shopping_cart', JSON.stringify(savedCart));
-  }, [companyId]);
-
-  const addToCart = useCallback((product, company) => {
-    setCart(prevCart => {
-      const existingItem = prevCart.items[product.id];
-      const newCart = {
-        items: {
-          ...prevCart.items,
-          [product.id]: {
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            final_price: product.active_promotions?.length > 0 
-              ? calculateDiscountedPrice(product.price, product.active_promotions[0])
-              : product.price,
-            image_url: product.image_url,
-            quantity: (existingItem?.quantity || 0) + 1,
-            active_promotions: product.active_promotions
-          }
-        },
-        company: company ? {
-          id: company.id,
-          name: company.name
-        } : prevCart.company
-      };
-      updateLocalStorage(newCart);
-      return newCart;
-    });
-  }, [updateLocalStorage]);
-
-  const removeFromCart = useCallback((productId) => {
-    setCart(prevCart => {
-      const newItems = { ...prevCart.items };
-      delete newItems[productId];
-      const newCart = {
-        items: newItems,
-        company: Object.keys(newItems).length > 0 ? prevCart.company : null
-      };
-      updateLocalStorage(newCart);
-      return newCart;
-    });
-  }, [updateLocalStorage]);
-
-  const updateQuantity = useCallback((productId, quantity) => {
-    if (quantity < 1) {
-      removeFromCart(productId);
-      return;
-    }
-
-    setCart(prevCart => {
-      const newCart = {
-        ...prevCart,
-        items: {
-          ...prevCart.items,
-          [productId]: {
-            ...prevCart.items[productId],
-            quantity
-          }
-        }
-      };
-      updateLocalStorage(newCart);
-      return newCart;
-    });
-  }, [removeFromCart, updateLocalStorage]);
-
-  const getCartTotal = useCallback(() => {
-    return Object.values(cart.items).reduce((total, item) => {
-      return total + (parseFloat(item.final_price) * item.quantity);
-    }, 0);
-  }, [cart.items]);
-
-  const clearCart = useCallback(() => {
-    setCart({ items: {}, company: null });
-    const savedCart = JSON.parse(localStorage.getItem('shopping_cart') || '{}');
-    delete savedCart[companyId];
-    localStorage.setItem('shopping_cart', JSON.stringify(savedCart));
-  }, [companyId]);
-
-  return {
-    cart,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    getCartTotal,
-    clearCart
-  };
-};
-
-// Utility function to calculate discounted price
-const calculateDiscountedPrice = (price, promotion) => {
-  if (!promotion) return price;
-  const basePrice = parseFloat(price);
-  if (promotion.discount_type === 'PERCENTAGE') {
-    return (basePrice * (1 - parseFloat(promotion.discount_value) / 100)).toFixed(2);
-  }
-  return (basePrice - parseFloat(promotion.discount_value)).toFixed(2);
-};
 
 // ImageWithFallback Component
 const ImageWithFallback = React.memo(({ src, alt, className }) => {
@@ -173,124 +25,18 @@ const ImageWithFallback = React.memo(({ src, alt, className }) => {
   );
 });
 
-// PromotionBadge Component
-const PromotionBadge = React.memo(({ promotion }) => {
-  const isPercentage = promotion.discount_type === 'PERCENTAGE';
-
-  return (
-    <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-      <div className="relative group">
-        <div className="bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg animate-bounce-slow">
-          <Flame 
-            className="w-5 h-5 text-orange-500 animate-pulse" 
-            style={{
-              filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))'
-            }}
-          />
-        </div>
-        
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute bottom-full right-0 mb-2 whitespace-nowrap">
-          <div className="bg-white dark:bg-gray-800 text-xs rounded-lg py-1 px-2 shadow-lg">
-            {promotion.title}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-fade-in-right">
-        {isPercentage ? (
-          <span>{promotion.discount_display} OFF</span>
-        ) : (
-          <span>Ahorra ${promotion.discount_value}</span>
-        )}
-      </div>
-    </div>
-  );
-});
-
-// ProductCard Component
-const ProductCard = React.memo(({ product, onClick }) => {
-  const hasPromotion = product.active_promotions && product.active_promotions.length > 0;
-  const promotion = hasPromotion ? product.active_promotions[0] : null;
-
-  const handleClick = useCallback(() => {
-    onClick(product);
-  }, [product, onClick]);
-
-  return (
-    <div
-      className="flex-none w-[65%] snap-start cursor-pointer"
-      style={{ scrollSnapAlign: 'start' }}
-      onClick={handleClick}
-    >
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden relative">
-        {hasPromotion && <PromotionBadge promotion={promotion} />}
-        <ImageWithFallback 
-          src={product.image_url} 
-          alt={product.name} 
-          className="w-full h-40 object-cover"
-        />
-        <div className="p-4">
-          <h4 className="text-lg font-semibold leading-4 mb-2 dark:text-white">{product.name}</h4>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-4 line-clamp-2">{product.description}</p>
-          <div className="mt-2 flex items-center gap-2">
-            <p className="text-green-600 dark:text-green-400 font-bold">
-              ${hasPromotion ? calculateDiscountedPrice(product.price, promotion) : product.price}
-            </p>
-            {hasPromotion && (
-              <p className="text-gray-400 line-through text-sm">
-                ${product.price}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-// CategoryButton Component
-const CategoryButton = React.memo(({ category, isSelected, onClick }) => {
-  const handleClick = useCallback(() => {
-    onClick(category.id, category.name);
-  }, [category, onClick]);
-
-  return (
-    <button
-      onClick={handleClick}
-      className={`flex-shrink-0 px-4 py-2 mx-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-        isSelected
-          ? 'bg-cyan-400 text-white shadow-lg dark:bg-cyan-600'
-          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-      } backdrop-filter backdrop-blur-lg bg-opacity-30 shadow-md`}
-    >
-      {category.name}
-    </button>
-  );
-});
-
 // Main CompanyDetail Component
 const CompanyDetail = () => {
   const [loading, setLoading] = useState(true);
   const [company, setCompany] = useState(null);
   const [productsByCategory, setProductsByCategory] = useState({});
   const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [nextTime, setNextTime] = useState('');
   const [hasTrackedVisit, setHasTrackedVisit] = useState(false);
 
   const { id } = useParams();
-  const categoryCarouselRef = useRef(null);
-  const carouselRefs = useRef({});
-  
-  const { trackCompanyVisit, trackCategoryClick } = useUserTracking();
-  const { addToCart: addToCartHook, cart } = useShoppingCart(id);
-  const { toast, showToast, hideToast } = useToast();
+  const { trackCompanyVisit } = useUserTracking();
 
   const formatTime = useCallback((timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -329,63 +75,6 @@ const CompanyDetail = () => {
       return { isOpen: false, nextTime: 'N/A' };
     }
   }, [formatTime]);
-
-  const toggleCategory = useCallback((categoryId, categoryName) => {
-    trackCategoryClick(categoryId, categoryName);
-    setSelectedCategories(prev => 
-      prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  }, [trackCategoryClick]);
-
-  const filteredProductsByCategory = useMemo(() => {
-    if (selectedCategories.length === 0) return productsByCategory;
-    return Object.fromEntries(
-      Object.entries(productsByCategory).filter(([categoryId]) => 
-        selectedCategories.includes(parseInt(categoryId))
-      )
-    );
-  }, [productsByCategory, selectedCategories]);
-
-  const startDragging = useCallback((e, ref) => {
-    if (!ref.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - ref.current.offsetLeft);
-    setScrollLeft(ref.current.scrollLeft);
-  }, []);
-
-  const stopDragging = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const onDrag = useCallback((e, ref) => {
-    if (!isDragging || !ref.current) return;
-    e.preventDefault();
-    const x = e.pageX - ref.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    ref.current.scrollLeft = scrollLeft - walk;
-  }, [isDragging, startX, scrollLeft]);
-
-  const getCarouselProducts = useCallback((products) => {
-    if (products.length <= 2) return products;
-    return [...products, ...products, ...products];
-  }, []);
-
-  const openProductModal = useCallback((product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  }, []);
-
-  const closeProductModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
-
-  const addToCart = useCallback((product) => {
-    addToCartHook(product, company);
-    closeProductModal();
-    showToast(`${product.name} agregado al carrito`, 'success'); // <- Corrección aquí
-  }, [addToCartHook, company, closeProductModal, showToast]); // Añadir showToast a las dependencias
 
   useEffect(() => {
     let isMounted = true;
@@ -452,9 +141,9 @@ const CompanyDetail = () => {
 
   return (
     <div className="flex flex-col items-center font-poppins dark:bg-gray-900">
-      {/* Sección del perfil de la empresa */}
+      {/* Profile Section */}
       <section className="w-full mb-3 flex flex-col items-center">
-        {/* Profile Image and Name Section */}
+        {/* Profile Image and Name */}
         <div className="flex flex-col items-center mb-4 mt-2">
           <div className="w-24 h-24 rounded-full flex items-center justify-center relative">
             <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin-slow" style={{
@@ -489,31 +178,6 @@ const CompanyDetail = () => {
                 : (company.category || 'Categoría de la empresa')}
             </p>
           </div>
-        </div>
-
-        {/* Categories Carousel */}
-        <div 
-          ref={categoryCarouselRef}
-          className="w-full flex justify-center overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-2 pb-2 px-4"
-          style={{ 
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-          onMouseDown={(e) => categoryCarouselRef.current && startDragging(e, categoryCarouselRef)}
-          onMouseUp={stopDragging}
-          onMouseLeave={stopDragging}
-          onMouseMove={(e) => categoryCarouselRef.current && onDrag(e, categoryCarouselRef)}
-        >
-          {categories.map(category => (
-            <CategoryButton
-              key={category.id}
-              category={category}
-              isSelected={selectedCategories.includes(category.id)}
-              onClick={toggleCategory}
-            />
-          ))}
         </div>
 
         {/* Info and Status Section */}
@@ -590,49 +254,11 @@ const CompanyDetail = () => {
       <BadgesSection badges={company.badges} />
 
       {/* Products Section */}
-      <section className="w-full">
-        {Object.entries(filteredProductsByCategory).map(([categoryId, products]) => (
-          <div key={categoryId} className="mb-0">
-            <h4 className="text-lg font-bold mb-4 text-gray-700 dark:text-gray-300 px-4">
-              {categories.find(cat => cat.id === parseInt(categoryId))?.name || 'Categoría'}
-            </h4>
-            <div 
-              className="overflow-x-hidden"
-              style={{ WebkitOverflowScrolling: 'touch' }}
-            >
-              <div
-                ref={el => carouselRefs[categoryId] = el}
-                className="flex gap-4 px-4 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
-                style={{
-                  scrollBehavior: 'smooth',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                }}
-                onMouseDown={(e) => carouselRefs[categoryId] && startDragging(e, { current: carouselRefs[categoryId] })}
-                onMouseUp={stopDragging}
-                onMouseLeave={stopDragging}
-                onMouseMove={(e) => carouselRefs[categoryId] && onDrag(e, { current: carouselRefs[categoryId] })}
-              >
-                {getCarouselProducts(products).map((product, index) => (
-                  <ProductCard
-                    key={`${product.id}-${index}`}
-                    product={product}
-                    onClick={() => openProductModal(product)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <MenuBar />
-
-      <ProductModal
-        product={selectedProduct}
-        isOpen={isModalOpen}
-        onClose={closeProductModal}
-        onAddToCart={addToCart}
+      <CompanyProducts 
+        productsByCategory={productsByCategory} 
+        categories={categories}
+        companyId={id}
+        company={company}
       />
 
       <style jsx global>{`
@@ -661,32 +287,6 @@ const CompanyDetail = () => {
         }
         .animate-spin-slow {
           animation: rotating 3s linear infinite;
-        }
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(-5%);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-          }
-          50% {
-            transform: translateY(0);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-          }
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 2s infinite;
-        }
-        @keyframes fade-in-right {
-          0% {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        .animate-fade-in-right {
-          animation: fade-in-right 0.5s ease-out;
         }
       `}</style>
     </div>

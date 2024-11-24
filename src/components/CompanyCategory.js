@@ -4,6 +4,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Layers, AlertCircle } from 'lucide-react';
 
+
+
 const CLOUDINARY_BASE_URL = 'https://res.cloudinary.com/dc3vcn9g6/';
 
 const getFullImageUrl = (imageUrl) => {
@@ -168,6 +170,7 @@ const CompanyCategory = () => {
 
   return (
     <div className="container mx-auto px-4 py-4">
+      
       <CategoryHeader category={category} companiesCount={companies.length} />
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
