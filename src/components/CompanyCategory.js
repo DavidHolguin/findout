@@ -4,6 +4,14 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Layers, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
+const CLOUDINARY_BASE_URL = 'https://res.cloudinary.com/dc3vcn9g6/';
+
+const getFullImageUrl = (imageUrl) => {
+  if (!imageUrl) return '/api/placeholder/400/320';
+  if (imageUrl.startsWith('http')) return imageUrl;
+  return `${CLOUDINARY_BASE_URL}${imageUrl}`;
+};
+
 const ImageFromS3 = ({ imageUrl, alt }) => {
   const [error, setError] = useState(false);
 
@@ -26,7 +34,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
 
   if (error || !logo) {
     return (
-      <div className={`w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center border-2 border-[#09fdfd] ${className}`}>
+      <div className={`w-[55px] h-[55px] rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center border-2 border-[#09fdfd] ${className}`}>
         <span className="text-lg font-bold text-gray-500 dark:text-gray-400">
           {companyName ? companyName.charAt(0).toUpperCase() : '?'}
         </span>
@@ -38,7 +46,7 @@ const CompanyLogo = ({ logo, companyName = '', className = "" }) => {
     <img
       src={logo}
       alt={`Logo de ${companyName || 'la empresa'}`}
-      className={`w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-800 shadow-lg ${className}`}
+      className={`w-[55px] h-[55px] rounded-full object-cover border-2 border-white dark:border-gray-800 shadow-lg ${className}`}
       onError={() => setError(true)}
     />
   );
@@ -120,8 +128,8 @@ const CategoryHeader = ({ category, companiesCount }) => {
           </button>
         </div>
 
-        <div className="flex-1 rounded-lg border-2 border-[#09fdfd] bg-white dark:bg-gray-900 dark:bg-gradient-to-l dark:from-primary/80 dark:via-primary/20 dark:to-transparent">
-          <div className="flex h-full items-center justify-between items-center p-1 px-3">
+        <div className="flex-1 rounded-lg border-2 border-[#09fdfd] bg-white dark:bg-gray-900">
+          <div className="flex h-full items-center justify-between p-1 px-3">
             <div className="flex flex-col">
               <h1 className="text-xl text-[#4d4d4d] dark:text-gray-200 font-bold leading-4">
                 {category?.name || 'Fast Food'}
@@ -133,7 +141,7 @@ const CategoryHeader = ({ category, companiesCount }) => {
             <div className="ml-8">
               {category?.image ? (
                 <img
-                  src={category.image}
+                  src={getFullImageUrl(category.image)}
                   alt={category.name}
                   className="w-10 h-10 object-cover"
                 />
@@ -171,7 +179,7 @@ const CompanyCategory = () => {
             config
           ),
           axios.get(
-            'https://backendfindout-ea692e018a66.herokuapp.com/api/marketplace/products/',
+            'https://backendfindout-ea692e018a66.herokuapp.com/api/products/',
             config
           )
         ]);
@@ -267,7 +275,7 @@ const CompanyCategory = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className={`relative overflow-hidden rounded-xl border-2 border-[#09fdfd] hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 ${
+              className={`relative overflow-hidden border border-[#09FDFD] dark:border-[#09FDFD] hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg ${
                 businessStatus && !businessStatus.isOpen ? 'opacity-60' : ''
               }`}
             >
@@ -284,27 +292,27 @@ const CompanyCategory = () => {
                   <CompanyLogo 
                     logo={company.profile_picture_url}
                     companyName={company.name}
-                    className="absolute -bottom-6 left-4 w-16 h-16 border-4 transform hover:scale-110 transition-transform duration-300"
+                    className="absolute top-2 right-2"
                   />
                   {company.business_hours && businessStatus && (
                     <div className="absolute top-2 left-2 min-w-[130px]">
                       <div className={`
                         rounded-full text-sm font-bold shadow-lg
                         ${businessStatus.isOpen 
-                          ? 'bg-gradient-to-r from-[#09fdfd] to-cyan-300 text-white' 
+                          ? 'bg-gradient-to-r from-cyan-400 to-cyan-300 text-white' 
                           : 'bg-gradient-to-r from-red-500 to-red-400 text-white'}
                       `}>
                         <div className="flex items-center">
                           <span className={`
                             px-3 py-1 rounded-full
-                            ${businessStatus.isOpen ? 'bg-[#09fdfd]' : 'bg-red-600'}
+                            ${businessStatus.isOpen ? 'bg-cyan-500' : 'bg-red-600'}
                           `}>
-                            {businessStatus.isOpen ? 'ABIERTO' : 'CERRADO'}
+                            {businessStatus.isOpen ? 'OPEN NOW' : 'CLOSE'}
                           </span>
                           <span className="px-2 whitespace-nowrap">
                             {businessStatus.isOpen 
-                              ? `HASTA ${businessStatus.closeTime}`
-                              : `ABRE ${businessStatus.openTime}`}
+                              ? `UNTIL ${businessStatus.closeTime}`
+                              : `OPEN ${businessStatus.openTime}`}
                           </span>
                         </div>
                       </div>
@@ -312,22 +320,28 @@ const CompanyCategory = () => {
                   )}
                 </div>
                 
-                <div className="p-6 pt-8">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{company.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{company.description}</p>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold leading-4 dark:text-white">{company.name}</h3>
+                  <Link 
+                    to={`/company-categories/${company.category?.id}`}
+                    className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
+                  >
+                    {company.category?.name}
+                  </Link>
+                  <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{company.description}</p>
                   {companyProducts.length > 0 && (
-                    <p className="text-sm text-[#09fdfd] mt-2">
-                      {companyProducts.length} producto{companyProducts.length !== 1 ? 's' : ''} disponible{companyProducts.length !== 1 ? 's' : ''}
+                    <p className="text-sm text-[#09FDFD] mt-2">
+                      {companyProducts.length} producto{companyProducts.length !== 1 ? 's' : ''} encontrado{companyProducts.length !== 1 ? 's' : ''}
                     </p>
                   )}
                 </div>
               </Link>
             </motion.div>
-            );
-          })}
-        </div>
+          );
+        })}
       </div>
-    );
-  };
-  
-  export default CompanyCategory;
+    </div>
+  );
+};
+
+export default CompanyCategory;
