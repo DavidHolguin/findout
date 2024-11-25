@@ -171,7 +171,7 @@ const CompanyCategory = () => {
             config
           ),
           axios.get(
-            'https://facturaspwa-954cb3785e4a.herokuapp.com/api/marketplace/products/',
+            'https://backendfindout-ea692e018a66.herokuapp.com/api/marketplace/products/',
             config
           )
         ]);
