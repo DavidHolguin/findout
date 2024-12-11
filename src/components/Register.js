@@ -16,7 +16,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        'https://backendfindout-ea692e018a66.herokuapp.com/api/register/', 
+        'https://findoutpwa-966440893d7b.herokuapp.com/api/register/', 
         { username, email, password },
         { withCredentials: true }
       );

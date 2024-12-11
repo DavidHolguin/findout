@@ -17,7 +17,7 @@ const CompanyList = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get('https://backendfindout-ea692e018a66.herokuapp.com/api/companies/');
+        const response = await axios.get('https://findoutpwa-966440893d7b.herokuapp.com/api/companies/');
         setCompanies(response.data);
         setFilteredCompanies(response.data);
       } catch (error) {
