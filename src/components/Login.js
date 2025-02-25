@@ -8,7 +8,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const API_URL = 'https://findoutpwa-966440893d7b.herokuapp.com';
+  const API_URL = 'https://findout-adf55aa841e8.herokuapp.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

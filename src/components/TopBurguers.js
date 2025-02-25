@@ -45,7 +45,7 @@ const TopBurgers = () => {
         // Start timing when fetch begins
         const startTime = Date.now();
         
-        const response = await axios.get('https://findoutpwa-966440893d7b.herokuapp.com/api/top-burgers/');
+        const response = await axios.get('https://findout-adf55aa841e8.herokuapp.com/api/top-burgers/');
         
         // Calculate how long the fetch took
         const fetchDuration = Date.now() - startTime;

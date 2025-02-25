@@ -11,7 +11,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   
-  const API_URL = 'https://findoutpwa-966440893d7b.herokuapp.com/api/login/';
+  const API_URL = 'https://findout-adf55aa841e8.herokuapp.com/api/login/';
 
   useEffect(() => {
     const fetchUserData = async () => {

@@ -235,9 +235,9 @@ const Search = () => {
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const [companiesResponse, productsResponse, categoriesResponse] = await Promise.all([
-          axios.get('https://findoutpwa-966440893d7b.herokuapp.com/api/companies/', config),
-          axios.get('https://findoutpwa-966440893d7b.herokuapp.com/api/products/', config),
-          axios.get('https://findoutpwa-966440893d7b.herokuapp.com/api/categories/', config),
+          axios.get('https://findout-adf55aa841e8.herokuapp.com/api/companies/', config),
+          axios.get('https://findout-adf55aa841e8.herokuapp.com/api/products/', config),
+          axios.get('https://findout-adf55aa841e8.herokuapp.com/api/categories/', config),
         ]);
 
         setCompanies(companiesResponse.data);

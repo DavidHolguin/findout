@@ -175,11 +175,11 @@ const CompanyCategory = () => {
 
         const [companiesResponse, productsResponse] = await Promise.all([
           axios.get(
-            `https://findoutpwa-966440893d7b.herokuapp.com/api/companies/?category=${categoryId}`,
+            `https://findout-adf55aa841e8.herokuapp.com/api/companies/?category=${categoryId}`,
             config
           ),
           axios.get(
-            'https://findoutpwa-966440893d7b.herokuapp.com/api/products/',
+            'https://findout-adf55aa841e8.herokuapp.com/api/products/',
             config
           )
         ]);

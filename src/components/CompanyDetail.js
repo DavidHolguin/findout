@@ -82,9 +82,9 @@ const CompanyDetail = () => {
     const fetchCompanyAndProducts = async () => {
       try {
         const [companyResponse, productsResponse, categoriesResponse] = await Promise.all([
-          axios.get(`https://findoutpwa-966440893d7b.herokuapp.com/api/companies/${id}/`),
-          axios.get(`https://findoutpwa-966440893d7b.herokuapp.com/api/products/`),
-          axios.get(`https://findoutpwa-966440893d7b.herokuapp.com/api/categories/`)
+          axios.get(`https://findout-adf55aa841e8.herokuapp.com/api/companies/${id}/`),
+          axios.get(`https://findout-adf55aa841e8.herokuapp.com/api/products/`),
+          axios.get(`https://findout-adf55aa841e8.herokuapp.com/api/categories/`)
         ]);
 
         if (!isMounted) return;
