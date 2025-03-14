@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { Instagram, MapPin, Facebook, MessageCircle } from 'lucide-react';
 import BadgesSection from './BadgesSection';
 import CompanyDetailSkeleton from './CompanyDetailSkeleton';
 import CompanyProducts from './CompanyProducts';
 import { useUserTracking } from '../hooks/useUserTracking';
+import { axiosWithRetry } from '../utils/axiosRetry';
 
 // ImageWithFallback Component
 const ImageWithFallback = React.memo(({ src, alt, className }) => {
@@ -81,10 +81,13 @@ const CompanyDetail = () => {
     
     const fetchCompanyAndProducts = async () => {
       try {
+        const token = localStorage.getItem('authToken');
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
         const [companyResponse, productsResponse, categoriesResponse] = await Promise.all([
-          axios.get(`https://findout-adf55aa841e8.herokuapp.com/api/companies/${id}/`),
-          axios.get(`https://findout-adf55aa841e8.herokuapp.com/api/products/`),
-          axios.get(`https://findout-adf55aa841e8.herokuapp.com/api/categories/`)
+          axiosWithRetry(`https://findout-adf55aa841e8.herokuapp.com/api/companies/${id}/`, config),
+          axiosWithRetry('https://findout-adf55aa841e8.herokuapp.com/api/products/', config),
+          axiosWithRetry('https://findout-adf55aa841e8.herokuapp.com/api/categories/', config)
         ]);
 
         if (!isMounted) return;
@@ -116,8 +119,7 @@ const CompanyDetail = () => {
           setHasTrackedVisit(true);
         }
       } catch (error) {
-        console.error('Error al obtener datos:', error);
-      } finally {
+        console.error('Error al obtener datos:', error.response?.data?.error || error.message);
         if (isMounted) {
           setLoading(false);
         }
@@ -261,7 +263,7 @@ const CompanyDetail = () => {
         company={company}
       />
 
-      <style jsx global>{`
+      <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

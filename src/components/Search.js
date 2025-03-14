@@ -5,6 +5,7 @@ import { Building2, Package, Search as SearchIcon, ChevronLeft, ChevronRight } f
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductModal from './ProductModal';
 import SearchResults from './SearchResults';
+import { axiosWithRetry } from '../utils/axiosRetry';
 
 const FrasesDeBusqueda = [
   "Quizá un hot dog...",
@@ -235,9 +236,9 @@ const Search = () => {
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const [companiesResponse, productsResponse, categoriesResponse] = await Promise.all([
-          axios.get('https://findout-adf55aa841e8.herokuapp.com/api/companies/', config),
-          axios.get('https://findout-adf55aa841e8.herokuapp.com/api/products/', config),
-          axios.get('https://findout-adf55aa841e8.herokuapp.com/api/categories/', config),
+          axiosWithRetry('https://findout-adf55aa841e8.herokuapp.com/api/companies/', config),
+          axiosWithRetry('https://findout-adf55aa841e8.herokuapp.com/api/products/', config),
+          axiosWithRetry('https://findout-adf55aa841e8.herokuapp.com/api/categories/', config),
         ]);
 
         setCompanies(companiesResponse.data);
@@ -250,7 +251,7 @@ const Search = () => {
         });
         setCompanyLogos(logoMap);
       } catch (error) {
-        console.error('Error al cargar datos:', error);
+        console.error('Error al cargar datos:', error.response?.data?.error || error.message);
         setError(
           error.response?.status === 403
             ? 'No tienes permiso para acceder a esta información. Por favor, inicia sesión o contacta al administrador.'
@@ -264,34 +265,6 @@ const Search = () => {
 
     fetchData();
   }, []);
-
-
-  const formatTime = (time) => {
-    if (!time) return '';
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    return `${hour > 12 ? hour - 12 : hour}:${minutes} ${hour >= 12 ? 'PM' : 'AM'}`;
-  };
-  
-  const isBusinessOpen = (businessHours) => {
-    if (!businessHours) return null;
-  
-    const now = new Date();
-    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const currentDay = daysOfWeek[now.getDay()];
-    const currentHours = businessHours[currentDay];
-  
-    if (!currentHours || !currentHours.open || !currentHours.close) return null;
-  
-    const currentTime = now.toLocaleTimeString('en-US', { hour12: false });
-    const isOpen = currentTime >= currentHours.open && currentTime <= currentHours.close;
-    
-    return {
-      isOpen,
-      openTime: formatTime(currentHours.open),
-      closeTime: formatTime(currentHours.close)
-    };
-  };
 
   // Función mejorada de filtrado
   const filterResults = useCallback(() => {
@@ -458,12 +431,9 @@ const Search = () => {
               
               <div className="p-4">
                 <h3 className="text-xl font-semibold leading-4 dark:text-white">{company.name}</h3>
-                <Link 
-                  to={`/company-categories/${company.category?.id}`}
-                  className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300"
-                >
+                <p className="text-base text-[#09FDFD] hover:text-[#00d8d8] transition-colors duration-300">
                   {company.category?.name}
-                </Link>
+                </p>
                 <p className="text-sm leading-4 text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{company.description}</p>
                 {shouldShowProducts && (
                   <p className="text-sm text-[#09FDFD] mt-2">
@@ -519,6 +489,33 @@ const Search = () => {
       })}
     </div>
   );
+
+  const formatTime = (time) => {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    return `${hour > 12 ? hour - 12 : hour}:${minutes} ${hour >= 12 ? 'PM' : 'AM'}`;
+  };
+  
+  const isBusinessOpen = (businessHours) => {
+    if (!businessHours) return null;
+  
+    const now = new Date();
+    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDay = daysOfWeek[now.getDay()];
+    const currentHours = businessHours[currentDay];
+  
+    if (!currentHours || !currentHours.open || !currentHours.close) return null;
+  
+    const currentTime = now.toLocaleTimeString('en-US', { hour12: false });
+    const isOpen = currentTime >= currentHours.open && currentTime <= currentHours.close;
+    
+    return {
+      isOpen,
+      openTime: formatTime(currentHours.open),
+      closeTime: formatTime(currentHours.close)
+    };
+  };
 
   if (error) {
     return (
@@ -683,4 +680,3 @@ const Search = () => {
 };
 
 export default Search;
-          
